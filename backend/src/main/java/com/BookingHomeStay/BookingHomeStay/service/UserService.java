@@ -1,0 +1,15 @@
+package com.BookingHomeStay.BookingHomeStay.service;
+
+import com.BookingHomeStay.BookingHomeStay.dto.Response;
+
+public interface UserService {
+  Response getAllUsers();
+
+  Response getUserBookingHistory(String userId);
+
+  Response deleteUser(String userId);
+
+  Response getUserById(String userId);
+
+  Response getMyInfo(String email);
+}
