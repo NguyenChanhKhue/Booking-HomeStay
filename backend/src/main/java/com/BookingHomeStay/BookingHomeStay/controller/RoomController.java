@@ -33,7 +33,7 @@ public class RoomController {
   @PostMapping
   @PreAuthorize("hasAuthority('ADMIN')")
   public ResponseEntity<Response> addNewRoom(
-      @RequestPart("photo") MultipartFile photo,
+      @RequestParam("photo") MultipartFile photo,
       @RequestParam("roomType") String roomType,
       @RequestParam("roomLocation") String roomLocation,
       @RequestParam("roomPrice") BigDecimal roomPrice,
@@ -91,7 +91,7 @@ public class RoomController {
       @RequestParam(required = false) String roomType,
       @RequestParam(required = false) String roomLocation,
       @RequestParam(required = false) BigDecimal roomPrice,
-      @RequestPart(required = false) MultipartFile photo) {
+      @RequestParam(required = false) MultipartFile photo) {
     return ResponseEntity.ok(roomService.updateRoom(roomId, description, roomType, roomLocation, roomPrice, photo));
   }
 

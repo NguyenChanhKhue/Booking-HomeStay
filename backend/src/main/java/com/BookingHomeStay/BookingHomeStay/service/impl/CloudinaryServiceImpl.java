@@ -41,7 +41,9 @@ public class CloudinaryServiceImpl implements com.BookingHomeStay.BookingHomeSta
     } catch (IOException ex) {
       throw new BadRequestException("Cannot read image file");
     } catch (Exception ex) {
-      throw new BadRequestException("Upload image to Cloudinary failed");
+      ex.printStackTrace();
+
+      throw new RuntimeException(ex.getMessage());
     }
   }
 }
