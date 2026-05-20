@@ -50,6 +50,18 @@ public class RoomController {
     return ResponseEntity.ok(roomService.getAllRooms());
   }
 
+  @GetMapping("/search")
+  public ResponseEntity<Response> searchRooms(
+      @RequestParam(required = false) String keyword,
+      @RequestParam(required = false) String roomType,
+      @RequestParam(required = false) BigDecimal minPrice,
+      @RequestParam(required = false) BigDecimal maxPrice,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkInDate,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOutDate) {
+    return ResponseEntity.ok(
+        roomService.searchRooms(keyword, roomType, minPrice, maxPrice, checkInDate, checkOutDate));
+  }
+
   @GetMapping("/available")
   public ResponseEntity<Response> getAvailableRoomsByDateAndType(
       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkInDate,

@@ -154,6 +154,29 @@ public class RoomServiceImpl implements RoomService {
     return response;
   }
 
+  @Override
+  public Response searchRooms(String keyword, String roomType, BigDecimal minPrice, BigDecimal maxPrice,
+      LocalDate checkInDate, LocalDate checkOutDate) {
+    validateSearchFilters(minPrice, maxPrice, checkInDate, checkOutDate);
+
+    List<RoomDTO> rooms = roomRepository.searchRooms(
+        normalizeText(keyword),
+        normalizeText(roomType),
+        minPrice,
+        maxPrice,
+        checkInDate,
+        checkOutDate)
+        .stream()
+        .map(this::mapRoomToRoomDto)
+        .toList();
+
+    Response response = new Response();
+    response.setStatusCode(200);
+    response.setMessage("Search rooms successfully");
+    response.setRoomList(rooms);
+    return response;
+  }
+
   private Room findRoomById(Long roomId) {
     if (roomId == null) {
       throw new BadRequestException("Room id is required");
@@ -182,6 +205,35 @@ public class RoomServiceImpl implements RoomService {
     if (!checkOutDate.isAfter(checkInDate)) {
       throw new BadRequestException("Check out date must be after check in date");
     }
+  }
+
+  private void validateSearchFilters(BigDecimal minPrice, BigDecimal maxPrice, LocalDate checkInDate,
+      LocalDate checkOutDate) {
+    if (minPrice != null && minPrice.compareTo(BigDecimal.ZERO) < 0) {
+      throw new BadRequestException("Minimum price must be greater than or equal to 0");
+    }
+    if (maxPrice != null && maxPrice.compareTo(BigDecimal.ZERO) <= 0) {
+      throw new BadRequestException("Maximum price must be greater than 0");
+    }
+    if (minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0) {
+      throw new BadRequestException("Minimum price must be less than or equal to maximum price");
+    }
+
+    boolean hasCheckInDate = checkInDate != null;
+    boolean hasCheckOutDate = checkOutDate != null;
+    if (hasCheckInDate != hasCheckOutDate) {
+      throw new BadRequestException("Check in date and check out date must be provided together");
+    }
+    if (hasCheckInDate) {
+      validateDateRange(checkInDate, checkOutDate);
+    }
+  }
+
+  private String normalizeText(String value) {
+    if (value == null || value.isBlank()) {
+      return null;
+    }
+    return value.trim();
   }
 
   private RoomDTO mapRoomToRoomDto(Room room) {

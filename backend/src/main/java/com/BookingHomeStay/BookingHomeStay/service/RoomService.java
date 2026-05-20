@@ -24,4 +24,7 @@ public interface RoomService {
   Response getAvailableRoomsByDataAndType(LocalDate checkInDate, LocalDate checkOutDate, String roomType);
 
   Response getAllAvailableRooms();
+
+  Response searchRooms(String keyword, String roomType, BigDecimal minPrice, BigDecimal maxPrice, LocalDate checkInDate,
+      LocalDate checkOutDate);
 }
