@@ -34,10 +34,11 @@ public class RoomController {
   public ResponseEntity<Response> addNewRoom(
       @RequestParam("photo") MultipartFile photo,
       @RequestParam("roomType") String roomType,
+      @RequestParam("roomLocation") String roomLocation,
       @RequestParam("roomPrice") BigDecimal roomPrice,
       @RequestParam("description") String description) {
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(roomService.addNewRoom(photo, roomType, roomPrice, description));
+        .body(roomService.addNewRoom(photo, roomType, roomLocation, roomPrice, description));
   }
 
   @GetMapping("/types")
@@ -53,13 +54,14 @@ public class RoomController {
   @GetMapping("/search")
   public ResponseEntity<Response> searchRooms(
       @RequestParam(required = false) String keyword,
+      @RequestParam(required = false) String location,
       @RequestParam(required = false) String roomType,
       @RequestParam(required = false) BigDecimal minPrice,
       @RequestParam(required = false) BigDecimal maxPrice,
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkInDate,
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOutDate) {
     return ResponseEntity.ok(
-        roomService.searchRooms(keyword, roomType, minPrice, maxPrice, checkInDate, checkOutDate));
+        roomService.searchRooms(keyword, location, roomType, minPrice, maxPrice, checkInDate, checkOutDate));
   }
 
   @GetMapping("/available")
@@ -86,9 +88,10 @@ public class RoomController {
       @PathVariable Long roomId,
       @RequestParam(required = false) String description,
       @RequestParam(required = false) String roomType,
+      @RequestParam(required = false) String roomLocation,
       @RequestParam(required = false) BigDecimal roomPrice,
       @RequestParam(required = false) MultipartFile photo) {
-    return ResponseEntity.ok(roomService.updateRoom(roomId, description, roomType, roomPrice, photo));
+    return ResponseEntity.ok(roomService.updateRoom(roomId, description, roomType, roomLocation, roomPrice, photo));
   }
 
   @DeleteMapping("/{roomId}")

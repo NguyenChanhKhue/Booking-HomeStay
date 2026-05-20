@@ -13,6 +13,7 @@ const SearchResultsPage = () => {
   const filters = useMemo(
     () => ({
       keyword: searchParams.get("keyword") ?? "",
+      location: searchParams.get("location") ?? "",
       roomType: searchParams.get("roomType") ?? "",
       checkInDate: searchParams.get("checkInDate") ?? "",
       checkOutDate: searchParams.get("checkOutDate") ?? "",
@@ -30,7 +31,7 @@ const SearchResultsPage = () => {
         const results = await searchRooms(filters);
         setRooms(results);
       } catch (err) {
-        setError("Không thể tải kết quả tìm kiếm lúc này.");
+        setError("Khong the tai ket qua tim kiem luc nay.");
       } finally {
         setLoading(false);
       }
@@ -39,22 +40,24 @@ const SearchResultsPage = () => {
     loadRooms();
   }, [filters]);
 
+  const activeLocation = filters.location || filters.keyword;
+
   return (
     <div className="space-y-8">
       <section className="rounded-[32px] border border-gray-100 bg-[linear-gradient(135deg,#ffffff_0%,#fff7f7_100%)] p-6 shadow-sm md:p-8">
         <div className="space-y-5">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.3em] text-rose-500">
-              Kết quả tìm kiếm
+              Ket qua tim kiem
             </p>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight text-gray-950 md:text-5xl">
-              {filters.keyword
-                ? `Những chỗ ở phù hợp với "${filters.keyword}"`
-                : "Khám phá các phòng đang có sẵn"}
+              {activeLocation
+                ? `Nhung cho o phu hop voi "${activeLocation}"`
+                : "Kham pha cac phong dang co san"}
             </h1>
             <p className="mt-3 max-w-3xl text-base leading-7 text-gray-600">
-              Dữ liệu được lấy từ API tìm kiếm phòng của hệ thống, có hỗ trợ lọc
-              theo khoảng ngày nếu bạn đã chọn ở thanh tìm kiếm.
+              Du lieu duoc lay tu API tim kiem phong cua he thong va ho tro loc theo dia diem,
+              loai phong, khoang gia va khoang ngay luu tru.
             </p>
           </div>
           <Search compact initialValues={filters} />
@@ -63,7 +66,7 @@ const SearchResultsPage = () => {
 
       {loading ? (
         <div className="rounded-[28px] border border-dashed border-gray-200 p-12 text-center text-gray-500">
-          Đang tải danh sách phòng...
+          Dang tai danh sach phong...
         </div>
       ) : error ? (
         <div className="rounded-[28px] border border-red-100 bg-red-50 p-6 text-red-600">
@@ -73,7 +76,7 @@ const SearchResultsPage = () => {
         <>
           <div className="flex items-center justify-between gap-4">
             <p className="text-sm text-gray-500">
-              Tìm thấy <span className="font-semibold text-gray-900">{rooms.length}</span> phòng phù hợp
+              Tim thay <span className="font-semibold text-gray-900">{rooms.length}</span> phong phu hop
             </p>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
@@ -85,10 +88,10 @@ const SearchResultsPage = () => {
       ) : (
         <div className="rounded-[28px] border border-dashed border-gray-200 p-12 text-center">
           <h2 className="text-2xl font-semibold text-gray-950">
-            Chưa có phòng khớp với bộ lọc hiện tại
+            Chua co phong khop voi bo loc hien tai
           </h2>
           <p className="mt-3 text-gray-600">
-            Bạn có thể đổi ngày, bỏ bớt điều kiện hoặc tìm bằng từ khóa khu vực khác.
+            Ban co the doi dia diem, doi ngay hoac bo bot dieu kien de mo rong ket qua.
           </p>
         </div>
       )}

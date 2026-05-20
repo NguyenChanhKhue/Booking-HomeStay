@@ -17,18 +17,18 @@ const defaultCheckOut = `${tomorrow.getFullYear()}-${String(
 const Search = ({ compact = false, initialValues = {} }) => {
   const navigate = useNavigate();
   const [form, setForm] = useState({
-    keyword: initialValues.keyword ?? "",
+    location: initialValues.location ?? initialValues.keyword ?? "",
     checkInDate: initialValues.checkInDate ?? defaultCheckIn,
     checkOutDate: initialValues.checkOutDate ?? defaultCheckOut,
   });
 
   useEffect(() => {
     setForm({
-      keyword: initialValues.keyword ?? "",
+      location: initialValues.location ?? initialValues.keyword ?? "",
       checkInDate: initialValues.checkInDate ?? defaultCheckIn,
       checkOutDate: initialValues.checkOutDate ?? defaultCheckOut,
     });
-  }, [initialValues.checkInDate, initialValues.checkOutDate, initialValues.keyword]);
+  }, [initialValues.checkInDate, initialValues.checkOutDate, initialValues.keyword, initialValues.location]);
 
   const wrapperClass = useMemo(
     () =>
@@ -47,7 +47,7 @@ const Search = ({ compact = false, initialValues = {} }) => {
     event.preventDefault();
     const params = new URLSearchParams();
 
-    if (form.keyword.trim()) params.set("keyword", form.keyword.trim());
+    if (form.location.trim()) params.set("location", form.location.trim());
     if (form.checkInDate) params.set("checkInDate", form.checkInDate);
     if (form.checkOutDate) params.set("checkOutDate", form.checkOutDate);
 
@@ -63,19 +63,19 @@ const Search = ({ compact = false, initialValues = {} }) => {
       >
         <label className="block rounded-full px-4 py-3">
           <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">
-            Điểm đến
+            Dia diem
           </span>
           <input
-            name="keyword"
-            value={form.keyword}
+            name="location"
+            value={form.location}
             onChange={handleChange}
-            placeholder="Bạn muốn ở khu vực nào?"
+            placeholder="Ban muon o khu vuc nao?"
             className="w-full border-none bg-transparent text-sm text-gray-900 outline-none placeholder:text-gray-400"
           />
         </label>
         <label className="block rounded-full px-4 py-3">
           <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">
-            Nhận phòng
+            Nhan phong
           </span>
           <input
             type="date"
@@ -87,7 +87,7 @@ const Search = ({ compact = false, initialValues = {} }) => {
         </label>
         <label className="block rounded-full px-4 py-3">
           <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">
-            Trả phòng
+            Tra phong
           </span>
           <input
             type="date"
@@ -104,7 +104,7 @@ const Search = ({ compact = false, initialValues = {} }) => {
           }`}
         >
           <SearchIcon size={18} />
-          <span>Tìm kiếm</span>
+          <span>Tim kiem</span>
         </button>
       </div>
     </form>

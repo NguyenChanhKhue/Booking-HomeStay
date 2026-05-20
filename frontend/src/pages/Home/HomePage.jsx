@@ -66,7 +66,7 @@ const HomePage = () => {
             {REGION_SUGGESTIONS.slice(0, 4).map((region) => (
               <Link
                 key={region.id}
-                to={`/search?keyword=${encodeURIComponent(region.name)}`}
+                to={`/search?location=${encodeURIComponent(region.name)}`}
                 className="group overflow-hidden rounded-[28px] border border-white/70 bg-white shadow-sm"
               >
                 <div className="aspect-[4/3] overflow-hidden">
@@ -111,7 +111,7 @@ const HomePage = () => {
           {REGION_SUGGESTIONS.map((region) => (
             <Link
               key={region.id}
-              to={`/search?keyword=${encodeURIComponent(region.name)}`}
+              to={`/search?location=${encodeURIComponent(region.name)}`}
               className="rounded-[28px] border border-gray-100 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
             >
               <p className="text-lg font-semibold text-gray-950">{region.name}</p>

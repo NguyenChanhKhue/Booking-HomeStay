@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.BookingHomeStay.BookingHomeStay.dto.Response;
 
 public interface RoomService {
-  Response addNewRoom(MultipartFile photo, String roomType, BigDecimal roomPrice, String description);
+  Response addNewRoom(MultipartFile photo, String roomType, String roomLocation, BigDecimal roomPrice, String description);
 
   List<String> getAllRoomTypes();
 
@@ -17,7 +17,8 @@ public interface RoomService {
 
   Response deleteRoom(Long roomId);
 
-  Response updateRoom(Long roomId, String description, String roomType, BigDecimal roomPrice, MultipartFile photo);
+  Response updateRoom(Long roomId, String description, String roomType, String roomLocation, BigDecimal roomPrice,
+      MultipartFile photo);
 
   Response getRoomById(Long roomId);
 
@@ -25,6 +26,6 @@ public interface RoomService {
 
   Response getAllAvailableRooms();
 
-  Response searchRooms(String keyword, String roomType, BigDecimal minPrice, BigDecimal maxPrice, LocalDate checkInDate,
-      LocalDate checkOutDate);
+  Response searchRooms(String keyword, String location, String roomType, BigDecimal minPrice, BigDecimal maxPrice,
+      LocalDate checkInDate, LocalDate checkOutDate);
 }

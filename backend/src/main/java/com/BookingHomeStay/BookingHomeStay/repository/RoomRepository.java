@@ -24,10 +24,12 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
   @Query("""
       SELECT r
       FROM Room r
-      WHERE (:roomType IS NULL OR LOWER(r.roomType) LIKE LOWER(CONCAT('%', :roomType, '%')))
+      WHERE (:location IS NULL OR LOWER(r.roomLocation) LIKE LOWER(CONCAT('%', :location, '%')))
+      AND (:roomType IS NULL OR LOWER(r.roomType) LIKE LOWER(CONCAT('%', :roomType, '%')))
       AND (:keyword IS NULL
           OR LOWER(r.roomType) LIKE LOWER(CONCAT('%', :keyword, '%'))
-          OR LOWER(r.roomDescription) LIKE LOWER(CONCAT('%', :keyword, '%')))
+          OR LOWER(r.roomDescription) LIKE LOWER(CONCAT('%', :keyword, '%'))
+          OR LOWER(r.roomLocation) LIKE LOWER(CONCAT('%', :keyword, '%')))
       AND (:minPrice IS NULL OR r.roomPrice >= :minPrice)
       AND (:maxPrice IS NULL OR r.roomPrice <= :maxPrice)
       AND ((:checkInDate IS NULL AND :checkOutDate IS NULL)
@@ -39,6 +41,6 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
               AND bk.checkOutDate >= :checkInDate
           ))
       """)
-  List<Room> searchRooms(String keyword, String roomType, BigDecimal minPrice, BigDecimal maxPrice, LocalDate checkInDate,
-      LocalDate checkOutDate);
+  List<Room> searchRooms(String keyword, String location, String roomType, BigDecimal minPrice, BigDecimal maxPrice,
+      LocalDate checkInDate, LocalDate checkOutDate);
 }

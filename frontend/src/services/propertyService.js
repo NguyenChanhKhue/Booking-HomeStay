@@ -20,6 +20,7 @@ export const searchRooms = async (filters) => {
   const params = {};
 
   if (filters.keyword) params.keyword = filters.keyword;
+  if (filters.location) params.location = filters.location;
   if (filters.roomType) params.roomType = filters.roomType;
   if (filters.minPrice) params.minPrice = filters.minPrice;
   if (filters.maxPrice) params.maxPrice = filters.maxPrice;

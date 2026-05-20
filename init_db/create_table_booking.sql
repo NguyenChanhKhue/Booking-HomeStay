@@ -72,6 +72,7 @@ DROP TABLE IF EXISTS `rooms`;
 CREATE TABLE `rooms` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `room_description` varchar(255) DEFAULT NULL,
+  `room_location` varchar(255) DEFAULT NULL,
   `room_photo_url` varchar(255) DEFAULT NULL,
   `room_price` decimal(38,2) DEFAULT NULL,
   `room_type` varchar(255) DEFAULT NULL,

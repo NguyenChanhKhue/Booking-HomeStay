@@ -30,11 +30,13 @@ public class RoomServiceImpl implements RoomService {
 
   @Override
   @Transactional
-  public Response addNewRoom(MultipartFile photo, String roomType, BigDecimal roomPrice, String description) {
-    validateRoomData(roomType, roomPrice, description);
+  public Response addNewRoom(MultipartFile photo, String roomType, String roomLocation, BigDecimal roomPrice,
+      String description) {
+    validateRoomData(roomType, roomLocation, roomPrice, description);
 
     Room room = new Room();
     room.setRoomType(roomType.trim());
+    room.setRoomLocation(roomLocation.trim());
     room.setRoomPrice(roomPrice);
     room.setRoomDescription(description.trim());
     room.setRoomPhotoUrl(cloudinaryService.uploadImage(photo, "booking-home-stay/rooms"));
@@ -81,11 +83,16 @@ public class RoomServiceImpl implements RoomService {
 
   @Override
   @Transactional
-  public Response updateRoom(Long roomId, String description, String roomType, BigDecimal roomPrice, MultipartFile photo) {
+  public Response updateRoom(Long roomId, String description, String roomType, String roomLocation, BigDecimal roomPrice,
+      MultipartFile photo) {
     Room room = findRoomById(roomId);
 
     if (roomType != null && !roomType.isBlank()) {
       room.setRoomType(roomType.trim());
+    }
+
+    if (roomLocation != null && !roomLocation.isBlank()) {
+      room.setRoomLocation(roomLocation.trim());
     }
 
     if (roomPrice != null) {
@@ -155,12 +162,13 @@ public class RoomServiceImpl implements RoomService {
   }
 
   @Override
-  public Response searchRooms(String keyword, String roomType, BigDecimal minPrice, BigDecimal maxPrice,
+  public Response searchRooms(String keyword, String location, String roomType, BigDecimal minPrice, BigDecimal maxPrice,
       LocalDate checkInDate, LocalDate checkOutDate) {
     validateSearchFilters(minPrice, maxPrice, checkInDate, checkOutDate);
 
     List<RoomDTO> rooms = roomRepository.searchRooms(
         normalizeText(keyword),
+        normalizeText(location),
         normalizeText(roomType),
         minPrice,
         maxPrice,
@@ -186,9 +194,12 @@ public class RoomServiceImpl implements RoomService {
         .orElseThrow(() -> new ResourceNotFoundException("Room not found"));
   }
 
-  private void validateRoomData(String roomType, BigDecimal roomPrice, String description) {
+  private void validateRoomData(String roomType, String roomLocation, BigDecimal roomPrice, String description) {
     if (roomType == null || roomType.isBlank()) {
       throw new BadRequestException("Room type is required");
+    }
+    if (roomLocation == null || roomLocation.isBlank()) {
+      throw new BadRequestException("Room location is required");
     }
     if (roomPrice == null || roomPrice.compareTo(BigDecimal.ZERO) <= 0) {
       throw new BadRequestException("Room price must be greater than 0");
@@ -240,6 +251,7 @@ public class RoomServiceImpl implements RoomService {
     RoomDTO roomDTO = new RoomDTO();
     roomDTO.setId(room.getId());
     roomDTO.setRoomType(room.getRoomType());
+    roomDTO.setRoomLocation(room.getRoomLocation());
     roomDTO.setRoomPrice(room.getRoomPrice());
     roomDTO.setRoomPhotoUrl(room.getRoomPhotoUrl());
     roomDTO.setRoomDescription(room.getRoomDescription());
