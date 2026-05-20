@@ -1,0 +1,15 @@
+
+@import "tailwindcss";
+
+/* Ép toàn bộ trang web luôn có nền trắng và font chữ chuẩn */
+:root {
+  background-color: white !important;
+  color: #222222; /* Màu đen đặc trưng của Airbnb */
+}
+
+body {
+  margin: 0;
+  background-color: white !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
