@@ -18,7 +18,8 @@ const inferAmenities = (room) => {
 };
 
 const PropertyDetailPage = () => {
-  const { roomId } = useParams();
+  const { id, roomId: legacyRoomId } = useParams();
+  const roomId = legacyRoomId ?? id;
   const [searchParams] = useSearchParams();
   const [room, setRoom] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -97,6 +98,11 @@ const PropertyDetailPage = () => {
               <span className="rounded-full bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-500">
                 {room.roomType}
               </span>
+              {room.roomLocation ? (
+                <span className="rounded-full bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700">
+                  {room.roomLocation}
+                </span>
+              ) : null}
               <span className="rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-600">
                 Dat truc tiep tu he thong
               </span>

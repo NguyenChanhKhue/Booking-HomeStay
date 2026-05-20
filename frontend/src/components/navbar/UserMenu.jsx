@@ -11,7 +11,7 @@ const UserMenu = () => {
       <button
         type="button"
         onClick={() => navigate("/search")}
-        className="hidden rounded-full px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 md:block"
+        className="hidden whitespace-nowrap rounded-full px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 2xl:block"
       >
         Khám phá chỗ ở
       </button>

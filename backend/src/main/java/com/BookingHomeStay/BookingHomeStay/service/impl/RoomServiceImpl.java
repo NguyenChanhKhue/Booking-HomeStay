@@ -83,8 +83,8 @@ public class RoomServiceImpl implements RoomService {
 
   @Override
   @Transactional
-  public Response updateRoom(Long roomId, String description, String roomType, String roomLocation, BigDecimal roomPrice,
-      MultipartFile photo) {
+  public Response updateRoom(Long roomId, String description, String roomType, String roomLocation,
+      BigDecimal roomPrice, MultipartFile photo) {
     Room room = findRoomById(roomId);
 
     if (roomType != null && !roomType.isBlank()) {

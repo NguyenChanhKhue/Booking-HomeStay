@@ -27,6 +27,7 @@ const SearchResultsPage = () => {
     const loadRooms = async () => {
       setLoading(true);
       setError("");
+
       try {
         const results = await searchRooms(filters);
         setRooms(results);
@@ -79,7 +80,7 @@ const SearchResultsPage = () => {
               Tim thay <span className="font-semibold text-gray-900">{rooms.length}</span> phong phu hop
             </p>
           </div>
-          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-4">
             {rooms.map((room) => (
               <PropertyCard key={room.id} data={room} />
             ))}

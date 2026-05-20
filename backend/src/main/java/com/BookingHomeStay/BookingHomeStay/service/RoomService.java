@@ -9,7 +9,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.BookingHomeStay.BookingHomeStay.dto.Response;
 
 public interface RoomService {
-  Response addNewRoom(MultipartFile photo, String roomType, String roomLocation, BigDecimal roomPrice, String description);
+  Response addNewRoom(MultipartFile photo, String roomType, String roomLocation, BigDecimal roomPrice,
+      String description);
 
   List<String> getAllRoomTypes();
 

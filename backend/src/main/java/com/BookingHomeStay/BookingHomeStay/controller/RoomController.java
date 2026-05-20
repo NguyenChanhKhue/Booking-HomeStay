@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,7 +33,7 @@ public class RoomController {
   @PostMapping
   @PreAuthorize("hasAuthority('ADMIN')")
   public ResponseEntity<Response> addNewRoom(
-      @RequestParam("photo") MultipartFile photo,
+      @RequestPart("photo") MultipartFile photo,
       @RequestParam("roomType") String roomType,
       @RequestParam("roomLocation") String roomLocation,
       @RequestParam("roomPrice") BigDecimal roomPrice,
@@ -90,7 +91,7 @@ public class RoomController {
       @RequestParam(required = false) String roomType,
       @RequestParam(required = false) String roomLocation,
       @RequestParam(required = false) BigDecimal roomPrice,
-      @RequestParam(required = false) MultipartFile photo) {
+      @RequestPart(required = false) MultipartFile photo) {
     return ResponseEntity.ok(roomService.updateRoom(roomId, description, roomType, roomLocation, roomPrice, photo));
   }
 

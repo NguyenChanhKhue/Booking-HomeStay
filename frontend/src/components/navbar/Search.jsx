@@ -28,7 +28,12 @@ const Search = ({ compact = false, initialValues = {} }) => {
       checkInDate: initialValues.checkInDate ?? defaultCheckIn,
       checkOutDate: initialValues.checkOutDate ?? defaultCheckOut,
     });
-  }, [initialValues.checkInDate, initialValues.checkOutDate, initialValues.keyword, initialValues.location]);
+  }, [
+    initialValues.checkInDate,
+    initialValues.checkOutDate,
+    initialValues.keyword,
+    initialValues.location,
+  ]);
 
   const wrapperClass = useMemo(
     () =>
@@ -54,13 +59,64 @@ const Search = ({ compact = false, initialValues = {} }) => {
     navigate(`/search?${params.toString()}`);
   };
 
+  if (compact) {
+    return (
+      <form
+        className="flex h-14 w-full max-w-[820px] items-center rounded-full border border-gray-200 bg-white pl-6 pr-2 shadow-sm transition hover:shadow-md"
+        onSubmit={handleSubmit}
+      >
+        <label className="min-w-0 flex-[1.6]">
+          <span className="block text-[10px] font-semibold uppercase text-gray-500">
+            Dia diem
+          </span>
+          <input
+            name="location"
+            value={form.location}
+            onChange={handleChange}
+            placeholder="Ban muon di dau?"
+            className="w-full border-none bg-transparent text-sm font-medium text-gray-900 outline-none placeholder:text-gray-500"
+          />
+        </label>
+        <span className="mx-3 hidden h-8 w-px bg-gray-200 xl:block" />
+        <label className="hidden w-36 xl:block">
+          <span className="block text-[10px] font-semibold uppercase text-gray-500">
+            Nhan phong
+          </span>
+          <input
+            type="date"
+            name="checkInDate"
+            value={form.checkInDate}
+            onChange={handleChange}
+            className="w-full border-none bg-transparent text-xs font-medium text-gray-900 outline-none"
+          />
+        </label>
+        <span className="mx-3 hidden h-8 w-px bg-gray-200 xl:block" />
+        <label className="hidden w-36 xl:block">
+          <span className="block text-[10px] font-semibold uppercase text-gray-500">
+            Tra phong
+          </span>
+          <input
+            type="date"
+            name="checkOutDate"
+            value={form.checkOutDate}
+            onChange={handleChange}
+            className="w-full border-none bg-transparent text-xs font-medium text-gray-900 outline-none"
+          />
+        </label>
+        <button
+          type="submit"
+          aria-label="Tim kiem"
+          className="ml-3 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-rose-500 text-white transition hover:bg-rose-600"
+        >
+          <SearchIcon size={16} />
+        </button>
+      </form>
+    );
+  }
+
   return (
     <form className={`w-full ${wrapperClass}`} onSubmit={handleSubmit}>
-      <div
-        className={`grid items-center gap-2 ${
-          compact ? "lg:grid-cols-[1.2fr_0.9fr_0.9fr_auto]" : "md:grid-cols-4"
-        }`}
-      >
+      <div className="grid items-center gap-2 md:grid-cols-4">
         <label className="block rounded-full px-4 py-3">
           <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">
             Dia diem
@@ -99,9 +155,7 @@ const Search = ({ compact = false, initialValues = {} }) => {
         </label>
         <button
           type="submit"
-          className={`flex items-center justify-center gap-2 rounded-full bg-rose-500 font-medium text-white transition hover:bg-rose-600 ${
-            compact ? "mx-2 my-2 h-12 px-5" : "h-14 px-6"
-          }`}
+          className="flex h-14 items-center justify-center gap-2 rounded-full bg-rose-500 px-6 font-medium text-white transition hover:bg-rose-600"
         >
           <SearchIcon size={18} />
           <span>Tim kiem</span>

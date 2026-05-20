@@ -1,12 +1,6 @@
-import axios from "axios";
-import { API_BASE_URL } from "../utils/constants";
+import axiosClient from "../api/axiosClient";
 
-export const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+export const api = axiosClient;
 
 export const authHeaders = (token) =>
   token
