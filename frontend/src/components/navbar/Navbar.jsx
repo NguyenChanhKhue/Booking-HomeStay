@@ -10,14 +10,14 @@ const Navbar = () => {
           <Logo />
         </div>
         <div className="hidden min-w-0 flex-none lg:block">
-          <Search />
+          <Search compact />
         </div>
         <div className="flex flex-1 justify-end">
           <UserMenu />
         </div>
       </div>
       <div className="mx-auto w-full max-w-[2520px] px-4 pb-3 lg:hidden sm:px-4 md:px-8 xl:px-24">
-        <Search />
+        <Search compact />
       </div>
     </header>
   );

@@ -1,53 +1,54 @@
-import { Heart } from 'lucide-react';
+import { Star } from "lucide-react";
+import { Link } from "react-router-dom";
+import { formatPrice } from "../../utils/formatPrice";
 
 const PropertyCard = ({ data }) => {
-  // Kiểm tra nếu không có data để tránh crash trang (lỗi hay gặp khi deploy)
   if (!data) return null;
 
+  const description =
+    data.roomDescription || "Không gian lưu trú được cập nhật từ hệ thống.";
+
   return (
-    <div className="flex flex-col gap-2 cursor-pointer group w-full">
-      {/* Container ảnh: Luôn giữ tỷ lệ vuông (1:1) dù mở trên máy tính hay điện thoại */}
-      <div className="aspect-square w-full relative overflow-hidden rounded-2xl bg-gray-100">
-        <img 
-          src={data.image || 'https://via.placeholder.com/400'} 
-          className="object-cover h-full w-full group-hover:scale-105 transition-transform duration-300 ease-in-out" 
-          alt={data.location || "Homestay"}
+    <Link
+      to={`/rooms/${data.id}`}
+      className="group flex h-full flex-col overflow-hidden rounded-[28px] border border-gray-100 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
+    >
+      <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
+        <img
+          src={data.roomPhotoUrl || "https://via.placeholder.com/800x600?text=Room"}
+          alt={data.roomType}
+          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
         />
-        
-        {/* Nút tim: Cố định vị trí, không bị lệch khi co giãn màn hình */}
-        <button className="absolute top-3 right-3 p-1 hover:scale-110 transition">
-           <Heart 
-             size={24} 
-             className="text-white stroke-[2px] fill-black/20 hover:fill-rose-500 hover:text-rose-500 transition-colors" 
-           />
-        </button>
+        <div className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-rose-500">
+          {data.roomType}
+        </div>
       </div>
-      
-      {/* Phần thông tin: Dùng text-sm/text-base để tự điều chỉnh cỡ chữ trên mobile */}
-      <div className="flex flex-col mt-1 px-1">
-        <div className="flex justify-between items-start">
-          <span className="font-bold text-[15px] md:text-[16px] text-gray-900 line-clamp-1">
-            {data.location}
-          </span>
-          <div className="flex items-center gap-1 text-sm shrink-0">
-            <span className="text-black">★</span>
-            <span className="font-light text-gray-600">{data.rating}</span>
+
+      <div className="flex flex-1 flex-col gap-3 p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-950">{data.roomType}</h3>
+            <p className="mt-1 line-clamp-2 text-sm leading-6 text-gray-600">
+              {description}
+            </p>
+          </div>
+          <div className="flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1 text-sm text-amber-700">
+            <Star size={14} className="fill-current" />
+            <span>4.9</span>
           </div>
         </div>
-        
-        <p className="text-gray-500 font-light text-[14px] md:text-[15px] line-clamp-1">
-          Chủ nhà siêu cấp
-        </p>
-        <p className="text-gray-500 font-light text-[14px] md:text-[15px]">
-          Ngày 10 - 15 tháng 6
-        </p>
-        
-        <div className="mt-1.5 flex items-center gap-1">
-          <span className="font-bold text-[16px]">{data.price}đ</span>
-          <span className="font-light text-gray-600">/ đêm</span>
+
+        <div className="mt-auto flex items-center justify-between gap-4 border-t border-gray-100 pt-4">
+          <div>
+            <p className="text-sm text-gray-500">Giá mỗi đêm</p>
+            <p className="text-lg font-semibold text-gray-950">
+              {formatPrice(data.roomPrice)}
+            </p>
+          </div>
+          <span className="text-sm font-medium text-rose-500">Xem chi tiết</span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 

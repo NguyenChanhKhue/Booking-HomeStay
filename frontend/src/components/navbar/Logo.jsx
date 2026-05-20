@@ -1,13 +1,18 @@
+import { Link } from "react-router-dom";
+
 const Logo = () => {
   return (
-    <div className="flex items-center gap-2 cursor-pointer group">
-      <div className="w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center shadow-md group-hover:bg-rose-600 transition">
-        <span className="text-white font-black text-2xl italic">v</span>
+    <Link to="/" className="flex items-center gap-3">
+      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-rose-500 text-lg font-black uppercase text-white shadow-sm">
+        B
       </div>
-      <span className="text-rose-500 font-bold text-xl hidden lg:block tracking-tighter">
-        vnStay
-      </span>
-    </div>
+      <div className="hidden sm:block">
+        <p className="text-lg font-semibold tracking-tight text-rose-500">
+          Booking HomeStay
+        </p>
+        <p className="text-xs text-gray-500">Ở đúng chỗ, nghỉ đúng gu</p>
+      </div>
+    </Link>
   );
 };
 
