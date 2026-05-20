@@ -12,6 +12,7 @@ import lombok.Data;
 public class RoomDTO {
   private Long id;
   private String roomType;
+  private String roomLocation;
   private BigDecimal roomPrice;
   private String roomPhotoUrl;
   private String roomDescription;

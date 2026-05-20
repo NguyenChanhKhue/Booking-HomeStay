@@ -27,6 +27,7 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
       WHERE (:roomType IS NULL OR LOWER(r.roomType) LIKE LOWER(CONCAT('%', :roomType, '%')))
       AND (:keyword IS NULL
           OR LOWER(r.roomType) LIKE LOWER(CONCAT('%', :keyword, '%'))
+          OR LOWER(r.roomLocation) LIKE LOWER(CONCAT('%', :keyword, '%'))
           OR LOWER(r.roomDescription) LIKE LOWER(CONCAT('%', :keyword, '%')))
       AND (:minPrice IS NULL OR r.roomPrice >= :minPrice)
       AND (:maxPrice IS NULL OR r.roomPrice <= :maxPrice)

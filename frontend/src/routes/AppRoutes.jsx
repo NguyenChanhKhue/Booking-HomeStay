@@ -44,6 +44,14 @@ const AppRoutes = () => {
             }
           />
           <Route
+            path="/property/:id"
+            element={
+              <MainLayout>
+                <PropertyDetailPage />
+              </MainLayout>
+            }
+          />
+          <Route
             path="/rooms/:roomId"
             element={
               <MainLayout>

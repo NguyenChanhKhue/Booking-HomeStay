@@ -2,8 +2,7 @@ import { api } from "./api";
 
 export const getAllRooms = async () => {
   const { data } = await api.get("/rooms");
-  console.log(data);
-  return data.roomList ?? [];
+  return Array.isArray(data) ? data : data.roomList ?? [];
 };
 
 export const getFeaturedRooms = async () => {
@@ -27,7 +26,7 @@ export const searchRooms = async (filters) => {
   if (filters.checkOutDate) params.checkOutDate = filters.checkOutDate;
 
   const { data } = await api.get("/rooms/search", { params });
-  return data.roomList ?? [];
+  return Array.isArray(data) ? data : data.roomList ?? [];
 };
 
 export const getRoomById = async (roomId) => {

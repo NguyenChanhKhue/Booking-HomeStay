@@ -54,6 +54,61 @@ const Search = ({ compact = false, initialValues = {} }) => {
     navigate(`/search?${params.toString()}`);
   };
 
+  if (compact) {
+    return (
+      <form
+        className="flex h-14 w-full max-w-[820px] items-center rounded-full border border-gray-200 bg-white pl-6 pr-2 shadow-sm transition hover:shadow-md"
+        onSubmit={handleSubmit}
+      >
+        <label className="min-w-0 flex-[1.6]">
+          <span className="block text-[10px] font-semibold uppercase text-gray-500">
+            Địa điểm
+          </span>
+          <input
+            name="keyword"
+            value={form.keyword}
+            onChange={handleChange}
+            placeholder="Bạn muốn đi đâu?"
+            className="w-full border-none bg-transparent text-sm font-medium text-gray-900 outline-none placeholder:text-gray-500"
+          />
+        </label>
+        <span className="mx-3 hidden h-8 w-px bg-gray-200 xl:block" />
+        <label className="hidden w-36 xl:block">
+          <span className="block text-[10px] font-semibold uppercase text-gray-500">
+            Nhận phòng
+          </span>
+          <input
+            type="date"
+            name="checkInDate"
+            value={form.checkInDate}
+            onChange={handleChange}
+            className="w-full border-none bg-transparent text-xs font-medium text-gray-900 outline-none"
+          />
+        </label>
+        <span className="mx-3 hidden h-8 w-px bg-gray-200 xl:block" />
+        <label className="hidden w-36 xl:block">
+          <span className="block text-[10px] font-semibold uppercase text-gray-500">
+            Trả phòng
+          </span>
+          <input
+            type="date"
+            name="checkOutDate"
+            value={form.checkOutDate}
+            onChange={handleChange}
+            className="w-full border-none bg-transparent text-xs font-medium text-gray-900 outline-none"
+          />
+        </label>
+        <button
+          type="submit"
+          aria-label="Tìm kiếm"
+          className="ml-3 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-rose-500 text-white transition hover:bg-rose-600"
+        >
+          <SearchIcon size={16} />
+        </button>
+      </form>
+    );
+  }
+
   return (
     <form className={`w-full ${wrapperClass}`} onSubmit={handleSubmit}>
       <div
