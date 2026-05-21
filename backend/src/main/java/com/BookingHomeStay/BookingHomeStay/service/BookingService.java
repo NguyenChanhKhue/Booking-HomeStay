@@ -11,4 +11,6 @@ public interface BookingService {
   Response getAllBookings();
 
   Response cancelBooking(Long bookingId);
+
+  Response updateBookingStatus(Long bookingId, String status);
 }

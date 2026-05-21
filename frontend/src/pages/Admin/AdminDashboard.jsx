@@ -2,8 +2,7 @@ import { BarChart3, BookOpen, Home, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { getDashboardStats } from "../../services/adminService";
-import { formatPrice } from "../../utils/formatPrice";
+import { getDashboardStats, updateBookingStatusAdmin } from "../../services/adminService";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -17,6 +16,33 @@ const AdminDashboard = () => {
     bookings: [],
   });
   const [loadingStats, setLoadingStats] = useState(true);
+  const [filterToday, setFilterToday] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
+
+  const calculatePrice = (booking) => {
+    const pricePerNight = booking.room?.roomPrice || 0;
+    if (booking.checkInDate && booking.checkOutDate) {
+      const checkIn = new Date(booking.checkInDate);
+      const checkOut = new Date(booking.checkOutDate);
+      const diffTime = Math.abs(checkOut - checkIn);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      const days = diffDays > 0 ? diffDays : 1;
+      return pricePerNight * days;
+    }
+    return pricePerNight;
+  };
+
+  const loadStats = async () => {
+    if (!token || user?.role !== "ADMIN") return;
+    try {
+      const data = await getDashboardStats(token);
+      setStats(data);
+    } catch (error) {
+      console.error("Failed to load stats:", error);
+    } finally {
+      setLoadingStats(false);
+    }
+  };
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -31,24 +57,83 @@ const AdminDashboard = () => {
   }, [isAuthenticated, loading, user, navigate]);
 
   useEffect(() => {
-    const loadStats = async () => {
-      if (!token || user?.role !== "ADMIN") return;
-      try {
-        const data = await getDashboardStats(token);
-        setStats(data);
-      } catch (error) {
-        console.error("Failed to load stats:", error);
-      } finally {
-        setLoadingStats(false);
-      }
-    };
-
     loadStats();
   }, [token, user]);
 
-  const StatCard = ({ icon: Icon, label, value, color }) => (
+  const getFilteredBookings = () => {
+    if (!filterToday) return stats.bookings.slice(0, 5);
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const currentDateStr = `${yyyy}-${mm}-${dd}`;
+    
+    return stats.bookings.filter(booking => {
+      if (!booking.checkInDate) return false;
+      return booking.checkInDate.split("T")[0] === currentDateStr;
+    });
+  };
+
+  const displayedBookings = getFilteredBookings();
+
+  const getTodayBookingsCount = () => {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const currentDateStr = `${yyyy}-${mm}-${dd}`;
+
+    return stats.bookings.reduce((count, booking) => {
+      if (!booking.checkInDate) return count;
+      const bookingDateStr = booking.checkInDate.split("T")[0];
+      return bookingDateStr === currentDateStr ? count + 1 : count;
+    }, 0);
+  };
+
+  const calculateTotalRevenue = () => {
+    const revenue = stats.bookings.reduce((sum, booking) => {
+      if (booking.status !== "CANCELLED") {
+        const pricePerNight = booking.room?.roomPrice || 0;
+        if (booking.checkInDate && booking.checkOutDate) {
+          const checkIn = new Date(booking.checkInDate);
+          const checkOut = new Date(booking.checkOutDate);
+          const diffTime = Math.abs(checkOut - checkIn);
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          const days = diffDays > 0 ? diffDays : 1;
+          return sum + (pricePerNight * days);
+        }
+        return sum + pricePerNight;
+      }
+      return sum;
+    }, 0);
+
+    const formatted = new Intl.NumberFormat("vi-VN").format(revenue);
+    return `${formatted} đ`;
+  };
+
+  const handleCancel = async (bookingId) => {
+    if (!window.confirm("Bạn có chắc chắn muốn hủy đơn đặt phòng này?")) return;
+    try {
+      await updateBookingStatusAdmin(bookingId, "CANCELLED", token);
+      alert("Hủy đơn đặt phòng thành công!");
+      await loadStats();
+    } catch (error) {
+      console.error("Failed to cancel booking:", error);
+      alert("Không thể hủy đơn đặt phòng.");
+    }
+  };
+
+  const getStatusBadge = (status) => {
+    if (status === "CANCELLED") {
+      return <span className="px-2.5 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold uppercase tracking-wider">Đã hủy</span>;
+    }
+    return <span className="px-2.5 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold uppercase tracking-wider">Thành công</span>;
+  };
+
+  const StatCard = ({ icon: Icon, label, value, color, onClick }) => (
     <div
-      className="bg-white rounded-lg shadow-md p-6 border-l-4"
+      onClick={onClick}
+      className={`bg-white rounded-lg shadow-md p-6 border-l-4 ${onClick ? 'cursor-pointer hover:scale-105 transition-transform duration-300' : ''}`}
       style={{ borderColor: color }}
     >
       <div className="flex items-center justify-between">
@@ -91,24 +176,28 @@ const AdminDashboard = () => {
           label="Tổng đơn đặt"
           value={stats.totalBookings}
           color="#3B82F6"
+          onClick={() => navigate("/admin/bookings")}
         />
         <StatCard
           icon={Home}
           label="Tổng phòng"
           value={stats.totalRooms}
           color="#10B981"
+          onClick={() => navigate("/admin/properties")}
         />
         <StatCard
           icon={Users}
           label="Tổng người dùng"
           value={stats.totalUsers}
           color="#8B5CF6"
+          onClick={() => navigate("/admin/users")}
         />
         <StatCard
           icon={BarChart3}
           label="Đơn hôm nay"
-          value={stats.todayBookings}
+          value={getTodayBookingsCount()}
           color="#F59E0B"
+          onClick={() => setFilterToday(true)}
         />
       </div>
 
@@ -116,17 +205,27 @@ const AdminDashboard = () => {
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-xl font-bold text-gray-900 mb-4">Tổng doanh thu</h2>
         <p className="text-4xl font-bold text-rose-500">
-          {formatPrice(stats.totalRevenue)}
+          {calculateTotalRevenue()}
         </p>
         <p className="text-gray-600 text-sm mt-2">
-          Doanh thu từ tất cả các đơn đặt
+          Doanh thu từ tất cả các đơn đặt hợp lệ (không bao gồm đơn đã hủy).
         </p>
       </div>
 
       {/* Recent Bookings */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="border-b border-gray-200 px-6 py-4">
-          <h2 className="text-xl font-bold text-gray-900">Đơn đặt gần đây</h2>
+        <div className="border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+          <h2 className="text-xl font-bold text-gray-900">
+            {filterToday ? "Đơn đặt hôm nay" : "Đơn đặt gần đây"}
+          </h2>
+          {filterToday && (
+            <button
+              onClick={() => setFilterToday(false)}
+              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg text-sm transition"
+            >
+              Xem tất cả
+            </button>
+          )}
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
@@ -145,12 +244,18 @@ const AdminDashboard = () => {
                   Ngày trả
                 </th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-                  Số khách
+                  Tổng tiền
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                  Trạng thái
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                  Thao tác
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {stats.bookings.slice(0, 5).map((booking) => (
+              {displayedBookings.map((booking) => (
                 <tr key={booking.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm text-gray-900 font-medium">
                     {booking.id}
@@ -164,20 +269,95 @@ const AdminDashboard = () => {
                   <td className="px-6 py-4 text-sm text-gray-600">
                     {new Date(booking.checkOutDate).toLocaleDateString("vi-VN")}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-900 font-medium">
-                    {booking.totalNumberOfGuest}
+                  <td className="px-6 py-4 text-sm text-rose-500 font-semibold">
+                    {new Intl.NumberFormat('vi-VN').format(calculatePrice(booking))} đ
+                  </td>
+                  <td className="px-6 py-4 text-sm">
+                    {getStatusBadge(booking.status)}
+                  </td>
+                  <td className="px-6 py-4 text-sm space-x-2">
+                    <button
+                      onClick={() => setSelectedBooking(booking)}
+                      className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-xs font-semibold shadow-sm transition"
+                    >
+                      Xem chi tiết
+                    </button>
+                    {booking.status !== "CANCELLED" && (
+                      <button
+                        onClick={() => handleCancel(booking.id)}
+                        className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-lg text-xs font-semibold shadow-sm transition"
+                      >
+                        Hủy
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        {stats.bookings.length === 0 && (
+        {displayedBookings.length === 0 && (
           <div className="p-6 text-center text-gray-500">
-            Chưa có đơn đặt nào
+            {filterToday ? "Không có đơn đặt hôm nay" : "Chưa có đơn đặt nào"}
           </div>
         )}
       </div>
+      {/* Detail Modal */}
+      {selectedBooking && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-sm p-4 transition-all">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all">
+            <div className="flex justify-between items-center p-6 border-b border-gray-100">
+              <h3 className="text-xl font-bold text-gray-900">Chi tiết đơn đặt</h3>
+              <button 
+                onClick={() => setSelectedBooking(null)}
+                className="text-gray-400 hover:text-gray-600 transition text-2xl leading-none"
+              >
+                &times;
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="grid grid-cols-3 gap-2">
+                <span className="text-gray-500 font-medium">Tên khách:</span>
+                <span className="col-span-2 text-gray-900 font-semibold">{selectedBooking.user?.name || "N/A"}</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <span className="text-gray-500 font-medium">Email:</span>
+                <span className="col-span-2 text-gray-900 font-semibold">{selectedBooking.user?.email || "N/A"}</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <span className="text-gray-500 font-medium">Loại phòng:</span>
+                <span className="col-span-2 text-gray-900 font-semibold">{selectedBooking.room?.roomType || "N/A"}</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <span className="text-gray-500 font-medium">Giá phòng:</span>
+                <span className="col-span-2 text-gray-900 font-semibold">{selectedBooking.room?.roomPrice ? new Intl.NumberFormat('vi-VN').format(selectedBooking.room.roomPrice) + ' đ/đêm' : "N/A"}</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <span className="text-gray-500 font-medium">Tổng tiền:</span>
+                <span className="col-span-2 text-rose-500 font-bold text-lg">{new Intl.NumberFormat('vi-VN').format(calculatePrice(selectedBooking))} đ</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <span className="text-gray-500 font-medium">Thời gian:</span>
+                <span className="col-span-2 text-gray-900 font-semibold">
+                  {new Date(selectedBooking.checkInDate).toLocaleDateString("vi-VN")} - {new Date(selectedBooking.checkOutDate).toLocaleDateString("vi-VN")}
+                </span>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <span className="text-gray-500 font-medium">Số người:</span>
+                <span className="col-span-2 text-gray-900 font-semibold">{selectedBooking.totalNumberOfGuest || selectedBooking.totalNumOfGuest || 1}</span>
+              </div>
+            </div>
+            <div className="p-6 bg-gray-50 flex justify-end gap-3 rounded-b-2xl">
+              <button
+                onClick={() => setSelectedBooking(null)}
+                className="px-5 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-semibold transition"
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -97,11 +97,28 @@ public class BookingServiceImpl implements BookingService {
     Booking booking = bookingRepository.findById(bookingId)
         .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
 
-    bookingRepository.delete(booking);
+    booking.setStatus("CANCELLED");
+    bookingRepository.save(booking);
 
     Response response = new Response();
     response.setStatusCode(200);
     response.setMessage("Cancel booking successfully");
+    return response;
+  }
+
+  @Override
+  @Transactional
+  public Response updateBookingStatus(Long bookingId, String status) {
+    Booking booking = bookingRepository.findById(bookingId)
+        .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
+
+    booking.setStatus(status);
+    Booking savedBooking = bookingRepository.save(booking);
+
+    Response response = new Response();
+    response.setStatusCode(200);
+    response.setMessage("Update booking status successfully");
+    response.setBooking(mapBookingToBookingDto(savedBooking));
     return response;
   }
 
@@ -145,6 +162,7 @@ public class BookingServiceImpl implements BookingService {
     bookingDTO.setNumOfChildren(booking.getNumOfChildren());
     bookingDTO.setTotalNumOfGuest(booking.getTotalNumOfGuest());
     bookingDTO.setBookingConfirmationCode(booking.getBookingConfirmationCode());
+    bookingDTO.setStatus(booking.getStatus());
     bookingDTO.setUser(mapUserToUserDto(booking.getUser()));
     bookingDTO.setRoom(mapRoomToRoomDto(booking.getRoom()));
     return bookingDTO;

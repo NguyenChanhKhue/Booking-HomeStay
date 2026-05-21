@@ -46,6 +46,13 @@ export const cancelBookingAdmin = async (bookingId, token) => {
   return data;
 };
 
+export const updateBookingStatusAdmin = async (bookingId, status, token) => {
+  const { data } = await api.patch(`/bookings/${bookingId}/status`, { status }, {
+    headers: authHeaders(token),
+  });
+  return data;
+};
+
 export const getBookingByConfirmationCode = async (confirmationCode, token) => {
   const { data } = await api.get(`/bookings/${confirmationCode}`, {
     headers: authHeaders(token),

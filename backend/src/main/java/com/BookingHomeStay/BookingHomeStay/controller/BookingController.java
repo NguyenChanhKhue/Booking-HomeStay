@@ -46,4 +46,12 @@ public class BookingController {
   public ResponseEntity<Response> cancelBooking(@PathVariable Long bookingId) {
     return ResponseEntity.ok(bookingService.cancelBooking(bookingId));
   }
+
+  @org.springframework.web.bind.annotation.PatchMapping("/{bookingId}/status")
+  public ResponseEntity<Response> updateBookingStatus(
+      @PathVariable Long bookingId,
+      @RequestBody java.util.Map<String, String> requestBody) {
+    String status = requestBody.get("status");
+    return ResponseEntity.ok(bookingService.updateBookingStatus(bookingId, status));
+  }
 }

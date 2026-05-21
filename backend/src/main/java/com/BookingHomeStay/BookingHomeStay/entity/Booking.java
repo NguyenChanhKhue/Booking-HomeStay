@@ -39,6 +39,8 @@ public class Booking {
 
   private String bookingConfirmationCode;
 
+  private String status = "PENDING";
+
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "user_id")
   private User user;

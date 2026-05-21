@@ -3,10 +3,11 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { formatPrice } from "../../utils/formatPrice";
+import { api, authHeaders } from "../../services/api";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, loading, user, fetchBookingHistory } = useAuth();
+  const { isAuthenticated, loading, user, fetchBookingHistory, token } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [error, setError] = useState("");
 
@@ -34,6 +35,21 @@ const ProfilePage = () => {
 
     loadHistory();
   }, [fetchBookingHistory, isAuthenticated]);
+
+  const handleCancelBooking = async (bookingId) => {
+    if (!window.confirm("Bạn có chắc chắn muốn hủy đơn đặt phòng này?")) return;
+    try {
+      await api.delete(`/bookings/${bookingId}`, {
+        headers: authHeaders(token),
+      });
+      alert("Hủy đơn đặt phòng thành công!");
+      const list = await fetchBookingHistory();
+      setBookings(list);
+    } catch (error) {
+      console.error("Failed to cancel booking:", error);
+      alert("Không thể hủy đơn đặt phòng.");
+    }
+  };
 
   if (loading) {
     return (
@@ -128,19 +144,34 @@ const ProfilePage = () => {
                       <KeyRound size={16} className="text-rose-500" />
                       <span>Mã: {booking.bookingConfirmationCode}</span>
                     </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${booking.status === "CANCELLED" ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>
+                        {booking.status === "CANCELLED" ? "Đã hủy" : "Thành công"}
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <div className="rounded-[24px] bg-gray-50 p-5">
-                  <p className="text-sm text-gray-500">Tổng số khách</p>
-                  <p className="mt-2 text-2xl font-semibold text-gray-950">
-                    {booking.totalNumOfGuest}
-                  </p>
-                  <p className="mt-3 text-sm text-gray-500">
-                    Giá tham khảo mỗi đêm
-                  </p>
-                  <p className="mt-2 text-xl font-semibold text-gray-950">
-                    {formatPrice(booking.room?.roomPrice)}
-                  </p>
+                <div className="rounded-[24px] bg-gray-50 p-5 flex flex-col justify-between">
+                  <div>
+                    <p className="text-sm text-gray-500">Tổng số khách</p>
+                    <p className="mt-2 text-2xl font-semibold text-gray-950">
+                      {booking.totalNumOfGuest}
+                    </p>
+                    <p className="mt-3 text-sm text-gray-500">
+                      Giá tham khảo mỗi đêm
+                    </p>
+                    <p className="mt-2 text-xl font-semibold text-gray-950">
+                      {formatPrice(booking.room?.roomPrice)}
+                    </p>
+                  </div>
+                  {booking.status !== "CANCELLED" && (
+                    <button
+                      onClick={() => handleCancelBooking(booking.id)}
+                      className="mt-4 w-full rounded-full bg-red-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-600"
+                    >
+                      Hủy đơn
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

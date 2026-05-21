@@ -49,7 +49,7 @@ const AdminBookings = () => {
 
     try {
       await cancelBookingAdmin(bookingId, token);
-      setBookings((prev) => prev.filter((b) => b.id !== bookingId));
+      setBookings((prev) => prev.map((b) => b.id === bookingId ? { ...b, status: "CANCELLED" } : b));
       setMessage("Hủy đơn đặt thành công!");
       setSelectedBooking(null);
     } catch (error) {
@@ -58,6 +58,13 @@ const AdminBookings = () => {
   };
 
   const getStatusBadge = (booking) => {
+    if (booking.status === "CANCELLED") {
+      return (
+        <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">
+          Đã hủy
+        </span>
+      );
+    }
     const checkOutDate = new Date(booking.checkOutDate);
     const today = new Date();
 
@@ -162,13 +169,15 @@ const AdminBookings = () => {
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => handleCancelBooking(booking.id)}
-                    className="ml-4 p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
-                    title="Hủy đơn đặt"
-                  >
-                    <X size={24} />
-                  </button>
+                  {booking.status !== "CANCELLED" && (
+                    <button
+                      onClick={() => handleCancelBooking(booking.id)}
+                      className="ml-4 p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                      title="Hủy đơn đặt"
+                    >
+                      <X size={24} />
+                    </button>
+                  )}
                 </div>
 
                 <button

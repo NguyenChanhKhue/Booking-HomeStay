@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import PropertyCard from "../../components/cards/PropertyCard";
-import Search from "../../components/navbar/Search";
 import { searchRooms } from "../../services/propertyService";
 
 const SearchResultsPage = () => {
@@ -41,29 +40,8 @@ const SearchResultsPage = () => {
     loadRooms();
   }, [filters]);
 
-  const activeLocation = filters.location || filters.keyword;
-
   return (
-    <div className="space-y-8">
-      <section className="rounded-[32px] border border-gray-100 bg-[linear-gradient(135deg,#ffffff_0%,#fff7f7_100%)] p-6 shadow-sm md:p-8">
-        <div className="space-y-5">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-rose-500">
-              Ket qua tim kiem
-            </p>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-gray-950 md:text-5xl">
-              {activeLocation
-                ? `Nhung cho o phu hop voi "${activeLocation}"`
-                : "Kham pha cac phong dang co san"}
-            </h1>
-            <p className="mt-3 max-w-3xl text-base leading-7 text-gray-600">
-              Du lieu duoc lay tu API tim kiem phong cua he thong va ho tro loc theo dia diem,
-              loai phong, khoang gia va khoang ngay luu tru.
-            </p>
-          </div>
-          <Search compact initialValues={filters} />
-        </div>
-      </section>
+    <div className="space-y-6">
 
       {loading ? (
         <div className="rounded-[28px] border border-dashed border-gray-200 p-12 text-center text-gray-500">

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import ForgotPasswordModal from "../../components/ForgotPasswordModal";
@@ -8,7 +8,14 @@ const AuthPage = () => {
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("redirect") || "/profile";
   const { login, register } = useAuth();
-  const [mode, setMode] = useState("login");
+  const [mode, setMode] = useState(searchParams.get("mode") === "register" ? "register" : "login");
+
+  useEffect(() => {
+    const urlMode = searchParams.get("mode");
+    if (urlMode === "register" || urlMode === "login") {
+      setMode(urlMode);
+    }
+  }, [searchParams]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [form, setForm] = useState({
@@ -33,14 +40,19 @@ const AuthPage = () => {
 
     try {
       if (isLogin) {
-        await login({
+        const response = await login({
           email: form.email,
           password: form.password,
         });
+        if (response?.role === "ADMIN") {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
       } else {
         await register(form);
+        navigate(redirectTo);
       }
-      navigate(redirectTo);
     } catch (err) {
       setError(
         err.response?.data?.message || "Không thể xử lý yêu cầu xác thực.",

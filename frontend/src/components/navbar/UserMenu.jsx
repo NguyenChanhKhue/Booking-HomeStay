@@ -86,7 +86,7 @@ const UserMenu = () => {
             ) : (
               <>
                 <Link
-                  to="/auth"
+                  to="/auth?mode=login"
                   onClick={() => setOpen(false)}
                   className="block px-4 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
                 >
@@ -94,7 +94,7 @@ const UserMenu = () => {
                 </Link>
 
                 <Link
-                  to="/auth"
+                  to="/auth?mode=register"
                   onClick={() => setOpen(false)}
                   className="block px-4 py-3 text-sm text-gray-700 transition hover:bg-gray-100"
                 >
