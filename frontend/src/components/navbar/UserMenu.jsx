@@ -94,7 +94,7 @@ const UserMenu = () => {
                 </Link>
 
                 <Link
-                  to="/register"
+                  to="/auth"
                   onClick={() => setOpen(false)}
                   className="block px-4 py-3 text-sm text-gray-700 transition hover:bg-gray-100"
                 >

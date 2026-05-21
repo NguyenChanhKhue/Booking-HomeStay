@@ -11,7 +11,7 @@ const defaultCheckIn = `${yyyy}-${mm}-${dd}`;
 const tomorrow = new Date(today);
 tomorrow.setDate(today.getDate() + 1);
 const defaultCheckOut = `${tomorrow.getFullYear()}-${String(
-  tomorrow.getMonth() + 1
+  tomorrow.getMonth() + 1,
 ).padStart(2, "0")}-${String(tomorrow.getDate()).padStart(2, "0")}`;
 
 const Search = ({ compact = false, initialValues = {} }) => {
@@ -40,7 +40,7 @@ const Search = ({ compact = false, initialValues = {} }) => {
       compact
         ? "rounded-full border border-gray-200 bg-white shadow-sm"
         : "rounded-[32px] border border-white/60 bg-white/95 p-3 shadow-[0_24px_70px_rgba(15,23,42,0.14)] backdrop-blur",
-    [compact]
+    [compact],
   );
 
   const handleChange = (event) => {
@@ -67,20 +67,20 @@ const Search = ({ compact = false, initialValues = {} }) => {
       >
         <label className="min-w-0 flex-[1.6]">
           <span className="block text-[10px] font-semibold uppercase text-gray-500">
-            Dia diem
+            Địa điểm
           </span>
           <input
             name="location"
             value={form.location}
             onChange={handleChange}
-            placeholder="Ban muon di dau?"
+            placeholder="Bạn muốn đi đâu?"
             className="w-full border-none bg-transparent text-sm font-medium text-gray-900 outline-none placeholder:text-gray-500"
           />
         </label>
         <span className="mx-3 hidden h-8 w-px bg-gray-200 xl:block" />
         <label className="hidden w-36 xl:block">
           <span className="block text-[10px] font-semibold uppercase text-gray-500">
-            Nhan phong
+            Nhận phòng
           </span>
           <input
             type="date"
@@ -93,7 +93,7 @@ const Search = ({ compact = false, initialValues = {} }) => {
         <span className="mx-3 hidden h-8 w-px bg-gray-200 xl:block" />
         <label className="hidden w-36 xl:block">
           <span className="block text-[10px] font-semibold uppercase text-gray-500">
-            Tra phong
+            Trả phòng
           </span>
           <input
             type="date"
@@ -105,7 +105,7 @@ const Search = ({ compact = false, initialValues = {} }) => {
         </label>
         <button
           type="submit"
-          aria-label="Tim kiem"
+          aria-label="Tìm kiếm"
           className="ml-3 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-rose-500 text-white transition hover:bg-rose-600"
         >
           <SearchIcon size={16} />
@@ -125,13 +125,13 @@ const Search = ({ compact = false, initialValues = {} }) => {
             name="location"
             value={form.location}
             onChange={handleChange}
-            placeholder="Ban muon o khu vuc nao?"
+            placeholder="Bạn muốn ở khu vực nào?"
             className="w-full border-none bg-transparent text-sm text-gray-900 outline-none placeholder:text-gray-400"
           />
         </label>
         <label className="block rounded-full px-4 py-3">
           <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">
-            Nhan phong
+            Nhận phòng
           </span>
           <input
             type="date"
@@ -143,7 +143,7 @@ const Search = ({ compact = false, initialValues = {} }) => {
         </label>
         <label className="block rounded-full px-4 py-3">
           <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">
-            Tra phong
+            Trả phòng
           </span>
           <input
             type="date"

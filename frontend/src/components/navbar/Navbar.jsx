@@ -17,7 +17,7 @@ const Navbar = () => {
         <div className="flex flex-none items-center justify-end gap-2">
           <Link
             to="/search"
-            aria-label="Tim kiem"
+            aria-label="Tìm kiếm"
             className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-rose-500 text-white transition hover:bg-rose-600 md:hidden"
           >
             <SearchIcon size={18} />

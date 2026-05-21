@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import ForgotPasswordModal from "../../components/ForgotPasswordModal";
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ const AuthPage = () => {
     email: "",
     password: "",
   });
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   const isLogin = useMemo(() => mode === "login", [mode]);
 
@@ -40,10 +42,16 @@ const AuthPage = () => {
       }
       navigate(redirectTo);
     } catch (err) {
-      setError(err.response?.data?.message || "Không thể xử lý yêu cầu xác thực.");
+      setError(
+        err.response?.data?.message || "Không thể xử lý yêu cầu xác thực.",
+      );
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleForgotPassword = () => {
+    setShowForgotPassword(true);
   };
 
   return (
@@ -53,11 +61,10 @@ const AuthPage = () => {
           Tài khoản khách hàng
         </p>
         <h1 className="mt-4 text-4xl font-semibold tracking-tight text-gray-950 md:text-5xl">
-          {isLogin ? "Đăng nhập để tiếp tục đặt phòng" : "Tạo tài khoản để quản lý booking"}
+          {isLogin
+            ? "Đăng nhập để tiếp tục đặt phòng"
+            : "Tạo tài khoản để quản lý booking"}
         </h1>
-        <p className="mt-4 max-w-xl text-base leading-8 text-gray-600">
-          Giao diện xác thực này đang dùng trực tiếp các endpoint đăng nhập và đăng ký từ backend.
-        </p>
       </section>
 
       <section className="rounded-[36px] border border-gray-100 bg-white p-6 shadow-sm md:p-8">
@@ -86,7 +93,9 @@ const AuthPage = () => {
           {!isLogin ? (
             <>
               <label className="block">
-                <span className="mb-2 block text-sm font-medium text-gray-700">Họ và tên</span>
+                <span className="mb-2 block text-sm font-medium text-gray-700">
+                  Họ và tên
+                </span>
                 <input
                   name="name"
                   value={form.name}
@@ -111,7 +120,9 @@ const AuthPage = () => {
           ) : null}
 
           <label className="block">
-            <span className="mb-2 block text-sm font-medium text-gray-700">Email</span>
+            <span className="mb-2 block text-sm font-medium text-gray-700">
+              Email
+            </span>
             <input
               type="email"
               name="email"
@@ -122,7 +133,9 @@ const AuthPage = () => {
             />
           </label>
           <label className="block">
-            <span className="mb-2 block text-sm font-medium text-gray-700">Mật khẩu</span>
+            <span className="mb-2 block text-sm font-medium text-gray-700">
+              Mật khẩu
+            </span>
             <input
               type="password"
               name="password"
@@ -147,11 +160,25 @@ const AuthPage = () => {
             {submitting
               ? "Đang xử lý..."
               : isLogin
-              ? "Đăng nhập"
-              : "Tạo tài khoản"}
+                ? "Đăng nhập"
+                : "Tạo tài khoản"}
           </button>
         </form>
+
+        {isLogin && (
+          <button
+            type="button"
+            className="text-blue-500 hover:underline"
+            onClick={handleForgotPassword}
+          >
+            Quên mật khẩu?
+          </button>
+        )}
       </section>
+      <ForgotPasswordModal
+        isOpen={showForgotPassword}
+        onClose={() => setShowForgotPassword(false)}
+      />
     </div>
   );
 };

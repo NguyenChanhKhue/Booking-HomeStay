@@ -27,3 +27,17 @@ export const getBookingHistory = async (userId, token) => {
   });
   return data;
 };
+
+export const requestPasswordReset = async (email) => {
+  const { data } = await api.post("/auth/forgot-password", { email });
+  return data;
+};
+
+export const resetPassword = async (email, otp, newPassword) => {
+  const { data } = await api.post("/auth/reset-password", {
+    email,
+    otp,
+    newPassword,
+  });
+  return data;
+};

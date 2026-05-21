@@ -147,7 +147,7 @@ const HomePage = () => {
         <section className="space-y-4">
           <div className="flex items-center justify-between gap-4">
             <h2 className="text-2xl font-semibold tracking-tight text-gray-950">
-              Dia diem noi bat
+              Địa điểm nổi bật
             </h2>
           </div>
           <div className="-mx-4 flex gap-5 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0">
@@ -175,10 +175,10 @@ const HomePage = () => {
         <section className="space-y-4">
           <div className="flex items-center justify-between gap-4">
             <h2 className="text-2xl font-semibold tracking-tight text-gray-950">
-              Homestay xu huong
+              HomeStay xu hướng
             </h2>
             <Link to="/search" className="text-sm font-medium text-rose-500">
-              Xem them
+              Xem thêm
             </Link>
           </div>
           <div className="-mx-4 flex snap-x gap-7 overflow-x-auto px-4 pb-3 sm:mx-0 sm:px-0">
@@ -200,11 +200,7 @@ const HomePage = () => {
         ) : null}
 
         {!loading && !error ? (
-          <div className="text-sm text-gray-500">
-            Hien co{" "}
-            <span className="font-semibold text-gray-900">{rooms.length}</span>{" "}
-            phong tu backend.
-          </div>
+          <div className="text-sm text-gray-500">Các phòng hiện còn trống</div>
         ) : null}
 
         {loading ? (
@@ -219,7 +215,7 @@ const HomePage = () => {
           </div>
         ) : (
           <div className="rounded-[28px] border border-dashed border-gray-200 p-12 text-center text-gray-500">
-            Hien chua co phong de hien thi tren trang chu.
+            Hiện chưa có phòng để hiện thị
           </div>
         )}
       </section>
