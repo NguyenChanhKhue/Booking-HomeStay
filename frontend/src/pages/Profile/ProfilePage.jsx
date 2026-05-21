@@ -13,6 +13,10 @@ const ProfilePage = () => {
   useEffect(() => {
     if (!loading && !isAuthenticated) {
       navigate("/auth?redirect=%2Fprofile");
+      return;
+    }
+    if (!loading && isAuthenticated && user?.role === "ADMIN") {
+      navigate("/admin");
     }
   }, [isAuthenticated, loading, navigate]);
 
@@ -51,7 +55,9 @@ const ProfilePage = () => {
         </p>
         <div className="mt-4 grid gap-6 md:grid-cols-[0.9fr_1.1fr]">
           <div className="rounded-[28px] bg-gray-50 p-6">
-            <h1 className="text-3xl font-semibold text-gray-950">{user?.name}</h1>
+            <h1 className="text-3xl font-semibold text-gray-950">
+              {user?.name}
+            </h1>
             <p className="mt-2 text-gray-600">{user?.email}</p>
             <div className="mt-5 flex items-center gap-3 text-sm text-gray-600">
               <Phone size={16} className="text-rose-500" />
@@ -61,11 +67,15 @@ const ProfilePage = () => {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="rounded-[28px] border border-gray-100 p-6">
               <p className="text-sm text-gray-500">Vai trò</p>
-              <p className="mt-2 text-2xl font-semibold text-gray-950">{user?.role}</p>
+              <p className="mt-2 text-2xl font-semibold text-gray-950">
+                {user?.role}
+              </p>
             </div>
             <div className="rounded-[28px] border border-gray-100 p-6">
               <p className="text-sm text-gray-500">Số booking</p>
-              <p className="mt-2 text-2xl font-semibold text-gray-950">{bookings.length}</p>
+              <p className="mt-2 text-2xl font-semibold text-gray-950">
+                {bookings.length}
+              </p>
             </div>
           </div>
         </div>
@@ -104,7 +114,8 @@ const ProfilePage = () => {
                     {booking.room?.roomType || "Phòng đã đặt"}
                   </h3>
                   <p className="mt-2 text-sm leading-7 text-gray-600">
-                    {booking.room?.roomDescription || "Chi tiết phòng được lấy từ lịch sử booking."}
+                    {booking.room?.roomDescription ||
+                      "Chi tiết phòng được lấy từ lịch sử booking."}
                   </p>
                   <div className="mt-4 flex flex-wrap gap-4 text-sm text-gray-600">
                     <div className="flex items-center gap-2">
@@ -124,7 +135,9 @@ const ProfilePage = () => {
                   <p className="mt-2 text-2xl font-semibold text-gray-950">
                     {booking.totalNumOfGuest}
                   </p>
-                  <p className="mt-3 text-sm text-gray-500">Giá tham khảo mỗi đêm</p>
+                  <p className="mt-3 text-sm text-gray-500">
+                    Giá tham khảo mỗi đêm
+                  </p>
                   <p className="mt-2 text-xl font-semibold text-gray-950">
                     {formatPrice(booking.room?.roomPrice)}
                   </p>
@@ -134,7 +147,8 @@ const ProfilePage = () => {
           </div>
         ) : (
           <div className="mt-8 rounded-[28px] border border-dashed border-gray-200 p-12 text-center text-gray-500">
-            Bạn chưa có booking nào. Hãy chọn một căn phòng và bắt đầu chuyến đi đầu tiên.
+            Bạn chưa có booking nào. Hãy chọn một căn phòng và bắt đầu chuyến đi
+            đầu tiên.
           </div>
         )}
       </section>
