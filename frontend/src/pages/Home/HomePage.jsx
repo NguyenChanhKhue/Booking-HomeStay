@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import PropertyCard from "../../components/cards/PropertyCard";
 import { getAllRooms, getRoomTypes } from "../../services/propertyService";
@@ -42,50 +42,34 @@ const FEATURED_LOCATIONS = [
   },
 ];
 
-const TRENDING_HOMESTAYS = [
-  {
-    id: 101,
-    roomType: "Cabin Da Lat",
-    roomLocation: "Da Lat",
-    roomDescription: "Khong gian go am ap, gan rung thong va khu ca phe.",
-    roomPrice: 850000,
-    roomPhotoUrl:
-      "https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    id: 102,
-    roomType: "Beach House",
-    roomLocation: "Vung Tau",
-    roomDescription: "Homestay gan bien, phu hop cho nhom ban cuoi tuan.",
-    roomPrice: 1200000,
-    roomPhotoUrl:
-      "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    id: 103,
-    roomType: "Villa Hoi An",
-    roomLocation: "Hoi An",
-    roomDescription: "San vuon yen tinh, tien di chuyen vao pho co.",
-    roomPrice: 1450000,
-    roomPhotoUrl:
-      "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=900&q=80",
-  },
-  {
-    id: 104,
-    roomType: "Mountain View",
-    roomLocation: "Sa Pa",
-    roomDescription: "Tam nhin nui thoang, khong gian nghi duong rieng tu.",
-    roomPrice: 990000,
-    roomPhotoUrl:
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80",
-  },
-];
+
 
 const HomePage = () => {
   const [rooms, setRooms] = useState([]);
   const [roomTypes, setRoomTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const trendingRooms = [...rooms].sort((a, b) => (b.bookingCount || 0) - (a.bookingCount || 0)).slice(0, 10);
+  const carouselRef = useRef(null);
+
+  useEffect(() => {
+    let intervalId;
+    if (carouselRef.current && trendingRooms.length > 0) {
+      intervalId = setInterval(() => {
+        if (carouselRef.current) {
+          carouselRef.current.scrollLeft += 1;
+          if (
+            carouselRef.current.scrollLeft >=
+            carouselRef.current.scrollWidth - carouselRef.current.clientWidth
+          ) {
+            carouselRef.current.scrollLeft = 0;
+          }
+        }
+      }, 30);
+    }
+    return () => clearInterval(intervalId);
+  }, [trendingRooms.length]);
 
   useEffect(() => {
     const loadHomeData = async () => {
@@ -181,15 +165,21 @@ const HomePage = () => {
               Xem thêm
             </Link>
           </div>
-          <div className="-mx-4 flex snap-x gap-7 overflow-x-auto px-4 pb-3 sm:mx-0 sm:px-0">
-            {TRENDING_HOMESTAYS.map((room) => (
+          <div 
+            ref={carouselRef}
+            className="-mx-4 flex gap-7 overflow-x-auto px-4 pb-3 sm:mx-0 sm:px-0 scrollbar-hide"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            {trendingRooms.length > 0 ? trendingRooms.map((room) => (
               <div
                 key={room.id}
-                className="w-[82vw] shrink-0 snap-start sm:w-[360px] lg:w-[calc((100%_-_84px)/4)]"
+                className="w-[82vw] shrink-0 sm:w-[360px] lg:w-[calc((100%_-_84px)/4)]"
               >
                 <PropertyCard data={room} />
               </div>
-            ))}
+            )) : (
+              <div className="w-full text-center text-gray-500 py-8">Đang cập nhật...</div>
+            )}
           </div>
         </section>
 

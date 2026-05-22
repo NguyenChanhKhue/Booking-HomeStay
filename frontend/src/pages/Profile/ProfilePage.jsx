@@ -10,6 +10,8 @@ const ProfilePage = () => {
   const { isAuthenticated, loading, user, fetchBookingHistory, token } = useAuth();
   const [bookings, setBookings] = useState([]);
   const [error, setError] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedBooking, setSelectedBooking] = useState(null);
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -98,7 +100,7 @@ const ProfilePage = () => {
       </section>
 
       <section className="rounded-[32px] border border-gray-100 bg-white p-6 shadow-sm md:p-8">
-        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.3em] text-gray-400">
               Lịch sử đặt phòng
@@ -107,9 +109,31 @@ const ProfilePage = () => {
               Những booking bạn đã thực hiện
             </h2>
           </div>
-          <Link to="/search" className="text-sm font-medium text-rose-500">
-            Tìm thêm chỗ ở
-          </Link>
+          <form 
+            className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto mt-4 md:mt-0"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const found = bookings.find(b => b.bookingConfirmationCode?.toLowerCase() === searchQuery.trim().toLowerCase());
+              if (found && found.room?.id) {
+                navigate(`/rooms/${found.room.id}`);
+              } else {
+                alert("Không tìm thấy mã đặt phòng này trong lịch sử của bạn.");
+              }
+            }}
+          >
+            <div className="flex w-full sm:w-auto gap-2">
+              <input 
+                type="text" 
+                placeholder="Nhập mã đặt phòng..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="rounded-full border border-gray-200 px-4 py-2 text-sm outline-none transition focus:border-rose-300 w-full sm:w-48"
+              />
+              <button type="submit" className="shrink-0 rounded-full bg-rose-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-600">
+                Đến phòng
+              </button>
+            </div>
+          </form>
         </div>
 
         {error ? (
@@ -119,60 +143,95 @@ const ProfilePage = () => {
         ) : null}
 
         {bookings.length > 0 ? (
-          <div className="mt-8 space-y-4">
+          <div className="mt-8 space-y-6">
             {bookings.map((booking) => (
-              <div
-                key={booking.id}
-                className="grid gap-5 rounded-[28px] border border-gray-100 p-5 lg:grid-cols-[1.1fr_0.9fr]"
-              >
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-950">
-                    {booking.room?.roomType || "Phòng đã đặt"}
-                  </h3>
-                  <p className="mt-2 text-sm leading-7 text-gray-600">
-                    {booking.room?.roomDescription ||
-                      "Chi tiết phòng được lấy từ lịch sử booking."}
-                  </p>
-                  <div className="mt-4 flex flex-wrap gap-4 text-sm text-gray-600">
-                    <div className="flex items-center gap-2">
-                      <CalendarDays size={16} className="text-rose-500" />
-                      <span>
-                        {booking.checkInDate} đến {booking.checkOutDate}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <KeyRound size={16} className="text-rose-500" />
-                      <span>Mã: {booking.bookingConfirmationCode}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${booking.status === "CANCELLED" ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>
-                        {booking.status === "CANCELLED" ? "Đã hủy" : "Thành công"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="rounded-[24px] bg-gray-50 p-5 flex flex-col justify-between">
+              <div key={booking.id} className="flex flex-col gap-2">
+                <div className="grid gap-5 rounded-[28px] border border-gray-100 p-5 lg:grid-cols-[1.1fr_0.9fr]">
                   <div>
-                    <p className="text-sm text-gray-500">Tổng số khách</p>
-                    <p className="mt-2 text-2xl font-semibold text-gray-950">
-                      {booking.totalNumOfGuest}
+                    <h3 className="text-xl font-semibold text-gray-950">
+                      {booking.room?.roomType || "Phòng đã đặt"}
+                    </h3>
+                    <p className="mt-2 text-sm leading-7 text-gray-600">
+                      {booking.room?.roomDescription ||
+                        "Chi tiết phòng được lấy từ lịch sử booking."}
                     </p>
-                    <p className="mt-3 text-sm text-gray-500">
-                      Giá tham khảo mỗi đêm
-                    </p>
-                    <p className="mt-2 text-xl font-semibold text-gray-950">
-                      {formatPrice(booking.room?.roomPrice)}
-                    </p>
+                    <div className="mt-4 flex flex-wrap gap-4 text-sm text-gray-600">
+                      <div className="flex items-center gap-2">
+                        <CalendarDays size={16} className="text-rose-500" />
+                        <span>
+                          {booking.checkInDate} đến {booking.checkOutDate}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <KeyRound size={16} className="text-rose-500" />
+                        <span>Mã: {booking.bookingConfirmationCode}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${booking.status === "CANCELLED" ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>
+                          {booking.status === "CANCELLED" ? "Đã hủy" : "Thành công"}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  {booking.status !== "CANCELLED" && (
-                    <button
-                      onClick={() => handleCancelBooking(booking.id)}
-                      className="mt-4 w-full rounded-full bg-red-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-600"
-                    >
-                      Hủy đơn
-                    </button>
-                  )}
+                  <div className="rounded-[24px] bg-gray-50 p-5 flex flex-col justify-end">
+                    <div className="space-y-2 mt-4">
+                      <button
+                        onClick={() => setSelectedBooking(selectedBooking?.id === booking.id ? null : booking)}
+                        className="w-full rounded-full border border-rose-200 bg-white px-4 py-2 text-sm font-semibold text-rose-500 transition hover:bg-rose-50"
+                      >
+                        {selectedBooking?.id === booking.id ? "Ẩn chi tiết" : "Xem chi tiết"}
+                      </button>
+                      {booking.status !== "CANCELLED" && (
+                        <button
+                          onClick={() => handleCancelBooking(booking.id)}
+                          className="w-full rounded-full bg-red-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-600"
+                        >
+                          Hủy đơn
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 </div>
+                {/* Detailed view rendered below the booking card if selected */}
+                {selectedBooking?.id === booking.id && (
+                  <div className="p-6 bg-rose-50/50 rounded-[28px] border border-rose-100">
+                    <h4 className="font-semibold text-gray-900 mb-4">
+                      Thông tin chi tiết đơn đặt
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                      <p>
+                        <strong className="text-gray-800">Tên khách:</strong>{" "}
+                        {user?.name}
+                      </p>
+                      <p>
+                        <strong className="text-gray-800">Email:</strong>{" "}
+                        {user?.email}
+                      </p>
+                      <p>
+                        <strong className="text-gray-800">Loại phòng:</strong>{" "}
+                        {booking.room?.roomType || "N/A"}
+                      </p>
+                      <p>
+                        <strong className="text-gray-800">Giá mỗi đêm:</strong>{" "}
+                        {formatPrice(booking.room?.roomPrice)}
+                      </p>
+                      <p>
+                        <strong className="text-gray-800">Số đêm ở:</strong>{" "}
+                        {Math.max(1, Math.ceil((new Date(booking.checkOutDate) - new Date(booking.checkInDate)) / (1000 * 60 * 60 * 24)))} đêm
+                      </p>
+                      <p>
+                        <strong className="text-gray-800">Tổng tiền:</strong>{" "}
+                        <span className="text-rose-600 font-bold text-base">
+                          {formatPrice((booking.room?.roomPrice || 0) * Math.max(1, Math.ceil((new Date(booking.checkOutDate) - new Date(booking.checkInDate)) / (1000 * 60 * 60 * 24))))}
+                        </span>
+                      </p>
+                      <p className="md:col-span-2">
+                        <strong className="text-gray-800">Mã đặt phòng:</strong>{" "}
+                        <span className="bg-white px-2 py-1 rounded border border-gray-200 ml-1 font-mono text-xs">{booking.bookingConfirmationCode}</span>
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>

@@ -44,6 +44,15 @@ const BookingPage = () => {
     [form]
   );
 
+  const getDiffDays = () => {
+    if (!form.checkInDate || !form.checkOutDate) return 1;
+    const checkIn = new Date(form.checkInDate);
+    const checkOut = new Date(form.checkOutDate);
+    if (checkOut <= checkIn) return 1;
+    const diffTime = Math.abs(checkOut - checkIn);
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  };
+
   const handleChange = (event) => {
     const { name, value } = event.target;
     setForm((current) => ({ ...current, [name]: value }));
@@ -166,6 +175,22 @@ const BookingPage = () => {
                 required
               />
             </label>
+          </div>
+
+          <div className="rounded-[24px] bg-rose-50 p-5 mt-4">
+            <h3 className="text-sm font-semibold uppercase tracking-widest text-rose-500 mb-4">Chi tiết thanh toán</h3>
+            <div className="flex justify-between text-gray-700 font-medium">
+              <span>Giá mỗi đêm:</span>
+              <span>{formatPrice(room?.roomPrice)}</span>
+            </div>
+            <div className="flex justify-between text-gray-700 font-medium mt-2">
+              <span>Số đêm ở:</span>
+              <span>{getDiffDays()} đêm</span>
+            </div>
+            <div className="flex justify-between border-t border-rose-200 mt-4 pt-4 text-xl font-bold text-rose-600">
+              <span>Tổng tiền:</span>
+              <span>{formatPrice((room?.roomPrice || 0) * getDiffDays())}</span>
+            </div>
           </div>
 
           {message ? (

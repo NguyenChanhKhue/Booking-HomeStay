@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService {
   public Response getAllUsers() {
     List<UserDTO> users = userRepository.findAll()
         .stream()
-        .map(this::mapUserToUserDtoWithoutBookings)
+        .map(this::mapUserToUserDtoWithBookings)
         .toList();
 
     Response response = new Response();

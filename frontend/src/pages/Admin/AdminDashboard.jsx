@@ -18,6 +18,7 @@ const AdminDashboard = () => {
   const [loadingStats, setLoadingStats] = useState(true);
   const [filterToday, setFilterToday] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [revenueFilter, setRevenueFilter] = useState('all');
 
   const calculatePrice = (booking) => {
     const pricePerNight = booking.room?.roomPrice || 0;
@@ -61,7 +62,7 @@ const AdminDashboard = () => {
   }, [token, user]);
 
   const getFilteredBookings = () => {
-    if (!filterToday) return stats.bookings.slice(0, 5);
+    if (!filterToday) return stats.bookings;
     const today = new Date();
     const yyyy = today.getFullYear();
     const mm = String(today.getMonth() + 1).padStart(2, '0');
@@ -91,8 +92,29 @@ const AdminDashboard = () => {
   };
 
   const calculateTotalRevenue = () => {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = today.getMonth();
+    const dd = today.getDate();
+
     const revenue = stats.bookings.reduce((sum, booking) => {
-      if (booking.status !== "CANCELLED") {
+      if (booking.status !== "CANCELLED" && booking.checkInDate) {
+        const bookingDate = new Date(booking.checkInDate);
+        
+        if (revenueFilter === 'day') {
+          if (bookingDate.getFullYear() !== yyyy || bookingDate.getMonth() !== mm || bookingDate.getDate() !== dd) {
+            return sum;
+          }
+        } else if (revenueFilter === 'month') {
+          if (bookingDate.getFullYear() !== yyyy || bookingDate.getMonth() !== mm) {
+            return sum;
+          }
+        } else if (revenueFilter === 'year') {
+          if (bookingDate.getFullYear() !== yyyy) {
+            return sum;
+          }
+        }
+
         const pricePerNight = booking.room?.roomPrice || 0;
         if (booking.checkInDate && booking.checkOutDate) {
           const checkIn = new Date(booking.checkInDate);
@@ -203,7 +225,19 @@ const AdminDashboard = () => {
 
       {/* Revenue Section */}
       <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Tổng doanh thu</h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold text-gray-900">Tổng doanh thu</h2>
+          <select 
+            value={revenueFilter}
+            onChange={(e) => setRevenueFilter(e.target.value)}
+            className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm outline-none focus:border-rose-500 font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 transition"
+          >
+            <option value="all">Toàn thời gian</option>
+            <option value="day">Hôm nay</option>
+            <option value="month">Tháng này</option>
+            <option value="year">Năm nay</option>
+          </select>
+        </div>
         <p className="text-4xl font-bold text-rose-500">
           {calculateTotalRevenue()}
         </p>
@@ -227,9 +261,9 @@ const AdminDashboard = () => {
             </button>
           )}
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto overflow-y-auto max-h-[400px]">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
               <tr>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
                   ID

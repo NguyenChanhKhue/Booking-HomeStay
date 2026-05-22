@@ -255,6 +255,7 @@ public class RoomServiceImpl implements RoomService {
     roomDTO.setRoomPrice(room.getRoomPrice());
     roomDTO.setRoomPhotoUrl(room.getRoomPhotoUrl());
     roomDTO.setRoomDescription(room.getRoomDescription());
+    roomDTO.setBookingCount(room.getBookings() != null ? room.getBookings().size() : 0);
     return roomDTO;
   }
 
