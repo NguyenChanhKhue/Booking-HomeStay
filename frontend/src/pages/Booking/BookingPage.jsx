@@ -1,5 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { createBooking } from "../../services/bookingService";
 import { getRoomById } from "../../services/propertyService";
@@ -9,7 +14,12 @@ const BookingPage = () => {
   const { roomId } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { isAuthenticated, loading: authLoading, user, refreshProfile } = useAuth();
+  const {
+    isAuthenticated,
+    loading: authLoading,
+    user,
+    refreshProfile,
+  } = useAuth();
   const [room, setRoom] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
@@ -41,7 +51,7 @@ const BookingPage = () => {
       numOfAdults: Number(form.numOfAdults),
       numOfChildren: Number(form.numOfChildren),
     }),
-    [form]
+    [form],
   );
 
   const getDiffDays = () => {
@@ -66,17 +76,21 @@ const BookingPage = () => {
 
     try {
       if (!isAuthenticated) {
-        navigate(`/auth?redirect=${encodeURIComponent(`/rooms/${roomId}/booking`)}`);
+        navigate(
+          `/auth?redirect=${encodeURIComponent(`/rooms/${roomId}/booking`)}`,
+        );
         return;
       }
 
       const profile = user ?? (await refreshProfile());
       const response = await createBooking(roomId, profile.id, bookingPayload);
       setMessage(
-        `Đặt phòng thành công. Mã xác nhận của bạn là ${response.bookingConfirmationCode}.`
+        `Đặt phòng thành công. Mã xác nhận của bạn là ${response.bookingConfirmationCode}.`,
       );
     } catch (err) {
-      setError(err.response?.data?.message || "Đặt phòng thất bại. Vui lòng thử lại.");
+      setError(
+        err.response?.data?.message || "Đặt phòng thất bại. Vui lòng thử lại.",
+      );
     } finally {
       setSubmitting(false);
     }
@@ -99,10 +113,6 @@ const BookingPage = () => {
         <h1 className="mt-3 text-3xl font-semibold tracking-tight text-gray-950">
           Điền thông tin lưu trú của bạn
         </h1>
-        <p className="mt-3 text-base leading-7 text-gray-600">
-          Form này gửi dữ liệu trực tiếp đến API booking của backend với ngày ở,
-          số lượng người lớn và trẻ em.
-        </p>
 
         {!isAuthenticated ? (
           <div className="mt-6 rounded-[24px] border border-amber-200 bg-amber-50 p-5 text-sm text-amber-700">
@@ -178,7 +188,9 @@ const BookingPage = () => {
           </div>
 
           <div className="rounded-[24px] bg-rose-50 p-5 mt-4">
-            <h3 className="text-sm font-semibold uppercase tracking-widest text-rose-500 mb-4">Chi tiết thanh toán</h3>
+            <h3 className="text-sm font-semibold uppercase tracking-widest text-rose-500 mb-4">
+              Chi tiết thanh toán
+            </h3>
             <div className="flex justify-between text-gray-700 font-medium">
               <span>Giá mỗi đêm:</span>
               <span>{formatPrice(room?.roomPrice)}</span>
@@ -223,13 +235,18 @@ const BookingPage = () => {
           <div className="mt-5 space-y-5">
             <div className="overflow-hidden rounded-[28px] bg-gray-100">
               <img
-                src={room.roomPhotoUrl || "https://via.placeholder.com/900x600?text=Room"}
+                src={
+                  room.roomPhotoUrl ||
+                  "https://via.placeholder.com/900x600?text=Room"
+                }
                 alt={room.roomType}
                 className="h-60 w-full object-cover"
               />
             </div>
             <div>
-              <h2 className="text-2xl font-semibold text-gray-950">{room.roomType}</h2>
+              <h2 className="text-2xl font-semibold text-gray-950">
+                {room.roomType}
+              </h2>
               <p className="mt-2 text-sm leading-7 text-gray-600">
                 {room.roomDescription}
               </p>

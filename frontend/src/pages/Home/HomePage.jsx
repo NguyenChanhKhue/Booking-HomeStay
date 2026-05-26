@@ -42,15 +42,15 @@ const FEATURED_LOCATIONS = [
   },
 ];
 
-
-
 const HomePage = () => {
   const [rooms, setRooms] = useState([]);
   const [roomTypes, setRoomTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const trendingRooms = [...rooms].sort((a, b) => (b.bookingCount || 0) - (a.bookingCount || 0)).slice(0, 10);
+  const trendingRooms = [...rooms]
+    .sort((a, b) => (b.bookingCount || 0) - (a.bookingCount || 0))
+    .slice(0, 10);
   const carouselRef = useRef(null);
 
   useEffect(() => {
@@ -92,7 +92,7 @@ const HomePage = () => {
         setError(
           fetchError.response?.data?.message ||
             fetchError.message ||
-            "Khong the tai du lieu phong tu backend.",
+            "Failed to load rooms",
         );
         setRooms([]);
       } finally {
@@ -165,27 +165,31 @@ const HomePage = () => {
               Xem thêm
             </Link>
           </div>
-          <div 
+          <div
             ref={carouselRef}
             className="-mx-4 flex gap-7 overflow-x-auto px-4 pb-3 sm:mx-0 sm:px-0 scrollbar-hide"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
-            {trendingRooms.length > 0 ? trendingRooms.map((room) => (
-              <div
-                key={room.id}
-                className="w-[82vw] shrink-0 sm:w-[360px] lg:w-[calc((100%_-_84px)/4)]"
-              >
-                <PropertyCard data={room} />
+            {trendingRooms.length > 0 ? (
+              trendingRooms.map((room) => (
+                <div
+                  key={room.id}
+                  className="w-[82vw] shrink-0 sm:w-[360px] lg:w-[calc((100%_-_84px)/4)]"
+                >
+                  <PropertyCard data={room} />
+                </div>
+              ))
+            ) : (
+              <div className="w-full text-center text-gray-500 py-8">
+                Đang cập nhật...
               </div>
-            )) : (
-              <div className="w-full text-center text-gray-500 py-8">Đang cập nhật...</div>
             )}
           </div>
         </section>
 
         {error ? (
           <div className="rounded-[28px] border border-red-100 bg-red-50 p-5 text-sm text-red-600">
-            Loi tai du lieu: {error}
+            Lỗi tải dữ liệu: {error}
           </div>
         ) : null}
 
@@ -195,7 +199,7 @@ const HomePage = () => {
 
         {loading ? (
           <div className="rounded-[28px] border border-dashed border-gray-200 p-12 text-center text-gray-500">
-            Dang tai danh sach phong...
+            Đang tải danh sách phòng
           </div>
         ) : rooms.length > 0 ? (
           <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-4">

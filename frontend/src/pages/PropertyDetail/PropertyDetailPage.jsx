@@ -7,7 +7,8 @@ import { formatPrice } from "../../utils/formatPrice";
 
 const inferAmenities = (room) => {
   const base = [...DEFAULT_AMENITIES];
-  const description = `${room?.roomType ?? ""} ${room?.roomDescription ?? ""}`.toLowerCase();
+  const description =
+    `${room?.roomType ?? ""} ${room?.roomDescription ?? ""}`.toLowerCase();
 
   if (description.includes("family")) base.push("Phu hop cho gia dinh");
   if (description.includes("deluxe")) base.push("Thiet ke cao cap");
@@ -66,7 +67,7 @@ const PropertyDetailPage = () => {
   if (loading) {
     return (
       <div className="rounded-[28px] border border-dashed border-gray-200 p-12 text-center text-gray-500">
-        Dang tai thong tin phong...
+        Đang tải thông tin phòng...
       </div>
     );
   }
@@ -86,7 +87,10 @@ const PropertyDetailPage = () => {
           <div className="overflow-hidden rounded-[36px] border border-gray-100 bg-white shadow-sm">
             <div className="aspect-[16/10] bg-gray-100">
               <img
-                src={room.roomPhotoUrl || "https://via.placeholder.com/1200x800?text=Room"}
+                src={
+                  room.roomPhotoUrl ||
+                  "https://via.placeholder.com/1200x800?text=Room"
+                }
                 alt={room.roomType}
                 className="h-full w-full object-cover"
               />
@@ -104,7 +108,7 @@ const PropertyDetailPage = () => {
                 </span>
               ) : null}
               <span className="rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-600">
-                Dat truc tiep tu he thong
+                Đặt trực tiếp từ hệ thống
               </span>
             </div>
 
@@ -113,10 +117,10 @@ const PropertyDetailPage = () => {
             </h1>
             <div className="mt-3 flex items-center gap-2 text-sm text-gray-500">
               <MapPin size={16} className="text-rose-500" />
-              <span>{room.roomLocation || "Chua cap nhat dia diem"}</span>
+              <span>{room.roomLocation || "Chưa cập nhật địa điểm"}</span>
             </div>
             <p className="mt-4 text-base leading-8 text-gray-600">
-              {room.roomDescription || "Phong hien chua co mo ta chi tiet."}
+              {room.roomDescription || "Phòng chưa có mô tả"}
             </p>
 
             <div className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -136,25 +140,23 @@ const PropertyDetailPage = () => {
         <div className="space-y-6">
           <div className="rounded-[32px] border border-gray-100 bg-white p-6 shadow-sm">
             <p className="text-sm font-semibold uppercase tracking-[0.3em] text-gray-400">
-              Gia tham khao
+              Giá tham khảo
             </p>
             <p className="mt-3 text-4xl font-semibold tracking-tight text-gray-950">
               {formatPrice(room.roomPrice)}
             </p>
-            <p className="mt-2 text-sm text-gray-500">moi dem, chua bao gom dich vu phat sinh</p>
+            <p className="mt-2 text-sm text-gray-500">
+              mỗi đêm , chưa bao gồm dịch vụ phát sinh
+            </p>
 
             <div className="mt-6 space-y-3 text-sm text-gray-600">
               <div className="flex items-center gap-3">
                 <Users size={18} className="text-rose-500" />
-                <span>Phu hop cho khach ca nhan, cap doi hoac nhom nho</span>
+                <span>Phù hợp cho khách cá nhân , hoặc nhóm nhỏ</span>
               </div>
               <div className="flex items-center gap-3">
                 <CalendarDays size={18} className="text-rose-500" />
-                <span>Co the kiem tra phong trong theo ngay truoc khi dat</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <ShieldCheck size={18} className="text-rose-500" />
-                <span>Thong tin booking duoc luu bang ma xac nhan tu backend</span>
+                <span>Có thể kiểm tra phòng trống theo ngày trước khi đặt</span>
               </div>
             </div>
 
@@ -162,16 +164,18 @@ const PropertyDetailPage = () => {
               to={bookingLink}
               className="mt-8 inline-flex w-full items-center justify-center rounded-full bg-rose-500 px-6 py-4 text-sm font-semibold text-white transition hover:bg-rose-600"
             >
-              Dat phong
+              Đặt phòng
             </Link>
           </div>
 
           <div className="overflow-hidden rounded-[32px] border border-gray-100 bg-white shadow-sm">
             <div className="border-b border-gray-100 px-6 py-5">
-              <h2 className="text-xl font-semibold text-gray-950">Ban do khu vuc</h2>
+              <h2 className="text-xl font-semibold text-gray-950">
+                Bản đồ khu vực
+              </h2>
               <p className="mt-2 flex items-center gap-2 text-sm text-gray-500">
                 <MapPin size={16} className="text-rose-500" />
-                Hien thi dua theo dia diem cua phong hoac tu khoa tim kiem
+                Hiển thị theo địa điểm hoặc từ khóa
               </p>
             </div>
             <iframe

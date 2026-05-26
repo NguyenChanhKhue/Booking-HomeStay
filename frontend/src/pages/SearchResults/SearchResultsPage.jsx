@@ -19,7 +19,7 @@ const SearchResultsPage = () => {
       minPrice: searchParams.get("minPrice") ?? "",
       maxPrice: searchParams.get("maxPrice") ?? "",
     }),
-    [searchParams]
+    [searchParams],
   );
 
   useEffect(() => {
@@ -42,7 +42,6 @@ const SearchResultsPage = () => {
 
   return (
     <div className="space-y-6">
-
       {loading ? (
         <div className="rounded-[28px] border border-dashed border-gray-200 p-12 text-center text-gray-500">
           Dang tai danh sach phong...
@@ -55,7 +54,11 @@ const SearchResultsPage = () => {
         <>
           <div className="flex items-center justify-between gap-4">
             <p className="text-sm text-gray-500">
-              Tim thay <span className="font-semibold text-gray-900">{rooms.length}</span> phong phu hop
+              Tìm thấy{" "}
+              <span className="font-semibold text-gray-900">
+                {rooms.length}
+              </span>{" "}
+              phòng phù hợp
             </p>
           </div>
           <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-4">
@@ -67,10 +70,11 @@ const SearchResultsPage = () => {
       ) : (
         <div className="rounded-[28px] border border-dashed border-gray-200 p-12 text-center">
           <h2 className="text-2xl font-semibold text-gray-950">
-            Chua co phong khop voi bo loc hien tai
+            Chưa có phòng phù hợp
           </h2>
           <p className="mt-3 text-gray-600">
-            Ban co the doi dia diem, doi ngay hoac bo bot dieu kien de mo rong ket qua.
+            Bạn có thể đổi địa điểm , đổi ngày hoặc bỏ bớt điều kiện để mở rộng
+            kết quả.
           </p>
         </div>
       )}
