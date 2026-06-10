@@ -86,22 +86,30 @@ const BookingPage = () => {
       const profile = user ?? (await refreshProfile());
       const response = await createBooking(roomId, profile.id, bookingPayload);
       
-      // Redirect to payment gateway
-      setMessage("Đang chuyển hướng đến cổng thanh toán...");
-      import("../../services/api").then(async ({ api }) => {
-        try {
-          const { data } = await api.get(`/payment/create-url/${response.booking.id}`);
-          if (data && data.paymentUrl) {
-            window.location.href = data.paymentUrl;
-          } else {
-            setError("Lỗi tạo đường dẫn thanh toán.");
+      if (paymentMethod === "VNPAY") {
+        // Redirect to payment gateway
+        setMessage("Đang chuyển hướng đến cổng thanh toán...");
+        import("../../services/api").then(async ({ api }) => {
+          try {
+            const { data } = await api.get(`/payment/create-url/${response.booking.id}`);
+            if (data && data.paymentUrl) {
+              window.location.href = data.paymentUrl;
+            } else {
+              setError("Lỗi tạo đường dẫn thanh toán.");
+              setSubmitting(false);
+            }
+          } catch (paymentErr) {
+            setError("Lỗi kết nối cổng thanh toán.");
             setSubmitting(false);
           }
-        } catch (paymentErr) {
-          setError("Lỗi kết nối cổng thanh toán.");
-          setSubmitting(false);
-        }
-      });
+        });
+      } else {
+        // Pay later
+        setMessage("Đặt phòng thành công! Đang chuyển hướng...");
+        setTimeout(() => {
+          navigate("/profile");
+        }, 1500);
+      }
     } catch (err) {
       setError(
         err.response?.data?.message || "Đặt phòng thất bại. Vui lòng thử lại.",
@@ -227,23 +235,8 @@ const BookingPage = () => {
             <div className="space-y-4">
               <label className="flex items-center justify-between p-4 border border-gray-200 rounded-2xl cursor-pointer hover:border-rose-300 transition">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-pink-600 rounded-lg flex items-center justify-center text-white font-bold text-xs">MoMo</div>
-                  <span className="font-medium text-gray-800">MoMo</span>
-                </div>
-                <input 
-                  type="radio" 
-                  name="paymentMethod" 
-                  value="MOMO"
-                  checked={paymentMethod === "MOMO"}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                  className="w-5 h-5 accent-rose-500"
-                />
-              </label>
-
-              <label className="flex items-center justify-between p-4 border border-gray-200 rounded-2xl cursor-pointer hover:border-rose-300 transition">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-slate-800 text-white rounded-lg flex items-center justify-center font-bold text-xs">VISA</div>
-                  <span className="font-medium text-gray-800">Thẻ tín dụng hoặc thẻ ghi nợ (VNPay)</span>
+                  <div className="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-xs">VNP</div>
+                  <span className="font-medium text-gray-800">Thanh toán trực tuyến (VNPay, ATM, Visa, MasterCard)</span>
                 </div>
                 <input 
                   type="radio" 
@@ -257,14 +250,14 @@ const BookingPage = () => {
 
               <label className="flex items-center justify-between p-4 border border-gray-200 rounded-2xl cursor-pointer hover:border-rose-300 transition">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center font-bold text-xs">ATM</div>
-                  <span className="font-medium text-gray-800">Tài khoản ngân hàng nội địa</span>
+                  <div className="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center font-bold text-xs">LATER</div>
+                  <span className="font-medium text-gray-800">Đặt phòng trước, thanh toán sau</span>
                 </div>
                 <input 
                   type="radio" 
                   name="paymentMethod" 
-                  value="BANK"
-                  checked={paymentMethod === "BANK"}
+                  value="PAY_LATER"
+                  checked={paymentMethod === "PAY_LATER"}
                   onChange={(e) => setPaymentMethod(e.target.value)}
                   className="w-5 h-5 accent-rose-500"
                 />
