@@ -98,7 +98,7 @@ const AdminDashboard = () => {
     const dd = today.getDate();
 
     const revenue = stats.bookings.reduce((sum, booking) => {
-      if (booking.status !== "CANCELLED" && booking.checkInDate) {
+      if (booking.status !== "CANCELLED" && booking.paymentStatus === "PAID" && booking.checkInDate) {
         const bookingDate = new Date(booking.checkInDate);
         
         if (revenueFilter === 'day') {
@@ -145,11 +145,14 @@ const AdminDashboard = () => {
     }
   };
 
-  const getStatusBadge = (status) => {
-    if (status === "CANCELLED") {
+  const getStatusBadge = (booking) => {
+    if (booking.status === "CANCELLED") {
       return <span className="px-2.5 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold uppercase tracking-wider">Đã hủy</span>;
     }
-    return <span className="px-2.5 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold uppercase tracking-wider">Thành công</span>;
+    if (booking.paymentStatus === "PAID") {
+      return <span className="px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-semibold uppercase tracking-wider">Đã thanh toán</span>;
+    }
+    return <span className="px-2.5 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-semibold uppercase tracking-wider">Chưa thanh toán</span>;
   };
 
   const StatCard = ({ icon: Icon, label, value, color, onClick }) => (
@@ -242,7 +245,7 @@ const AdminDashboard = () => {
           {calculateTotalRevenue()}
         </p>
         <p className="text-gray-600 text-sm mt-2">
-          Doanh thu từ tất cả các đơn đặt hợp lệ (không bao gồm đơn đã hủy).
+          Doanh thu từ tất cả các đơn đặt đã được thanh toán thành công.
         </p>
       </div>
 
@@ -307,7 +310,7 @@ const AdminDashboard = () => {
                     {new Intl.NumberFormat('vi-VN').format(calculatePrice(booking))} đ
                   </td>
                   <td className="px-6 py-4 text-sm">
-                    {getStatusBadge(booking.status)}
+                    {getStatusBadge(booking)}
                   </td>
                   <td className="px-6 py-4 text-sm space-x-2">
                     <button

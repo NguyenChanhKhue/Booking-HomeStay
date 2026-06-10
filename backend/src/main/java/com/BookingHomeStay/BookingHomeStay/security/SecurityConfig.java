@@ -36,7 +36,7 @@ public class SecurityConfig {
         .csrf(csrf -> csrf.disable())
         .cors(Customizer.withDefaults())
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/auth/**", "/api/rooms/**", "/api/bookings/**").permitAll()
+            .requestMatchers("/api/auth/**", "/api/rooms/**", "/api/bookings/**", "/api/payment/**").permitAll()
             .anyRequest().authenticated())
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authenticationProvider(authenticationProvider())

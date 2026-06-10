@@ -163,6 +163,8 @@ public class BookingServiceImpl implements BookingService {
     bookingDTO.setTotalNumOfGuest(booking.getTotalNumOfGuest());
     bookingDTO.setBookingConfirmationCode(booking.getBookingConfirmationCode());
     bookingDTO.setStatus(booking.getStatus());
+    bookingDTO.setPaymentStatus(booking.getPaymentStatus());
+    bookingDTO.setPaymentMethod(booking.getPaymentMethod());
     bookingDTO.setUser(mapUserToUserDto(booking.getUser()));
     bookingDTO.setRoom(mapRoomToRoomDto(booking.getRoom()));
     return bookingDTO;

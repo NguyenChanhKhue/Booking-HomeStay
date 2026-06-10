@@ -24,6 +24,7 @@ const BookingPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("VNPAY");
   const [form, setForm] = useState({
     checkInDate: searchParams.get("checkInDate") ?? "",
     checkOutDate: searchParams.get("checkOutDate") ?? "",
@@ -84,14 +85,27 @@ const BookingPage = () => {
 
       const profile = user ?? (await refreshProfile());
       const response = await createBooking(roomId, profile.id, bookingPayload);
-      setMessage(
-        `Đặt phòng thành công. Mã xác nhận của bạn là ${response.bookingConfirmationCode}.`,
-      );
+      
+      // Redirect to payment gateway
+      setMessage("Đang chuyển hướng đến cổng thanh toán...");
+      import("../../services/api").then(async ({ api }) => {
+        try {
+          const { data } = await api.get(`/payment/create-url/${response.booking.id}`);
+          if (data && data.paymentUrl) {
+            window.location.href = data.paymentUrl;
+          } else {
+            setError("Lỗi tạo đường dẫn thanh toán.");
+            setSubmitting(false);
+          }
+        } catch (paymentErr) {
+          setError("Lỗi kết nối cổng thanh toán.");
+          setSubmitting(false);
+        }
+      });
     } catch (err) {
       setError(
         err.response?.data?.message || "Đặt phòng thất bại. Vui lòng thử lại.",
       );
-    } finally {
       setSubmitting(false);
     }
   };
@@ -202,6 +216,59 @@ const BookingPage = () => {
             <div className="flex justify-between border-t border-rose-200 mt-4 pt-4 text-xl font-bold text-rose-600">
               <span>Tổng tiền:</span>
               <span>{formatPrice((room?.roomPrice || 0) * getDiffDays())}</span>
+            </div>
+          </div>
+
+          <div className="rounded-[24px] border border-gray-100 p-5 mt-6">
+            <h3 className="text-sm font-semibold uppercase tracking-widest text-gray-500 mb-4">
+              1. Thêm phương thức thanh toán
+            </h3>
+            
+            <div className="space-y-4">
+              <label className="flex items-center justify-between p-4 border border-gray-200 rounded-2xl cursor-pointer hover:border-rose-300 transition">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-pink-600 rounded-lg flex items-center justify-center text-white font-bold text-xs">MoMo</div>
+                  <span className="font-medium text-gray-800">MoMo</span>
+                </div>
+                <input 
+                  type="radio" 
+                  name="paymentMethod" 
+                  value="MOMO"
+                  checked={paymentMethod === "MOMO"}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                  className="w-5 h-5 accent-rose-500"
+                />
+              </label>
+
+              <label className="flex items-center justify-between p-4 border border-gray-200 rounded-2xl cursor-pointer hover:border-rose-300 transition">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-slate-800 text-white rounded-lg flex items-center justify-center font-bold text-xs">VISA</div>
+                  <span className="font-medium text-gray-800">Thẻ tín dụng hoặc thẻ ghi nợ (VNPay)</span>
+                </div>
+                <input 
+                  type="radio" 
+                  name="paymentMethod" 
+                  value="VNPAY"
+                  checked={paymentMethod === "VNPAY"}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                  className="w-5 h-5 accent-rose-500"
+                />
+              </label>
+
+              <label className="flex items-center justify-between p-4 border border-gray-200 rounded-2xl cursor-pointer hover:border-rose-300 transition">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center font-bold text-xs">ATM</div>
+                  <span className="font-medium text-gray-800">Tài khoản ngân hàng nội địa</span>
+                </div>
+                <input 
+                  type="radio" 
+                  name="paymentMethod" 
+                  value="BANK"
+                  checked={paymentMethod === "BANK"}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                  className="w-5 h-5 accent-rose-500"
+                />
+              </label>
             </div>
           </div>
 

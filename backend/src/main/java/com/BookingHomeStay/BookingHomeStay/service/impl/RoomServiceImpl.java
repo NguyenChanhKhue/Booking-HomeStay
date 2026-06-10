@@ -274,6 +274,8 @@ public class RoomServiceImpl implements RoomService {
     bookingDTO.setNumOfChildren(booking.getNumOfChildren());
     bookingDTO.setTotalNumOfGuest(booking.getTotalNumOfGuest());
     bookingDTO.setBookingConfirmationCode(booking.getBookingConfirmationCode());
+    bookingDTO.setPaymentStatus(booking.getPaymentStatus());
+    bookingDTO.setPaymentMethod(booking.getPaymentMethod());
     return bookingDTO;
   }
 }

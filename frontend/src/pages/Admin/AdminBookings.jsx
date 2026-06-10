@@ -14,6 +14,7 @@ const AdminBookings = () => {
   const [loadingBookings, setLoadingBookings] = useState(true);
   const [message, setMessage] = useState("");
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -83,6 +84,11 @@ const AdminBookings = () => {
     );
   };
 
+  const filteredBookings = bookings.filter((booking) => {
+    if (!searchQuery) return true;
+    return booking.bookingConfirmationCode?.toLowerCase().includes(searchQuery.toLowerCase());
+  });
+
   if (loading || loadingBookings) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -93,12 +99,23 @@ const AdminBookings = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-4xl font-bold text-gray-900">Quản lý đơn đặt</h1>
-        <p className="text-gray-600 mt-2">
-          Tổng cộng {bookings.length} đơn đặt
-        </p>
+      {/* Header and Actions */}
+      <div className="flex flex-col md:flex-row justify-between md:items-end gap-4">
+        <div>
+          <h1 className="text-4xl font-bold text-gray-900">Quản lý đơn đặt</h1>
+          <p className="text-gray-600 mt-2">
+            Tổng cộng {filteredBookings.length} đơn đặt
+          </p>
+        </div>
+        <div className="w-full md:w-auto">
+          <input
+            type="text"
+            placeholder="Tìm theo mã đơn..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full md:w-64 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent transition"
+          />
+        </div>
       </div>
 
       {/* Message */}
@@ -116,7 +133,7 @@ const AdminBookings = () => {
 
       {/* Bookings Grid */}
       <div className="grid grid-cols-1 gap-6">
-        {bookings.map((booking) => (
+        {filteredBookings.map((booking) => (
           <div
             key={booking.id}
             className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition"
@@ -129,7 +146,12 @@ const AdminBookings = () => {
                       <h3 className="text-xl font-bold text-gray-900">
                         {booking.room?.roomType || "Phòng"}
                       </h3>
-                      {getStatusBadge(booking)}
+                      <div className="flex gap-2">
+                        {getStatusBadge(booking)}
+                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${booking.paymentStatus === "PAID" ? "bg-emerald-100 text-emerald-700" : "bg-orange-100 text-orange-700"}`}>
+                          {booking.paymentStatus === "PAID" ? "Đã thanh toán" : "Chưa thanh toán"}
+                        </span>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
@@ -227,9 +249,9 @@ const AdminBookings = () => {
         ))}
       </div>
 
-      {bookings.length === 0 && (
+      {filteredBookings.length === 0 && (
         <div className="bg-white rounded-lg shadow-md p-12 text-center text-gray-500">
-          <p className="text-lg">Chưa có đơn đặt nào</p>
+          <p className="text-lg">Không tìm thấy đơn đặt nào</p>
         </div>
       )}
     </div>

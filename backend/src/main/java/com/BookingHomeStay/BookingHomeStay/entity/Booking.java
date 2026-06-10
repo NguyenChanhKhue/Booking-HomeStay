@@ -41,6 +41,10 @@ public class Booking {
 
   private String status = "PENDING";
 
+  private String paymentStatus = "UNPAID";
+
+  private String paymentMethod = "CASH";
+
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "user_id")
   private User user;

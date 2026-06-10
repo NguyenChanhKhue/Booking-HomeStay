@@ -17,6 +17,7 @@ public class Response {
   private UserRole role;
   private String expirationTime;
   private String bookingConfirmationCode;
+  private String paymentUrl;
 
   private UserDTO user;
   private RoomDTO room;

@@ -8,4 +8,5 @@ import com.BookingHomeStay.BookingHomeStay.entity.Booking;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
   Optional<Booking> findByBookingConfirmationCode(String confirmationCode);
+  java.util.List<Booking> findByBookingConfirmationCodeStartingWith(String prefix);
 }

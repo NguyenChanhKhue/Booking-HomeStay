@@ -12,6 +12,7 @@ import AdminDashboard from "../pages/Admin/AdminDashboard";
 import AdminProperties from "../pages/Admin/AdminProperties";
 import AdminBookings from "../pages/Admin/AdminBookings";
 import AdminUsers from "../pages/Admin/AdminUsers";
+import PaymentResultPage from "../pages/Payment/PaymentResultPage";
 
 const NotFoundPage = () => (
   <div className="mx-auto flex min-h-[60vh] max-w-3xl flex-col items-center justify-center gap-4 text-center">
@@ -85,6 +86,14 @@ const AppRoutes = () => {
             element={
               <MainLayout>
                 <AuthPage />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/payment/result"
+            element={
+              <MainLayout>
+                <PaymentResultPage />
               </MainLayout>
             }
           />

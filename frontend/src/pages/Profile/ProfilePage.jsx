@@ -29,7 +29,8 @@ const ProfilePage = () => {
 
       try {
         const list = await fetchBookingHistory();
-        setBookings(list);
+        const sortedList = [...list].sort((a, b) => b.id - a.id);
+        setBookings(sortedList);
       } catch (err) {
         setError("Không thể tải lịch sử đặt phòng.");
       }
@@ -46,10 +47,24 @@ const ProfilePage = () => {
       });
       alert("Hủy đơn đặt phòng thành công!");
       const list = await fetchBookingHistory();
-      setBookings(list);
+      const sortedList = [...list].sort((a, b) => b.id - a.id);
+      setBookings(sortedList);
     } catch (error) {
       console.error("Failed to cancel booking:", error);
       alert("Không thể hủy đơn đặt phòng.");
+    }
+  };
+
+  const handlePayNow = async (bookingId) => {
+    try {
+      const { data } = await api.get(`/payment/create-url/${bookingId}`);
+      if (data && data.paymentUrl) {
+        window.location.href = data.paymentUrl;
+      } else {
+        alert("Không thể tạo đường dẫn thanh toán lúc này.");
+      }
+    } catch (err) {
+      alert("Lỗi kết nối đến cổng thanh toán.");
     }
   };
 
@@ -171,6 +186,11 @@ const ProfilePage = () => {
                           {booking.status === "CANCELLED" ? "Đã hủy" : "Thành công"}
                         </span>
                       </div>
+                      <div className="flex items-center gap-2">
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${booking.paymentStatus === "PAID" ? "bg-emerald-100 text-emerald-700" : "bg-orange-100 text-orange-700"}`}>
+                          {booking.paymentStatus === "PAID" ? "Đã thanh toán" : "Chưa thanh toán"}
+                        </span>
+                      </div>
                     </div>
                   </div>
                   <div className="rounded-[24px] bg-gray-50 p-5 flex flex-col justify-end">
@@ -187,6 +207,14 @@ const ProfilePage = () => {
                           className="w-full rounded-full bg-red-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-600"
                         >
                           Hủy đơn
+                        </button>
+                      )}
+                      {booking.status !== "CANCELLED" && booking.paymentStatus !== "PAID" && (
+                        <button
+                          onClick={() => handlePayNow(booking.id)}
+                          className="w-full rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-600"
+                        >
+                          Thanh toán ngay
                         </button>
                       )}
                     </div>

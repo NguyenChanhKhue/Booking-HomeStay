@@ -124,6 +124,8 @@ public class UserServiceImpl implements UserService {
     bookingDTO.setTotalNumOfGuest(booking.getTotalNumOfGuest());
     bookingDTO.setBookingConfirmationCode(booking.getBookingConfirmationCode());
     bookingDTO.setStatus(booking.getStatus());
+    bookingDTO.setPaymentStatus(booking.getPaymentStatus());
+    bookingDTO.setPaymentMethod(booking.getPaymentMethod());
     bookingDTO.setRoom(mapRoomToRoomDto(booking.getRoom()));
     return bookingDTO;
   }
