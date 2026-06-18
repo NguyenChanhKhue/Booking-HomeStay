@@ -1,6 +1,8 @@
 import { Search as SearchIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Slider from "rc-slider";
+import "rc-slider/assets/index.css";
 
 const today = new Date();
 const yyyy = today.getFullYear();
@@ -14,13 +16,14 @@ const defaultCheckOut = `${tomorrow.getFullYear()}-${String(
   tomorrow.getMonth() + 1,
 ).padStart(2, "0")}-${String(tomorrow.getDate()).padStart(2, "0")}`;
 
-const Search = ({ compact = false, initialValues = {} }) => {
+const Search = ({ compact = false, fullWidth = false, initialValues = {} }) => {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     location: initialValues.location ?? initialValues.keyword ?? "",
     checkInDate: initialValues.checkInDate ?? defaultCheckIn,
     checkOutDate: initialValues.checkOutDate ?? defaultCheckOut,
-    maxPrice: initialValues.maxPrice ?? 5000000,
+    minPrice: initialValues.minPrice ? Number(initialValues.minPrice) : 0,
+    maxPrice: initialValues.maxPrice ? Number(initialValues.maxPrice) : 5000000,
   });
 
   useEffect(() => {
@@ -28,13 +31,15 @@ const Search = ({ compact = false, initialValues = {} }) => {
       location: initialValues.location ?? initialValues.keyword ?? "",
       checkInDate: initialValues.checkInDate ?? defaultCheckIn,
       checkOutDate: initialValues.checkOutDate ?? defaultCheckOut,
-      maxPrice: initialValues.maxPrice ?? 5000000,
+      minPrice: initialValues.minPrice ? Number(initialValues.minPrice) : 0,
+      maxPrice: initialValues.maxPrice ? Number(initialValues.maxPrice) : 5000000,
     });
   }, [
     initialValues.checkInDate,
     initialValues.checkOutDate,
     initialValues.keyword,
     initialValues.location,
+    initialValues.minPrice,
     initialValues.maxPrice,
   ]);
 
@@ -50,10 +55,8 @@ const Search = ({ compact = false, initialValues = {} }) => {
     if (form.location.trim()) params.set("location", form.location.trim());
     if (form.checkInDate) params.set("checkInDate", form.checkInDate);
     if (form.checkOutDate) params.set("checkOutDate", form.checkOutDate);
-    if (form.maxPrice < 5000000) {
-      params.set("minPrice", "0");
-      params.set("maxPrice", form.maxPrice.toString());
-    }
+    if (form.minPrice > 0) params.set("minPrice", form.minPrice.toString());
+    if (form.maxPrice < 5000000) params.set("maxPrice", form.maxPrice.toString());
 
     navigate(`/search?${params.toString()}`);
   };
@@ -115,23 +118,20 @@ const Search = ({ compact = false, initialValues = {} }) => {
   }
 
   const formatPriceLabel = (price) => {
-    if (price >= 5000000) return "Tất cả";
-    if (price >= 1000000) return `${(price / 1000000).toFixed(1)}tr đ`;
-    return `${(price / 1000).toFixed(0)}k đ`;
+    const numPrice = Number(price) || 0;
+    return numPrice.toLocaleString('vi-VN') + 'đ';
   };
-
-  const pct = ((form.maxPrice - 500000) / (5000000 - 500000)) * 100;
 
   return (
     <form
-      className="mx-auto w-full max-w-3xl rounded-full border border-white/60 bg-white/95 px-2 py-1.5 shadow-[0_16px_48px_rgba(0,0,0,0.12)] backdrop-blur-xl"
+      className={`mx-auto w-full ${fullWidth ? 'max-w-none' : 'max-w-4xl'} rounded-full border border-gray-200 bg-white/95 px-2 py-1.5 shadow-[0_16px_48px_rgba(0,0,0,0.06)] backdrop-blur-xl`}
       onSubmit={handleSubmit}
     >
       <div className="flex flex-col md:flex-row items-center divide-y md:divide-y-0 md:divide-x divide-gray-200">
 
         {/* Địa điểm */}
-        <label className="w-full flex-[1.4] px-3 py-1.5 hover:bg-gray-50/60 rounded-full transition-colors cursor-text">
-          <span className="block text-[9px] font-extrabold uppercase tracking-widest text-gray-900 mb-0.5">
+        <label className="w-full flex-[1.4] px-4 py-2 hover:bg-gray-50/60 rounded-full transition-colors cursor-text">
+          <span className="block text-[10px] font-extrabold uppercase tracking-widest text-gray-900 mb-0.5">
             Địa điểm
           </span>
           <input
@@ -139,13 +139,13 @@ const Search = ({ compact = false, initialValues = {} }) => {
             value={form.location}
             onChange={handleChange}
             placeholder="Bạn muốn ở khu vực nào?"
-            className="w-full border-none bg-transparent text-xs text-gray-600 outline-none placeholder:text-gray-400 font-medium"
+            className="w-full border-none bg-transparent text-base font-medium text-gray-900 outline-none placeholder:text-gray-400"
           />
         </label>
 
         {/* Nhận phòng */}
-        <label className="w-full flex-1 px-3 py-1.5 hover:bg-gray-50/60 rounded-full transition-colors cursor-pointer">
-          <span className="block text-[9px] font-extrabold uppercase tracking-widest text-gray-900 mb-0.5">
+        <label className="w-full flex-1 px-4 py-2 hover:bg-gray-50/60 rounded-full transition-colors cursor-pointer">
+          <span className="block text-[10px] font-extrabold uppercase tracking-widest text-gray-900 mb-0.5">
             Nhận phòng
           </span>
           <input
@@ -153,13 +153,13 @@ const Search = ({ compact = false, initialValues = {} }) => {
             name="checkInDate"
             value={form.checkInDate}
             onChange={handleChange}
-            className="w-full border-none bg-transparent text-xs text-gray-600 outline-none font-medium cursor-pointer"
+            className="w-full border-none bg-transparent text-base font-medium text-gray-900 outline-none cursor-pointer"
           />
         </label>
 
         {/* Trả phòng */}
-        <label className="w-full flex-1 px-3 py-1.5 hover:bg-gray-50/60 rounded-full transition-colors cursor-pointer">
-          <span className="block text-[9px] font-extrabold uppercase tracking-widest text-gray-900 mb-0.5">
+        <label className="w-full flex-1 px-4 py-2 hover:bg-gray-50/60 rounded-full transition-colors cursor-pointer">
+          <span className="block text-[10px] font-extrabold uppercase tracking-widest text-gray-900 mb-0.5">
             Trả phòng
           </span>
           <input
@@ -167,34 +167,35 @@ const Search = ({ compact = false, initialValues = {} }) => {
             name="checkOutDate"
             value={form.checkOutDate}
             onChange={handleChange}
-            className="w-full border-none bg-transparent text-xs text-gray-600 outline-none font-medium cursor-pointer"
+            className="w-full border-none bg-transparent text-base font-medium text-gray-900 outline-none cursor-pointer"
           />
         </label>
 
         {/* Mức giá - Slider */}
-        <label className="w-full flex-[1.2] px-3 py-1.5 hover:bg-gray-50/60 rounded-full transition-colors cursor-pointer">
-          <span className="flex items-center justify-between text-[9px] font-extrabold uppercase tracking-widest text-gray-900 mb-0.5">
-            Mức giá:&nbsp;
-            <span className="font-black normal-case text-[12px] text-rose-500">
-              {formatPriceLabel(form.maxPrice)}
+        <div className="w-full min-w-[240px] flex-[2] px-4 py-2 hover:bg-gray-50/60 rounded-full transition-colors flex flex-col justify-center">
+          <span className="flex items-center justify-between text-[10px] font-extrabold uppercase tracking-widest text-gray-900 mb-2">
+            Mức giá:
+            <span className="font-black normal-case text-sm text-gray-700 tracking-normal whitespace-nowrap ml-2">
+              {formatPriceLabel(form.minPrice)} - {formatPriceLabel(form.maxPrice)}
             </span>
           </span>
-          <div className="flex items-center h-2.5">
-            <input
-              type="range"
-              name="maxPrice"
-              min="500000"
-              max="5000000"
-              step="500000"
-              value={form.maxPrice}
-              onChange={handleChange}
-              className="w-full h-1 rounded-lg appearance-none cursor-pointer"
-              style={{
-                background: `linear-gradient(to right, #f43f5e ${pct}%, #e5e7eb ${pct}%)`,
-              }}
+          <div className="flex items-center h-4 px-2 mb-1 w-full">
+            <Slider
+              range
+              min={0}
+              max={5000000}
+              step={100000}
+              value={[form.minPrice, form.maxPrice]}
+              onChange={(val) => setForm((prev) => ({ ...prev, minPrice: val[0], maxPrice: val[1] }))}
+              trackStyle={[{ backgroundColor: '#f43f5e', height: 4 }]}
+              handleStyle={[
+                { borderColor: '#f43f5e', backgroundColor: 'white', opacity: 1, height: 16, width: 16, marginTop: -6 },
+                { borderColor: '#f43f5e', backgroundColor: 'white', opacity: 1, height: 16, width: 16, marginTop: -6 }
+              ]}
+              railStyle={{ backgroundColor: '#e5e7eb', height: 4 }}
             />
           </div>
-        </label>
+        </div>
 
         {/* Nút Tìm kiếm */}
         <div className="px-1.5 py-1 w-full md:w-auto">

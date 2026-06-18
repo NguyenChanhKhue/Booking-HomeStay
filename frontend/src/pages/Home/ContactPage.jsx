@@ -35,7 +35,7 @@ const ContactPage = () => {
       <section className="relative h-[60vh] min-h-[500px] w-[100vw] ml-[calc(-50vw+50%)] -mt-[88px]">
         <div className="absolute inset-0 w-full h-full">
           <img
-            src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=2000&q=80"
+            src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=2000&q=80"
             alt="Contact Us"
             className="w-full h-full object-cover"
           />

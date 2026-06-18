@@ -127,7 +127,7 @@ const AboutPage = () => {
       <section className="text-center px-4 max-w-3xl mx-auto pb-16">
         <h2 className="text-3xl font-bold text-gray-900 mb-6">Bạn đã sẵn sàng cho chuyến đi?</h2>
         <Link 
-          to="/rooms" 
+          to="/search" 
           className="inline-flex items-center justify-center px-8 py-4 bg-rose-500 text-white rounded-full font-bold hover:bg-rose-600 transition shadow-lg shadow-rose-500/30"
         >
           Khám phá phòng ngay

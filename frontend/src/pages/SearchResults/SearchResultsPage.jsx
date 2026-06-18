@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useSearchParams } from "react-router-dom";
 import PropertyCard from "../../components/cards/PropertyCard";
+import Search from "../../components/navbar/Search";
 import { searchRooms } from "../../services/propertyService";
 
 const SearchResultsPage = () => {
@@ -51,6 +52,10 @@ const SearchResultsPage = () => {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  const hasSearchParams = Array.from(searchParams.keys()).length > 0;
+  const pageTitle = hasSearchParams ? "Kết quả tìm kiếm" : "Khám phá tất cả chỗ ở";
+  const subTitle = hasSearchParams ? `Tìm thấy ${rooms.length} phòng phù hợp` : `Có sẵn ${rooms.length} phòng`;
+
   return (
     <div className="space-y-8 pb-12">
       <motion.div 
@@ -60,13 +65,18 @@ const SearchResultsPage = () => {
       >
         <div className="flex items-center justify-between gap-4 mb-2">
           <h1 className="text-2xl font-bold text-gray-900">
-            Kết quả tìm kiếm
+            {pageTitle}
           </h1>
           {!loading && !error && (
             <p className="text-sm font-medium text-rose-500 bg-rose-50 px-4 py-2 rounded-full">
-              Tìm thấy <span className="font-black">{rooms.length}</span> phòng phù hợp
+              {hasSearchParams ? "Tìm thấy" : "Có sẵn"} <span className="font-black">{rooms.length}</span> {hasSearchParams ? "phòng phù hợp" : "phòng"}
             </p>
           )}
+        </div>
+        
+        {/* Thanh công cụ tìm kiếm / lọc */}
+        <div className="mt-6 bg-gray-50/50 -mx-6 -mb-6 p-6 rounded-b-[32px] border-t border-gray-100">
+          <Search fullWidth={true} initialValues={filters} />
         </div>
       </motion.div>
 

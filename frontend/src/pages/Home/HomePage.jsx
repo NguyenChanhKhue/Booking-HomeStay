@@ -1,46 +1,50 @@
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { Home, Users, MapPin, Star, Award, ChevronRight } from "lucide-react";
 import PropertyCard from "../../components/cards/PropertyCard";
 import Search from "../../components/navbar/Search";
+import SkeletonCard from "../../components/ui/SkeletonCard";
+import EmptyState from "../../components/ui/EmptyState";
+import CountUp from "../../components/ui/CountUp";
 import { getAllRooms, getRoomTypes } from "../../services/propertyService";
 
 const FEATURED_LOCATIONS = [
   {
     id: "da-lat",
     name: "Da Lat",
-    image:
-      "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80",
+    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80",
+    propertyCount: "1,200",
   },
   {
     id: "vung-tau",
     name: "Vung Tau",
-    image:
-      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80",
+    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80",
+    propertyCount: "850",
   },
   {
     id: "hoi-an",
     name: "Hoi An",
-    image:
-      "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=400&q=80",
+    image: "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=400&q=80",
+    propertyCount: "920",
   },
   {
     id: "sa-pa",
     name: "Sa Pa",
-    image:
-      "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=400&q=80",
+    image: "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=400&q=80",
+    propertyCount: "430",
   },
   {
     id: "nha-trang",
     name: "Nha Trang",
-    image:
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=400&q=80",
+    image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=400&q=80",
+    propertyCount: "1,500",
   },
   {
     id: "phu-quoc",
     name: "Phu Quoc",
-    image:
-      "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=400&q=80",
+    image: "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=400&q=80",
+    propertyCount: "680",
   },
 ];
 
@@ -55,6 +59,7 @@ const HomePage = () => {
   const trendingRooms = [...rooms]
     .sort((a, b) => (b.bookingCount || 0) - (a.bookingCount || 0))
     .slice(0, 10);
+
   const carouselRef = useRef(null);
 
   useEffect(() => {
@@ -118,16 +123,16 @@ const HomePage = () => {
   return (
     <div className="pb-6">
       {/* Hero Section */}
-      <section className="relative h-[85vh] min-h-[600px] w-[100vw] ml-[calc(-50vw+50%)] mb-8 -mt-[88px]">
+      <section className="relative h-[65vh] min-h-[450px] w-[100vw] ml-[calc(-50vw+50%)] mb-8 -mt-[88px]">
         {/* Background Image */}
         <div className="absolute inset-0 w-full h-full">
           <img
-            src="https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?auto=format&fit=crop&w=2000&q=80"
-            alt="Beautiful HomeStay"
+            src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=2000&q=80"
+            alt="Luxury Resort"
             className="w-full h-full object-cover"
           />
-          {/* Gradient Overlay that fades into the global background color */}
-          <div className="absolute inset-0 bg-gradient-to-b from-gray-900/60 via-gray-900/30 to-[#f7f9fc]"></div>
+          {/* Gradient Overlay giúp chữ nổi bật mà không làm tối toàn bộ ảnh */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-transparent"></div>
         </div>
 
         {/* Hero Content */}
@@ -136,7 +141,7 @@ const HomePage = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="text-5xl md:text-7xl font-extrabold text-white mb-6 drop-shadow-lg tracking-tight"
+            className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 tracking-tight drop-shadow-[0_4px_8px_rgba(0,0,0,0.5)] [text-shadow:_0_2px_15px_rgb(0_0_0_/_60%)]"
           >
             Khám phá không gian <br className="hidden md:block" /> lưu trú tuyệt vời
           </motion.h1>
@@ -145,7 +150,7 @@ const HomePage = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-            className="text-lg md:text-2xl text-white/90 mb-10 max-w-2xl font-medium drop-shadow-md"
+            className="text-lg md:text-2xl text-white/95 mb-10 max-w-2xl font-medium drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
           >
             Trải nghiệm những khoảnh khắc đáng nhớ với hàng ngàn lựa chọn chỗ ở độc đáo trên khắp Việt Nam.
           </motion.p>
@@ -161,7 +166,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      <div className="space-y-16 relative z-10 -mt-32">
+      <div className="space-y-10 relative z-10 mt-4">
         {/* Categories Section */}
         <motion.section 
           initial={{ opacity: 0, y: 20 }}
@@ -186,9 +191,9 @@ const HomePage = () => {
           ) : null}
           <Link
             to="/search"
-            className="shrink-0 text-sm font-medium text-rose-500"
+            className="shrink-0 flex items-center text-sm font-medium text-rose-500 hover:text-rose-600 transition"
           >
-            Xem tat ca
+            Xem tất cả <ChevronRight size={16} className="ml-0.5" />
           </Link>
         </div>
         </motion.section>
@@ -212,14 +217,14 @@ const HomePage = () => {
                 to={`/search?location=${encodeURIComponent(location.name)}`}
                 className="group flex w-24 shrink-0 flex-col items-center gap-3 text-center"
               >
-                <div className="h-20 w-20 overflow-hidden rounded-full bg-gray-100 ring-1 ring-gray-100 transition group-hover:ring-gray-950">
+                <div className="relative h-20 w-20 overflow-hidden rounded-full bg-gray-100 ring-2 ring-transparent transition-all duration-300 group-hover:ring-rose-500 group-hover:shadow-lg">
                   <img
                     src={location.image}
                     alt={location.name}
-                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                    className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
                   />
                 </div>
-                <span className="text-sm font-semibold text-gray-800">
+                <span className="text-sm font-bold text-gray-800 text-center w-full transition-colors group-hover:text-rose-500">
                   {location.name}
                 </span>
               </Link>
@@ -227,7 +232,8 @@ const HomePage = () => {
           </div>
         </motion.section>
 
-        <motion.section 
+        {/* Trending Section */} 
+        <motion.section
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -247,10 +253,16 @@ const HomePage = () => {
             className="-mx-4 flex gap-7 overflow-x-auto px-4 pb-3 sm:mx-0 sm:px-0 scrollbar-hide"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
-            {trendingRooms.length > 0 ? (
+            {loading ? (
+              Array(4).fill(0).map((_, i) => (
+                <div key={i} className="w-[82vw] shrink-0 sm:w-[360px] lg:w-[calc((100%_-_84px)/4)]">
+                  <SkeletonCard />
+                </div>
+              ))
+            ) : trendingRooms.length > 0 ? (
               trendingRooms.map((room) => (
                 <div
-                  key={room.id}
+                  key={`trend-${room.id}`}
                   className="w-[82vw] shrink-0 sm:w-[360px] lg:w-[calc((100%_-_84px)/4)]"
                 >
                   <PropertyCard data={room} />
@@ -264,6 +276,11 @@ const HomePage = () => {
           </div>
         </motion.section>
 
+        <section className="space-y-6">
+          <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+          <h2 className="text-2xl font-bold tracking-tight text-gray-950">Khám phá tất cả</h2>
+        </div>
+
         {error ? (
           <div className="rounded-[28px] border border-red-100 bg-red-50 p-5 text-sm text-red-600">
             Lỗi tải dữ liệu: {error}
@@ -275,8 +292,10 @@ const HomePage = () => {
         ) : null}
 
         {loading ? (
-          <div className="rounded-[28px] border border-dashed border-gray-200 p-12 text-center text-gray-500">
-            Đang tải danh sách phòng
+          <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-4">
+            {Array(8).fill(0).map((_, i) => (
+              <SkeletonCard key={`skel-${i}`} />
+            ))}
           </div>
         ) : currentRooms.length > 0 ? (
           <>
@@ -320,10 +339,9 @@ const HomePage = () => {
             )}
           </>
         ) : (
-          <div className="rounded-[28px] border border-dashed border-gray-200 p-12 text-center text-gray-500">
-            Hiện chưa có phòng để hiện thị
-          </div>
+          <EmptyState onReset={() => window.location.reload()} />
         )}
+        </section>
       </div>
     </div>
   );

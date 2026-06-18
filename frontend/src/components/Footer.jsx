@@ -3,8 +3,8 @@ import { Mail, Phone, MapPin } from "lucide-react";
 
 const Footer = () => {
   return (
-    <footer className="bg-white/80 backdrop-blur-xl border-t border-white/50 text-gray-600 py-16 px-4 md:px-8 mt-auto shadow-[0_-10px_40px_rgba(0,0,0,0.02)]">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12 border-b border-gray-200/60 pb-12">
+    <footer className="bg-white/80 backdrop-blur-xl border-t border-white/50 text-gray-600 py-10 px-4 md:px-8 mt-auto shadow-[0_-10px_40px_rgba(0,0,0,0.02)]">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-8 border-b border-gray-200/60 pb-8">
         {/* Logo and About */}
         <div className="space-y-6">
           <Link to="/" className="inline-flex items-center text-4xl font-black tracking-tighter text-gray-900 group">
@@ -53,8 +53,8 @@ const Footer = () => {
         {/* Liên hệ */}
         <div>
           <h3 className="text-lg font-bold text-gray-900 mb-6">Liên hệ</h3>
-          <ul className="space-y-5">
-            <li className="flex items-start gap-4">
+          <ul className="space-y-4">
+            <li className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center shrink-0">
                 <MapPin size={20} className="text-rose-500" />
               </div>
@@ -70,9 +70,7 @@ const Footer = () => {
               <div className="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center shrink-0">
                 <Mail size={20} className="text-rose-500" />
               </div>
-              <div className="flex flex-col text-sm text-gray-600 font-medium">
-                <span>dungrom4269@gmail.com</span>
-              </div>
+              <span className="text-sm text-gray-600 font-medium">dungrom4269@gmail.com</span>
             </li>
           </ul>
         </div>
