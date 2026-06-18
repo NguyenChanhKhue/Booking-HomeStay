@@ -1,6 +1,8 @@
 package com.BookingHomeStay.BookingHomeStay.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -19,6 +21,8 @@ public class BookingDTO {
   private String status;
   private String paymentStatus;
   private String paymentMethod;
+  private BigDecimal totalPrice;
+  private LocalDateTime createdAt;
   private UserDTO user;
   private RoomDTO room;
 }

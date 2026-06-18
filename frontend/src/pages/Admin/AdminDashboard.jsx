@@ -70,8 +70,8 @@ const AdminDashboard = () => {
     const currentDateStr = `${yyyy}-${mm}-${dd}`;
     
     return stats.bookings.filter(booking => {
-      if (!booking.checkInDate) return false;
-      return booking.checkInDate.split("T")[0] === currentDateStr;
+      if (!booking.createdAt) return false;
+      return booking.createdAt.split("T")[0] === currentDateStr;
     });
   };
 
@@ -85,8 +85,8 @@ const AdminDashboard = () => {
     const currentDateStr = `${yyyy}-${mm}-${dd}`;
 
     return stats.bookings.reduce((count, booking) => {
-      if (!booking.checkInDate) return count;
-      const bookingDateStr = booking.checkInDate.split("T")[0];
+      if (!booking.createdAt) return count;
+      const bookingDateStr = booking.createdAt.split("T")[0];
       return bookingDateStr === currentDateStr ? count + 1 : count;
     }, 0);
   };
@@ -98,8 +98,8 @@ const AdminDashboard = () => {
     const dd = today.getDate();
 
     const revenue = stats.bookings.reduce((sum, booking) => {
-      if (booking.status !== "CANCELLED" && booking.paymentStatus === "PAID" && booking.checkInDate) {
-        const bookingDate = new Date(booking.checkInDate);
+      if (booking.status !== "CANCELLED" && booking.paymentStatus === "PAID" && booking.createdAt) {
+        const bookingDate = new Date(booking.createdAt);
         
         if (revenueFilter === 'day') {
           if (bookingDate.getFullYear() !== yyyy || bookingDate.getMonth() !== mm || bookingDate.getDate() !== dd) {
@@ -113,6 +113,10 @@ const AdminDashboard = () => {
           if (bookingDate.getFullYear() !== yyyy) {
             return sum;
           }
+        }
+
+        if (booking.totalPrice) {
+          return sum + booking.totalPrice;
         }
 
         const pricePerNight = booking.room?.roomPrice || 0;

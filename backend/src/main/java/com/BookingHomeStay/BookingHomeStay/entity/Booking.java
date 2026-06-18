@@ -3,6 +3,8 @@ package com.BookingHomeStay.BookingHomeStay.entity;
 import jakarta.persistence.Entity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 import jakarta.persistence.*;
 import jakarta.persistence.GeneratedValue;
@@ -44,6 +46,10 @@ public class Booking {
   private String paymentStatus = "UNPAID";
 
   private String paymentMethod = "CASH";
+
+  private BigDecimal totalPrice;
+
+  private LocalDateTime createdAt = LocalDateTime.now();
 
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "user_id")

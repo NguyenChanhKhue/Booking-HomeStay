@@ -1,4 +1,4 @@
-import { LogOut, Menu, X } from "lucide-react";
+import { LogOut, Menu, X, Home } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -86,6 +86,13 @@ const AdminLayout = ({ children }) => {
                 {user?.name ?? "Admin"}
               </p>
             </div>
+            <Link
+              to="/"
+              className="w-full flex items-center gap-2 px-4 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-white font-medium transition"
+            >
+              <Home size={18} />
+              Trở về trang chủ
+            </Link>
             <button
               onClick={handleLogout}
               className="w-full flex items-center gap-2 px-4 py-3 bg-red-600 hover:bg-red-700 rounded-lg text-white font-medium transition"

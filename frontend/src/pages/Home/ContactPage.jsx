@@ -1,9 +1,13 @@
 import { MapPin, Phone, Mail, Clock, Send } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import { api } from "../../services/api";
 
 const ContactPage = () => {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -18,6 +22,11 @@ const ContactPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!isAuthenticated) {
+      navigate("/auth?redirect=/contact");
+      return;
+    }
+    
     setStatus("sending");
     try {
       await api.post("/contact", formData);

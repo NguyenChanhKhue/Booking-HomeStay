@@ -68,15 +68,26 @@ const AuthPage = () => {
 
   return (
     <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-      <section className="rounded-[36px] bg-[linear-gradient(135deg,#fff1f2_0%,#ffffff_50%,#fef3f2_100%)] p-8 md:p-10">
-        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-rose-500">
-          Tài khoản khách hàng
-        </p>
-        <h1 className="mt-4 text-4xl font-semibold tracking-tight text-gray-950 md:text-5xl">
-          {isLogin
-            ? "Đăng nhập để tiếp tục đặt phòng"
-            : "Tạo tài khoản để quản lý booking"}
-        </h1>
+      <section className="relative flex min-h-[400px] flex-col justify-center overflow-hidden rounded-[36px] bg-gray-900 p-8 md:p-12">
+        {/* Dark Image Background */}
+        <img 
+          src="https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=1600&q=80" 
+          alt="Auth background" 
+          className="absolute inset-0 h-full w-full object-cover opacity-50 mix-blend-overlay"
+        />
+        <div className="relative z-10">
+          <p className="text-sm font-bold uppercase tracking-[0.3em] text-rose-300">
+            Tài khoản khách hàng
+          </p>
+          <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-white md:text-5xl lg:text-[54px] leading-[1.1]">
+            {isLogin
+              ? "Đăng nhập để tiếp tục đặt phòng"
+              : "Tạo tài khoản để quản lý booking"}
+          </h1>
+          <p className="mt-6 text-lg font-medium text-gray-200 lg:text-xl">
+             Trải nghiệm không gian lưu trú tuyệt vời và các dịch vụ tốt nhất.
+          </p>
+        </div>
       </section>
 
       <section className="rounded-[36px] border border-gray-100 bg-white p-6 shadow-sm md:p-8">
@@ -101,30 +112,30 @@ const AuthPage = () => {
           </button>
         </div>
 
-        <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {!isLogin ? (
             <>
               <label className="block">
-                <span className="mb-2 block text-sm font-medium text-gray-700">
+                <span className="mb-2 block text-base font-semibold text-gray-700">
                   Họ và tên
                 </span>
                 <input
                   name="name"
                   value={form.name}
                   onChange={handleChange}
-                  className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none transition focus:border-rose-300"
+                  className="w-full rounded-2xl border border-gray-200 px-5 py-4 text-base outline-none transition focus:border-rose-400 focus:ring-4 focus:ring-rose-50"
                   required
                 />
               </label>
               <label className="block">
-                <span className="mb-2 block text-sm font-medium text-gray-700">
+                <span className="mb-2 block text-base font-semibold text-gray-700">
                   Số điện thoại
                 </span>
                 <input
                   name="phoneNumber"
                   value={form.phoneNumber}
                   onChange={handleChange}
-                  className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none transition focus:border-rose-300"
+                  className="w-full rounded-2xl border border-gray-200 px-5 py-4 text-base outline-none transition focus:border-rose-400 focus:ring-4 focus:ring-rose-50"
                   required
                 />
               </label>
@@ -132,7 +143,7 @@ const AuthPage = () => {
           ) : null}
 
           <label className="block">
-            <span className="mb-2 block text-sm font-medium text-gray-700">
+            <span className="mb-2 block text-base font-semibold text-gray-700">
               Email
             </span>
             <input
@@ -140,12 +151,12 @@ const AuthPage = () => {
               name="email"
               value={form.email}
               onChange={handleChange}
-              className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none transition focus:border-rose-300"
+              className="w-full rounded-2xl border border-gray-200 px-5 py-4 text-base outline-none transition focus:border-rose-400 focus:ring-4 focus:ring-rose-50"
               required
             />
           </label>
           <label className="block">
-            <span className="mb-2 block text-sm font-medium text-gray-700">
+            <span className="mb-2 block text-base font-semibold text-gray-700">
               Mật khẩu
             </span>
             <input
@@ -153,7 +164,7 @@ const AuthPage = () => {
               name="password"
               value={form.password}
               onChange={handleChange}
-              className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none transition focus:border-rose-300"
+              className="w-full rounded-2xl border border-gray-200 px-5 py-4 text-base outline-none transition focus:border-rose-400 focus:ring-4 focus:ring-rose-50"
               required
             />
           </label>
@@ -167,7 +178,7 @@ const AuthPage = () => {
           <button
             type="submit"
             disabled={submitting}
-            className="inline-flex w-full items-center justify-center rounded-full bg-rose-500 px-6 py-4 text-sm font-semibold text-white transition hover:bg-rose-600 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex w-full items-center justify-center rounded-full bg-rose-500 px-6 py-4 text-lg font-bold text-white transition hover:-translate-y-1 hover:bg-rose-600 hover:shadow-xl hover:shadow-rose-500/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
           >
             {submitting
               ? "Đang xử lý..."
@@ -177,15 +188,17 @@ const AuthPage = () => {
           </button>
         </form>
 
-        {isLogin && (
-          <button
-            type="button"
-            className="text-blue-500 hover:underline"
-            onClick={handleForgotPassword}
-          >
-            Quên mật khẩu?
-          </button>
-        )}
+        <div className="mt-6 text-center">
+          {isLogin && (
+            <button
+              type="button"
+              className="text-base font-medium text-blue-600 hover:text-blue-800 hover:underline"
+              onClick={handleForgotPassword}
+            >
+              Quên mật khẩu?
+            </button>
+          )}
+        </div>
       </section>
       <ForgotPasswordModal
         isOpen={showForgotPassword}

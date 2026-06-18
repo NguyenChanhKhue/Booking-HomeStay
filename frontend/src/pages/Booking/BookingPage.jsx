@@ -9,6 +9,8 @@ import { useAuth } from "../../context/AuthContext";
 import { createBooking } from "../../services/bookingService";
 import { getRoomById } from "../../services/propertyService";
 import { formatPrice } from "../../utils/formatPrice";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const BookingPage = () => {
   const { roomId } = useParams();
@@ -45,15 +47,19 @@ const BookingPage = () => {
     loadRoom();
   }, [roomId]);
 
-  const bookingPayload = useMemo(
-    () => ({
-      checkInDate: form.checkInDate,
-      checkOutDate: form.checkOutDate,
-      numOfAdults: Number(form.numOfAdults),
-      numOfChildren: Number(form.numOfChildren),
-    }),
-    [form],
-  );
+  const disabledIntervals = useMemo(() => {
+    if (!room || !room.bookings) return [];
+    return room.bookings
+      .filter((b) => b.status !== "CANCELLED")
+      .map((b) => {
+        const [inYear, inMonth, inDay] = b.checkInDate.split("-");
+        const [outYear, outMonth, outDay] = b.checkOutDate.split("-");
+        return {
+          start: new Date(inYear, inMonth - 1, inDay),
+          end: new Date(outYear, outMonth - 1, outDay),
+        };
+      });
+  }, [room]);
 
   const getDiffDays = () => {
     if (!form.checkInDate || !form.checkOutDate) return 1;
@@ -63,6 +69,17 @@ const BookingPage = () => {
     const diffTime = Math.abs(checkOut - checkIn);
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
+
+  const bookingPayload = useMemo(
+    () => ({
+      checkInDate: form.checkInDate,
+      checkOutDate: form.checkOutDate,
+      numOfAdults: Number(form.numOfAdults),
+      numOfChildren: Number(form.numOfChildren),
+      totalPrice: (room?.roomPrice || 0) * getDiffDays(),
+    }),
+    [form, room],
+  );
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -74,6 +91,22 @@ const BookingPage = () => {
     setSubmitting(true);
     setError("");
     setMessage("");
+
+    if (room && room.bookings) {
+      const checkIn = new Date(form.checkInDate);
+      const checkOut = new Date(form.checkOutDate);
+      const isOverlap = room.bookings.some(b => {
+        if (b.status === "CANCELLED") return false;
+        const bIn = new Date(b.checkInDate);
+        const bOut = new Date(b.checkOutDate);
+        return checkIn < bOut && checkOut > bIn;
+      });
+      if (isOverlap) {
+        setError("Rất tiếc! Khoảng thời gian này đã có người đặt. Vui lòng chọn ngày khác.");
+        setSubmitting(false);
+        return;
+      }
+    }
 
     try {
       if (!isAuthenticated) {
@@ -154,11 +187,24 @@ const BookingPage = () => {
               <span className="mb-2 block text-sm font-medium text-gray-700">
                 Ngày nhận phòng
               </span>
-              <input
-                type="date"
-                name="checkInDate"
-                value={form.checkInDate}
-                onChange={handleChange}
+              <DatePicker
+                selected={form.checkInDate ? (() => {
+                  const [y, m, d] = form.checkInDate.split("-");
+                  return new Date(y, m - 1, d);
+                })() : null}
+                onChange={(date) => {
+                  if (date) {
+                    const offset = date.getTimezoneOffset();
+                    const localDate = new Date(date.getTime() - offset * 60 * 1000);
+                    handleChange({ target: { name: "checkInDate", value: localDate.toISOString().split("T")[0] } });
+                  } else {
+                    handleChange({ target: { name: "checkInDate", value: "" } });
+                  }
+                }}
+                excludeDateIntervals={disabledIntervals}
+                minDate={new Date()}
+                dateFormat="dd/MM/yyyy"
+                placeholderText="Chọn ngày nhận"
                 className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none transition focus:border-rose-300"
                 required
               />
@@ -167,11 +213,27 @@ const BookingPage = () => {
               <span className="mb-2 block text-sm font-medium text-gray-700">
                 Ngày trả phòng
               </span>
-              <input
-                type="date"
-                name="checkOutDate"
-                value={form.checkOutDate}
-                onChange={handleChange}
+              <DatePicker
+                selected={form.checkOutDate ? (() => {
+                  const [y, m, d] = form.checkOutDate.split("-");
+                  return new Date(y, m - 1, d);
+                })() : null}
+                onChange={(date) => {
+                  if (date) {
+                    const offset = date.getTimezoneOffset();
+                    const localDate = new Date(date.getTime() - offset * 60 * 1000);
+                    handleChange({ target: { name: "checkOutDate", value: localDate.toISOString().split("T")[0] } });
+                  } else {
+                    handleChange({ target: { name: "checkOutDate", value: "" } });
+                  }
+                }}
+                excludeDateIntervals={disabledIntervals}
+                minDate={form.checkInDate ? (() => {
+                  const [y, m, d] = form.checkInDate.split("-");
+                  return new Date(y, m - 1, d);
+                })() : new Date()}
+                dateFormat="dd/MM/yyyy"
+                placeholderText="Chọn ngày trả"
                 className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none transition focus:border-rose-300"
                 required
               />

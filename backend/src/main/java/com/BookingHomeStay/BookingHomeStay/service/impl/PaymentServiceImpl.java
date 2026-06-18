@@ -179,6 +179,9 @@ public class PaymentServiceImpl implements PaymentService {
   }
 
   private long calculateAmount(Booking booking) {
+    if (booking.getTotalPrice() != null) {
+      return booking.getTotalPrice().longValue();
+    }
     long pricePerNight = booking.getRoom().getRoomPrice().longValue();
     int days = Math.max(1, (int) (booking.getCheckOutDate().toEpochDay() - booking.getCheckInDate().toEpochDay()));
     return pricePerNight * days;
