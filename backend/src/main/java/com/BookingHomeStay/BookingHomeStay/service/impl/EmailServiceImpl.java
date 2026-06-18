@@ -34,4 +34,24 @@ public class EmailServiceImpl implements EmailService {
         """.formatted(otpCode, otpExpirationMinutes));
     mailSender.send(message);
   }
+
+  @Override
+  public void sendContactEmail(String name, String email, String subject, String messageContent) {
+    SimpleMailMessage message = new SimpleMailMessage();
+    message.setFrom(fromEmail);
+    message.setTo(fromEmail); // Send to homestay email
+    message.setReplyTo(email); // Reply to customer
+    message.setSubject("Tin nhắn từ khách hàng: " + subject);
+    message.setText("""
+        Bạn nhận được tin nhắn từ khách hàng qua trang Liên hệ:
+        
+        Họ tên: %s
+        Email: %s
+        Tiêu đề: %s
+        
+        Nội dung:
+        %s
+        """.formatted(name, email, subject, messageContent));
+    mailSender.send(message);
+  }
 }

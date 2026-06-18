@@ -8,6 +8,8 @@ const SearchResultsPage = () => {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const roomsPerPage = 10;
 
   const filters = useMemo(
     () => ({
@@ -40,6 +42,14 @@ const SearchResultsPage = () => {
     loadRooms();
   }, [filters]);
 
+  // Pagination logic
+  const indexOfLastRoom = currentPage * roomsPerPage;
+  const indexOfFirstRoom = indexOfLastRoom - roomsPerPage;
+  const currentRooms = rooms.slice(indexOfFirstRoom, indexOfLastRoom);
+  const totalPages = Math.ceil(rooms.length / roomsPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   return (
     <div className="space-y-6">
       {loading ? (
@@ -62,10 +72,43 @@ const SearchResultsPage = () => {
             </p>
           </div>
           <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-4">
-            {rooms.map((room) => (
+            {currentRooms.map((room) => (
               <PropertyCard key={room.id} data={room} />
             ))}
           </div>
+
+          {/* Pagination UI */}
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-8 gap-2">
+              <button
+                onClick={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-4 py-2 border border-gray-200 rounded-lg disabled:opacity-50 hover:bg-gray-50 transition"
+              >
+                Trang trước
+              </button>
+              {[...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i + 1}
+                  onClick={() => paginate(i + 1)}
+                  className={`w-10 h-10 rounded-lg flex items-center justify-center transition ${
+                    currentPage === i + 1 
+                      ? "bg-rose-500 text-white font-bold" 
+                      : "border border-gray-200 hover:bg-gray-50 text-gray-700"
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+              <button
+                onClick={() => paginate(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 border border-gray-200 rounded-lg disabled:opacity-50 hover:bg-gray-50 transition"
+              >
+                Trang sau
+              </button>
+            </div>
+          )}
         </>
       ) : (
         <div className="rounded-[28px] border border-dashed border-gray-200 p-12 text-center">

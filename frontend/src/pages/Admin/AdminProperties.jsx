@@ -25,6 +25,7 @@ const AdminProperties = () => {
     roomPrice: "",
     description: "",
     photo: null,
+    additionalPhotos: [],
   });
 
   useEffect(() => {
@@ -65,6 +66,7 @@ const AdminProperties = () => {
         roomPrice: room.roomPrice,
         description: room.roomDescription,
         photo: null,
+        additionalPhotos: [],
       });
     } else {
       setEditingRoom(null);
@@ -74,6 +76,7 @@ const AdminProperties = () => {
         roomPrice: "",
         description: "",
         photo: null,
+        additionalPhotos: [],
       });
     }
     setMessage("");
@@ -102,6 +105,14 @@ const AdminProperties = () => {
         photo: file,
       }));
     }
+  };
+
+  const handleAdditionalFilesChange = (e) => {
+    const files = Array.from(e.target.files);
+    setFormData((prev) => ({
+      ...prev,
+      additionalPhotos: files.slice(0, 4), // max 4 additional images + 1 main = 5
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -144,6 +155,11 @@ const AdminProperties = () => {
       data.append("description", formData.description.trim());
       if (formData.photo) {
         data.append("photo", formData.photo);
+      }
+      if (formData.additionalPhotos && formData.additionalPhotos.length > 0) {
+        formData.additionalPhotos.forEach((file) => {
+          data.append("additionalPhotos", file);
+        });
       }
 
       if (editingRoom) {
@@ -371,13 +387,31 @@ const AdminProperties = () => {
                 />
                 {formData.photo ? (
                   <p className="mt-2 text-sm text-green-600">
-                    ✓ Tệp: {formData.photo.name}
+                    ✓ Tệp chính: {formData.photo.name}
                   </p>
                 ) : editingRoom ? (
                   <p className="mt-2 text-sm text-gray-500">
                     Không upload file = giữ nguyên ảnh cũ
                   </p>
                 ) : null}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Hình ảnh phụ (Tối đa 4 ảnh)
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleAdditionalFilesChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none"
+                />
+                {formData.additionalPhotos && formData.additionalPhotos.length > 0 && (
+                  <p className="mt-2 text-sm text-green-600">
+                    ✓ Đã chọn {formData.additionalPhotos.length} ảnh phụ.
+                  </p>
+                )}
               </div>
 
               <div className="flex gap-4 pt-4">

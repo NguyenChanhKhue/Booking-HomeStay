@@ -31,6 +31,15 @@ public class UserController {
     return ResponseEntity.ok(userService.getMyInfo(authentication.getName()));
   }
 
+  @org.springframework.web.bind.annotation.PutMapping("/profile")
+  public ResponseEntity<Response> updateProfile(
+      Authentication authentication,
+      @org.springframework.web.bind.annotation.RequestParam(required = false) String name,
+      @org.springframework.web.bind.annotation.RequestParam(required = false) String phoneNumber,
+      @org.springframework.web.bind.annotation.RequestParam(required = false) org.springframework.web.multipart.MultipartFile avatar) {
+    return ResponseEntity.ok(userService.updateProfile(authentication.getName(), name, phoneNumber, avatar));
+  }
+
   @GetMapping("/{userId}")
   public ResponseEntity<Response> getUserById(@PathVariable String userId) {
     return ResponseEntity.ok(userService.getUserById(userId));
@@ -45,5 +54,17 @@ public class UserController {
   @PreAuthorize("hasAuthority('ADMIN')")
   public ResponseEntity<Response> deleteUser(@PathVariable String userId) {
     return ResponseEntity.ok(userService.deleteUser(userId));
+  }
+
+  @org.springframework.web.bind.annotation.PutMapping("/{userId}/toggle-status")
+  @PreAuthorize("hasAuthority('ADMIN')")
+  public ResponseEntity<Response> toggleUserStatus(@PathVariable String userId) {
+    return ResponseEntity.ok(userService.toggleUserStatus(userId));
+  }
+
+  @org.springframework.web.bind.annotation.PutMapping("/{userId}/role")
+  @PreAuthorize("hasAuthority('ADMIN')")
+  public ResponseEntity<Response> changeUserRole(@PathVariable String userId) {
+    return ResponseEntity.ok(userService.changeUserRole(userId));
   }
 }

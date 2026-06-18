@@ -15,6 +15,7 @@ import com.BookingHomeStay.BookingHomeStay.entity.User;
 import com.BookingHomeStay.BookingHomeStay.exception.BadRequestException;
 import com.BookingHomeStay.BookingHomeStay.exception.ResourceNotFoundException;
 import com.BookingHomeStay.BookingHomeStay.repository.UserRepository;
+import com.BookingHomeStay.BookingHomeStay.service.CloudinaryService;
 import com.BookingHomeStay.BookingHomeStay.service.UserService;
 
 import lombok.AllArgsConstructor;
@@ -24,6 +25,7 @@ import lombok.AllArgsConstructor;
 public class UserServiceImpl implements UserService {
 
   private final UserRepository userRepository;
+  private final CloudinaryService cloudinaryService;
 
   @Override
   public Response getAllUsers() {
@@ -86,6 +88,63 @@ public class UserServiceImpl implements UserService {
     return response;
   }
 
+  @Override
+  @Transactional
+  public Response toggleUserStatus(String userId) {
+    User user = findUserById(userId);
+    user.setActive(!user.isActive());
+    userRepository.save(user);
+
+    Response response = new Response();
+    response.setStatusCode(200);
+    response.setMessage(user.isActive() ? "User unlocked successfully" : "User locked successfully");
+    response.setUser(mapUserToUserDtoWithoutBookings(user));
+    return response;
+  }
+
+  @Override
+  @Transactional
+  public Response changeUserRole(String userId) {
+    User user = findUserById(userId);
+    if (user.getRole() == com.BookingHomeStay.BookingHomeStay.enums.UserRole.ADMIN) {
+      user.setRole(com.BookingHomeStay.BookingHomeStay.enums.UserRole.CUSTOMER);
+    } else {
+      user.setRole(com.BookingHomeStay.BookingHomeStay.enums.UserRole.ADMIN);
+    }
+    userRepository.save(user);
+
+    Response response = new Response();
+    response.setStatusCode(200);
+    response.setMessage("User role updated successfully");
+    response.setUser(mapUserToUserDtoWithoutBookings(user));
+    return response;
+  }
+
+  @Override
+  @Transactional
+  public Response updateProfile(String email, String name, String phoneNumber, org.springframework.web.multipart.MultipartFile avatar) {
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+    if (name != null && !name.isBlank()) {
+      user.setName(name.trim());
+    }
+    if (phoneNumber != null && !phoneNumber.isBlank()) {
+      user.setPhoneNumber(phoneNumber.trim());
+    }
+    if (avatar != null && !avatar.isEmpty()) {
+      user.setAvatarUrl(cloudinaryService.uploadImage(avatar, "booking-home-stay/avatars"));
+    }
+
+    userRepository.save(user);
+
+    Response response = new Response();
+    response.setStatusCode(200);
+    response.setMessage("Profile updated successfully");
+    response.setUser(mapUserToUserDtoWithoutBookings(user));
+    return response;
+  }
+
   private User findUserById(String userId) {
     Long parsedUserId;
     try {
@@ -104,7 +163,9 @@ public class UserServiceImpl implements UserService {
     userDTO.setEmail(user.getEmail());
     userDTO.setName(user.getName());
     userDTO.setPhoneNumber(user.getPhoneNumber());
+    userDTO.setAvatarUrl(user.getAvatarUrl());
     userDTO.setRole(user.getRole());
+    userDTO.setIsActive(user.isActive());
     return userDTO;
   }
 

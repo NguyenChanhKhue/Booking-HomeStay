@@ -12,4 +12,10 @@ public interface UserService {
   Response getUserById(String userId);
 
   Response getMyInfo(String email);
+
+  Response toggleUserStatus(String userId);
+
+  Response changeUserRole(String userId);
+
+  Response updateProfile(String email, String name, String phoneNumber, org.springframework.web.multipart.MultipartFile avatar);
 }

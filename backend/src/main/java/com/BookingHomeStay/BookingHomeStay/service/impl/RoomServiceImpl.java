@@ -2,6 +2,7 @@ package com.BookingHomeStay.BookingHomeStay.service.impl;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -30,7 +31,7 @@ public class RoomServiceImpl implements RoomService {
 
   @Override
   @Transactional
-  public Response addNewRoom(MultipartFile photo, String roomType, String roomLocation, BigDecimal roomPrice,
+  public Response addNewRoom(MultipartFile photo, List<MultipartFile> additionalPhotos, String roomType, String roomLocation, BigDecimal roomPrice,
       String description) {
     validateRoomData(roomType, roomLocation, roomPrice, description);
 
@@ -40,6 +41,16 @@ public class RoomServiceImpl implements RoomService {
     room.setRoomPrice(roomPrice);
     room.setRoomDescription(description.trim());
     room.setRoomPhotoUrl(cloudinaryService.uploadImage(photo, "booking-home-stay/rooms"));
+    
+    if (additionalPhotos != null && !additionalPhotos.isEmpty()) {
+      List<String> additionalImages = new ArrayList<>();
+      for (MultipartFile additionalPhoto : additionalPhotos) {
+        if (additionalPhoto != null && !additionalPhoto.isEmpty()) {
+          additionalImages.add(cloudinaryService.uploadImage(additionalPhoto, "booking-home-stay/rooms/additional"));
+        }
+      }
+      room.setAdditionalImages(additionalImages);
+    }
 
     Room savedRoom = roomRepository.save(room);
 
@@ -84,7 +95,7 @@ public class RoomServiceImpl implements RoomService {
   @Override
   @Transactional
   public Response updateRoom(Long roomId, String description, String roomType, String roomLocation,
-      BigDecimal roomPrice, MultipartFile photo) {
+      BigDecimal roomPrice, MultipartFile photo, List<MultipartFile> additionalPhotos) {
     Room room = findRoomById(roomId);
 
     if (roomType != null && !roomType.isBlank()) {
@@ -108,6 +119,18 @@ public class RoomServiceImpl implements RoomService {
 
     if (photo != null && !photo.isEmpty()) {
       room.setRoomPhotoUrl(cloudinaryService.uploadImage(photo, "booking-home-stay/rooms"));
+    }
+
+    if (additionalPhotos != null && !additionalPhotos.isEmpty()) {
+      List<String> newAdditionalImages = new ArrayList<>();
+      for (MultipartFile additionalPhoto : additionalPhotos) {
+        if (additionalPhoto != null && !additionalPhoto.isEmpty()) {
+          newAdditionalImages.add(cloudinaryService.uploadImage(additionalPhoto, "booking-home-stay/rooms/additional"));
+        }
+      }
+      if (!newAdditionalImages.isEmpty()) {
+        room.setAdditionalImages(newAdditionalImages); // overwrite existing for simplicity
+      }
     }
 
     Room updatedRoom = roomRepository.save(room);
@@ -254,6 +277,7 @@ public class RoomServiceImpl implements RoomService {
     roomDTO.setRoomLocation(room.getRoomLocation());
     roomDTO.setRoomPrice(room.getRoomPrice());
     roomDTO.setRoomPhotoUrl(room.getRoomPhotoUrl());
+    roomDTO.setAdditionalImages(room.getAdditionalImages() != null ? room.getAdditionalImages() : new ArrayList<>());
     roomDTO.setRoomDescription(room.getRoomDescription());
     roomDTO.setBookingCount(room.getBookings() != null ? room.getBookings().size() : 0);
     return roomDTO;
