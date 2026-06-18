@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import { useSearchParams } from "react-router-dom";
 import PropertyCard from "../../components/cards/PropertyCard";
 import { searchRooms } from "../../services/propertyService";
@@ -51,7 +52,24 @@ const SearchResultsPage = () => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 pb-12">
+      <motion.div 
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white rounded-[32px] p-6 shadow-sm border border-gray-100 mt-4"
+      >
+        <div className="flex items-center justify-between gap-4 mb-2">
+          <h1 className="text-2xl font-bold text-gray-900">
+            Kết quả tìm kiếm
+          </h1>
+          {!loading && !error && (
+            <p className="text-sm font-medium text-rose-500 bg-rose-50 px-4 py-2 rounded-full">
+              Tìm thấy <span className="font-black">{rooms.length}</span> phòng phù hợp
+            </p>
+          )}
+        </div>
+      </motion.div>
+
       {loading ? (
         <div className="rounded-[28px] border border-dashed border-gray-200 p-12 text-center text-gray-500">
           Dang tai danh sach phong...
@@ -62,15 +80,6 @@ const SearchResultsPage = () => {
         </div>
       ) : rooms.length > 0 ? (
         <>
-          <div className="flex items-center justify-between gap-4">
-            <p className="text-sm text-gray-500">
-              Tìm thấy{" "}
-              <span className="font-semibold text-gray-900">
-                {rooms.length}
-              </span>{" "}
-              phòng phù hợp
-            </p>
-          </div>
           <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-4">
             {currentRooms.map((room) => (
               <PropertyCard key={room.id} data={room} />

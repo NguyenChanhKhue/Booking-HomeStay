@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from "react";
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import PropertyCard from "../../components/cards/PropertyCard";
+import Search from "../../components/navbar/Search";
 import { getAllRooms, getRoomTypes } from "../../services/propertyService";
 
 const FEATURED_LOCATIONS = [
@@ -114,9 +116,61 @@ const HomePage = () => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
-    <div className="space-y-8 pb-6">
-      <section className="space-y-6">
-        <div className="flex flex-col gap-4 border-b border-gray-100 pb-4 md:flex-row md:items-center md:justify-between">
+    <div className="pb-6">
+      {/* Hero Section */}
+      <section className="relative h-[85vh] min-h-[600px] w-[100vw] ml-[calc(-50vw+50%)] mb-8 -mt-[88px]">
+        {/* Background Image */}
+        <div className="absolute inset-0 w-full h-full">
+          <img
+            src="https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?auto=format&fit=crop&w=2000&q=80"
+            alt="Beautiful HomeStay"
+            className="w-full h-full object-cover"
+          />
+          {/* Gradient Overlay that fades into the global background color */}
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-900/60 via-gray-900/30 to-[#f7f9fc]"></div>
+        </div>
+
+        {/* Hero Content */}
+        <div className="relative h-full w-full flex flex-col justify-center items-center text-center pb-20 px-4">
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="text-5xl md:text-7xl font-extrabold text-white mb-6 drop-shadow-lg tracking-tight"
+          >
+            Khám phá không gian <br className="hidden md:block" /> lưu trú tuyệt vời
+          </motion.h1>
+          
+          <motion.p
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+            className="text-lg md:text-2xl text-white/90 mb-10 max-w-2xl font-medium drop-shadow-md"
+          >
+            Trải nghiệm những khoảnh khắc đáng nhớ với hàng ngàn lựa chọn chỗ ở độc đáo trên khắp Việt Nam.
+          </motion.p>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="w-full max-w-5xl"
+          >
+            <Search />
+          </motion.div>
+        </div>
+      </section>
+
+      <div className="space-y-16 relative z-10 -mt-32">
+        {/* Categories Section */}
+        <motion.section 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="space-y-6"
+        >
+          <div className="flex flex-col gap-4 border-b border-gray-100 pb-4 md:flex-row md:items-center md:justify-between">
           {roomTypes.length > 0 ? (
             <div className="flex gap-3 overflow-x-auto pb-1">
               {roomTypes.map((type) => (
@@ -137,8 +191,15 @@ const HomePage = () => {
             Xem tat ca
           </Link>
         </div>
+        </motion.section>
 
-        <section className="space-y-4">
+        <motion.section 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="space-y-6"
+        >
           <div className="flex items-center justify-between gap-4">
             <h2 className="text-2xl font-semibold tracking-tight text-gray-950">
               Địa điểm nổi bật
@@ -164,9 +225,15 @@ const HomePage = () => {
               </Link>
             ))}
           </div>
-        </section>
+        </motion.section>
 
-        <section className="space-y-4">
+        <motion.section 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="space-y-6"
+        >
           <div className="flex items-center justify-between gap-4">
             <h2 className="text-2xl font-semibold tracking-tight text-gray-950">
               HomeStay xu hướng
@@ -195,7 +262,7 @@ const HomePage = () => {
               </div>
             )}
           </div>
-        </section>
+        </motion.section>
 
         {error ? (
           <div className="rounded-[28px] border border-red-100 bg-red-50 p-5 text-sm text-red-600">
@@ -257,7 +324,7 @@ const HomePage = () => {
             Hiện chưa có phòng để hiện thị
           </div>
         )}
-      </section>
+      </div>
     </div>
   );
 };

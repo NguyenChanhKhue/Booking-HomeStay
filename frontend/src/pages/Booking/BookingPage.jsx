@@ -127,8 +127,8 @@ const BookingPage = () => {
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[1fr_0.85fr]">
-      <section className="rounded-[32px] border border-gray-100 bg-white p-6 shadow-sm md:p-8">
+    <div className="grid gap-12 lg:grid-cols-[1.8fr_1fr] items-start">
+      <section className="rounded-[40px] border border-gray-100 bg-white p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] md:p-10">
         <p className="text-sm font-semibold uppercase tracking-[0.3em] text-rose-500">
           Hoàn tất đặt phòng
         </p>
@@ -287,7 +287,7 @@ const BookingPage = () => {
         </form>
       </section>
 
-      <aside className="rounded-[32px] border border-gray-100 bg-white p-6 shadow-sm md:p-8">
+      <aside className="sticky top-28 rounded-[40px] border border-gray-100 bg-white p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] md:p-8">
         <p className="text-sm font-semibold uppercase tracking-[0.3em] text-gray-400">
           Thông tin phòng
         </p>

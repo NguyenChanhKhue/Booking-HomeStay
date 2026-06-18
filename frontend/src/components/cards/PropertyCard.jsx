@@ -1,5 +1,6 @@
 import { MapPin, Star } from "lucide-react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { formatPrice } from "../../utils/formatPrice";
 
 const PropertyCard = ({ data }) => {
@@ -9,10 +10,15 @@ const PropertyCard = ({ data }) => {
     data.roomDescription || "Khong gian luu tru duoc cap nhat tu he thong.";
 
   return (
-    <Link
-      to={`/property/${data.id}`}
-      className="group flex h-full flex-col overflow-hidden rounded-[24px] border border-gray-100 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl"
+    <motion.div
+      whileHover={{ y: -8 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      className="h-full"
     >
+      <Link
+        to={`/property/${data.id}`}
+        className="group flex h-full flex-col overflow-hidden rounded-[32px] border border-gray-100 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] transition-shadow duration-300"
+      >
       <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
         <img
           src={data.roomPhotoUrl || "https://via.placeholder.com/800x600?text=Room"}
@@ -54,7 +60,8 @@ const PropertyCard = ({ data }) => {
           <span className="text-sm font-medium text-rose-500">Xem chi tiet</span>
         </div>
       </div>
-    </Link>
+      </Link>
+    </motion.div>
   );
 };
 
