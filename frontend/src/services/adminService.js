@@ -80,6 +80,20 @@ export const deleteUserAdmin = async (userId, token) => {
   return data;
 };
 
+export const toggleUserStatusAdmin = async (userId, token) => {
+  const { data } = await api.put(`/users/${userId}/toggle-status`, {}, {
+    headers: authHeaders(token),
+  });
+  return data;
+};
+
+export const changeUserRoleAdmin = async (userId, token) => {
+  const { data } = await api.put(`/users/${userId}/role`, {}, {
+    headers: authHeaders(token),
+  });
+  return data;
+};
+
 // Dashboard Statistics
 export const getDashboardStats = async (token) => {
   try {

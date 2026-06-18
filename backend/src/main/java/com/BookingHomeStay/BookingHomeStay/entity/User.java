@@ -49,6 +49,12 @@ public class User implements UserDetails {
   @Column(nullable = false, length = 20)
   private UserRole role = UserRole.CUSTOMER;
 
+  @Column(nullable = false)
+  private boolean isActive = true;
+
+  @Column(name = "avatar_url")
+  private String avatarUrl;
+
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   private List<Booking> bookings = new ArrayList<>();
 
@@ -60,5 +66,10 @@ public class User implements UserDetails {
   @Override
   public String getUsername() {
     return email;
+  }
+
+  @Override
+  public boolean isEnabled() {
+    return isActive;
   }
 }

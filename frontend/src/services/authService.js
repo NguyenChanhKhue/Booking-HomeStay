@@ -21,6 +21,16 @@ export const getMyInfo = async (token) => {
   return data.user;
 };
 
+export const updateProfileRequest = async (formData, token) => {
+  const { data } = await api.put("/users/profile", formData, {
+    headers: {
+      ...authHeaders(token),
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return data;
+};
+
 export const getBookingHistory = async (userId, token) => {
   const { data } = await api.get(`/users/${userId}/bookings`, {
     headers: authHeaders(token),

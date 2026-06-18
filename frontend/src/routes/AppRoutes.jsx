@@ -8,11 +8,14 @@ import HomePage from "../pages/Home/HomePage";
 import ProfilePage from "../pages/Profile/ProfilePage";
 import PropertyDetailPage from "../pages/PropertyDetail/PropertyDetailPage";
 import SearchResultsPage from "../pages/SearchResults/SearchResultsPage";
+import ForgotPasswordPage from "../pages/Auth/ForgotPasswordPage";
 import AdminDashboard from "../pages/Admin/AdminDashboard";
 import AdminProperties from "../pages/Admin/AdminProperties";
 import AdminBookings from "../pages/Admin/AdminBookings";
 import AdminUsers from "../pages/Admin/AdminUsers";
 import PaymentResultPage from "../pages/Payment/PaymentResultPage";
+import AboutPage from "../pages/Home/AboutPage";
+import ContactPage from "../pages/Home/ContactPage";
 
 const NotFoundPage = () => (
   <div className="mx-auto flex min-h-[60vh] max-w-3xl flex-col items-center justify-center gap-4 text-center">
@@ -46,6 +49,22 @@ const AppRoutes = () => {
             element={
               <MainLayout>
                 <SearchResultsPage />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/about"
+            element={
+              <MainLayout>
+                <AboutPage />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/contact"
+            element={
+              <MainLayout>
+                <ContactPage />
               </MainLayout>
             }
           />
@@ -86,6 +105,14 @@ const AppRoutes = () => {
             element={
               <MainLayout>
                 <AuthPage />
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/forgot-password"
+            element={
+              <MainLayout>
+                <ForgotPasswordPage />
               </MainLayout>
             }
           />

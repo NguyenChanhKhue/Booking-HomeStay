@@ -4,6 +4,7 @@ import {
   getMyInfo,
   loginRequest,
   registerRequest,
+  updateProfileRequest,
 } from "../services/authService";
 
 const AuthContext = createContext(null);
@@ -71,6 +72,15 @@ export const AuthProvider = ({ children }) => {
     return profile;
   }, [token]);
 
+  const updateProfile = useCallback(async (formData) => {
+    if (!token) return null;
+    const response = await updateProfileRequest(formData, token);
+    if (response && response.user) {
+      setUser(response.user);
+    }
+    return response;
+  }, [token]);
+
   const fetchBookingHistory = useCallback(async () => {
     if (!token || !user?.id) return [];
     const data = await getBookingHistory(user.id, token);
@@ -90,6 +100,7 @@ export const AuthProvider = ({ children }) => {
         register,
         logout,
         refreshProfile,
+        updateProfile,
         fetchBookingHistory,
       }}
     >

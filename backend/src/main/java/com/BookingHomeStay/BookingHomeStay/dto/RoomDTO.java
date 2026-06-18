@@ -1,6 +1,7 @@
 package com.BookingHomeStay.BookingHomeStay.dto;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -16,6 +17,7 @@ public class RoomDTO {
   private BigDecimal roomPrice;
   private String roomPhotoUrl;
   private String roomDescription;
+  private List<String> additionalImages = new ArrayList<>();
+  private List<BookingDTO> bookings = new ArrayList<>();
   private Integer bookingCount;
-  private List<BookingDTO> bookings;
 }

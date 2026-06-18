@@ -15,6 +15,8 @@ public class UserDTO {
   private String email;
   private String name;
   private String phoneNumber;
+  private String avatarUrl;
   private UserRole role;
+  private Boolean isActive;
   private List<BookingDTO> bookings = new ArrayList<>();
 }

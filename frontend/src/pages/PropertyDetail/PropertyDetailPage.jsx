@@ -85,16 +85,36 @@ const PropertyDetailPage = () => {
       <section className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
         <div className="space-y-6">
           <div className="overflow-hidden rounded-[36px] border border-gray-100 bg-white shadow-sm">
-            <div className="aspect-[16/10] bg-gray-100">
-              <img
-                src={
-                  room.roomPhotoUrl ||
-                  "https://via.placeholder.com/1200x800?text=Room"
-                }
-                alt={room.roomType}
-                className="h-full w-full object-cover"
-              />
-            </div>
+            {room.additionalImages && room.additionalImages.length > 0 ? (
+              <div className="grid grid-cols-2 gap-2 p-2">
+                <div className="col-span-2 md:col-span-1 aspect-[4/3] bg-gray-100 rounded-[28px] overflow-hidden">
+                  <img
+                    src={room.roomPhotoUrl || "https://via.placeholder.com/1200x800?text=Room"}
+                    alt={room.roomType}
+                    className="h-full w-full object-cover transition-transform hover:scale-105"
+                  />
+                </div>
+                <div className="col-span-2 md:col-span-1 grid grid-cols-2 gap-2">
+                  {room.additionalImages.slice(0, 4).map((img, idx) => (
+                    <div key={idx} className="aspect-[4/3] bg-gray-100 rounded-[20px] overflow-hidden">
+                      <img
+                        src={img}
+                        alt={`${room.roomType} view ${idx + 1}`}
+                        className="h-full w-full object-cover transition-transform hover:scale-105"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="aspect-[16/10] bg-gray-100">
+                <img
+                  src={room.roomPhotoUrl || "https://via.placeholder.com/1200x800?text=Room"}
+                  alt={room.roomType}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            )}
           </div>
 
           <div className="rounded-[32px] border border-gray-100 bg-white p-6 shadow-sm md:p-8">

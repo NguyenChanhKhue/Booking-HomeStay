@@ -14,7 +14,11 @@ const Navbar = () => {
         <div className="hidden min-w-0 flex-1 justify-center px-6 md:flex">
           <Search compact />
         </div>
-        <div className="flex flex-none items-center justify-end gap-2">
+        <div className="flex flex-none items-center justify-end gap-2 md:gap-4">
+          <div className="hidden md:flex items-center gap-6 text-sm font-semibold text-gray-600 mr-2">
+            <Link to="/about" className="hover:text-rose-500 transition">Giới Thiệu</Link>
+            <Link to="/contact" className="hover:text-rose-500 transition">Liên hệ</Link>
+          </div>
           <Link
             to="/search"
             aria-label="Tìm kiếm"

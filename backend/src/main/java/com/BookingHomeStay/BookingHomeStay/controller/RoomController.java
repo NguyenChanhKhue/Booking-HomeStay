@@ -34,12 +34,13 @@ public class RoomController {
   @PreAuthorize("hasAuthority('ADMIN')")
   public ResponseEntity<Response> addNewRoom(
       @RequestParam("photo") MultipartFile photo,
+      @RequestParam(value = "additionalPhotos", required = false) List<MultipartFile> additionalPhotos,
       @RequestParam("roomType") String roomType,
       @RequestParam("roomLocation") String roomLocation,
       @RequestParam("roomPrice") BigDecimal roomPrice,
       @RequestParam("description") String description) {
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(roomService.addNewRoom(photo, roomType, roomLocation, roomPrice, description));
+        .body(roomService.addNewRoom(photo, additionalPhotos, roomType, roomLocation, roomPrice, description));
   }
 
   @GetMapping("/types")
@@ -91,8 +92,9 @@ public class RoomController {
       @RequestParam(required = false) String roomType,
       @RequestParam(required = false) String roomLocation,
       @RequestParam(required = false) BigDecimal roomPrice,
-      @RequestParam(required = false) MultipartFile photo) {
-    return ResponseEntity.ok(roomService.updateRoom(roomId, description, roomType, roomLocation, roomPrice, photo));
+      @RequestParam(required = false) MultipartFile photo,
+      @RequestParam(required = false) List<MultipartFile> additionalPhotos) {
+    return ResponseEntity.ok(roomService.updateRoom(roomId, description, roomType, roomLocation, roomPrice, photo, additionalPhotos));
   }
 
   @DeleteMapping("/{roomId}")

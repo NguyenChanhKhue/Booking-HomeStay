@@ -1,12 +1,24 @@
 import { LogOut, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const AdminLayout = ({ children }) => {
   const navigate = useNavigate();
-  const { logout, user } = useAuth();
+  const { logout, user, isAuthenticated, loading } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      navigate("/auth?redirect=%2Fadmin");
+      return;
+    }
+
+    if (!loading && user?.role !== "ADMIN") {
+      navigate("/");
+      return;
+    }
+  }, [isAuthenticated, loading, user, navigate]);
 
   const handleLogout = () => {
     logout();
@@ -19,6 +31,14 @@ const AdminLayout = ({ children }) => {
     { label: "Quản lý đơn đặt", path: "/admin/bookings" },
     { label: "Quản lý người dùng", path: "/admin/users" },
   ];
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Đang tải...</div>;
+  }
+
+  if (!isAuthenticated || user?.role !== "ADMIN") {
+    return null; // or you could return a "Access Denied" page
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

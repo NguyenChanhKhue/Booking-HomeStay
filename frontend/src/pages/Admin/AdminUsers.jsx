@@ -1,8 +1,8 @@
-import { Mail, Phone, Trash2, User } from "lucide-react";
+import { Lock, Unlock, Shield, ShieldAlert, Mail, Phone, Trash2, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { deleteUserAdmin, getAllUsersAdmin } from "../../services/adminService";
+import { deleteUserAdmin, getAllUsersAdmin, toggleUserStatusAdmin, changeUserRoleAdmin } from "../../services/adminService";
 
 const AdminUsers = () => {
   const navigate = useNavigate();
@@ -58,6 +58,28 @@ const AdminUsers = () => {
     }
   };
 
+  const handleToggleStatus = async (userId, currentStatus) => {
+    if (!window.confirm(`Bạn có chắc muốn ${currentStatus ? "khóa" : "mở khóa"} người dùng này?`)) return;
+    try {
+      await toggleUserStatusAdmin(userId, token);
+      setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, isActive: !u.isActive } : u));
+      setMessage(`${currentStatus ? "Khóa" : "Mở khóa"} người dùng thành công!`);
+    } catch (error) {
+      setMessage(error.response?.data?.message || `Không thể ${currentStatus ? "khóa" : "mở khóa"} người dùng`);
+    }
+  };
+
+  const handleChangeRole = async (userId, currentRole) => {
+    if (!window.confirm(`Bạn có chắc muốn cấp quyền ${currentRole === "ADMIN" ? "Khách hàng" : "Quản trị viên"} cho người dùng này?`)) return;
+    try {
+      await changeUserRoleAdmin(userId, token);
+      setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, role: currentRole === "ADMIN" ? "CUSTOMER" : "ADMIN" } : u));
+      setMessage("Cập nhật vai trò thành công!");
+    } catch (error) {
+      setMessage(error.response?.data?.message || "Không thể cập nhật vai trò người dùng");
+    }
+  };
+
   if (loading || loadingUsers) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -103,22 +125,45 @@ const AdminUsers = () => {
                     <User size={24} className="text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-gray-900">{userItem.name}</h3>
-                    <p className="text-xs text-gray-600">
+                    <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                      {userItem.name}
+                      {userItem.isActive === false && (
+                        <span className="px-2 py-0.5 bg-red-100 text-red-700 text-[10px] font-bold rounded-full uppercase">Đã khóa</span>
+                      )}
+                    </h3>
+                    <p className="text-xs text-gray-600 font-medium">
                       {userItem.role === "ADMIN"
-                        ? "Quản trị viên"
+                        ? <span className="text-rose-600">Quản trị viên</span>
                         : "Khách hàng"}
                     </p>
                   </div>
                 </div>
-                {userItem.role !== "ADMIN" && userItem.id !== user?.id && (
-                  <button
-                    onClick={() => handleDeleteUser(userItem.id)}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
-                    title="Xóa người dùng"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+                {userItem.id !== user?.id && (
+                  <div className="flex flex-col gap-1">
+                    <button
+                      onClick={() => handleToggleStatus(userItem.id, userItem.isActive !== false)}
+                      className={`p-2 rounded-lg transition flex justify-center ${userItem.isActive === false ? 'text-green-600 hover:bg-green-50' : 'text-orange-500 hover:bg-orange-50'}`}
+                      title={userItem.isActive === false ? "Mở khóa tài khoản" : "Khóa tài khoản"}
+                    >
+                      {userItem.isActive === false ? <Unlock size={18} /> : <Lock size={18} />}
+                    </button>
+                    <button
+                      onClick={() => handleChangeRole(userItem.id, userItem.role)}
+                      className={`p-2 rounded-lg transition flex justify-center ${userItem.role === 'ADMIN' ? 'text-gray-600 hover:bg-gray-100' : 'text-blue-600 hover:bg-blue-50'}`}
+                      title={userItem.role === 'ADMIN' ? "Giáng cấp thành Khách hàng" : "Cấp quyền Quản trị viên"}
+                    >
+                      {userItem.role === 'ADMIN' ? <ShieldAlert size={18} /> : <Shield size={18} />}
+                    </button>
+                    {userItem.role !== "ADMIN" && (
+                      <button
+                        onClick={() => handleDeleteUser(userItem.id)}
+                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition flex justify-center"
+                        title="Xóa người dùng"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
 

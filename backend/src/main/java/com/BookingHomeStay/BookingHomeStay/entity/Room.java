@@ -22,9 +22,18 @@ public class Room {
 
   private String roomType;
   private String roomLocation;
+  
+  @Column(precision = 18, scale = 0)
   private BigDecimal roomPrice;
+  
   private String roomPhotoUrl;
   private String roomDescription;
+  
+  @ElementCollection(fetch = FetchType.EAGER)
+  @CollectionTable(name = "room_images", joinColumns = @JoinColumn(name = "room_id"))
+  @Column(name = "image_url")
+  private List<String> additionalImages = new ArrayList<>();
+
   @OneToMany(mappedBy = "room", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
   private List<Booking> bookings = new ArrayList<>();
 
