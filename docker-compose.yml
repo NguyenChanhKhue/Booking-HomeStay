@@ -3,6 +3,7 @@ services:
     image: mysql:8.4
     container_name: bookinghomestay-db
     restart: unless-stopped
+    command: --max_connect_errors=100000
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE:-bookinghomestay_db}
       MYSQL_USER: ${MYSQL_USER:-booking_user}
