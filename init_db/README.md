@@ -6,7 +6,7 @@ Supported by the official MySQL image on first container startup:
 - `*.sh`
 
 Example:
-- `init_db/01-schema.sql`
+- `init_db/01-schema.sql` 
 - `init_db/02-seed.sql`
 
 These files run only when the `mysql_data` volume is empty.
