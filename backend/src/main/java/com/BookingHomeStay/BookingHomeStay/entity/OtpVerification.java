@@ -17,9 +17,16 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import jakarta.persistence.Index;
+
 @Data
 @Entity
-@Table(name = "otp_verifications")
+@Table(
+  name = "otp_verifications",
+  indexes = {
+    @Index(name = "idx_otp_email_purpose", columnList = "email, purpose")
+  }
+)
 public class OtpVerification {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,6 +54,9 @@ public class OtpVerification {
 
   @Column(nullable = false)
   private boolean used;
+
+  @Column(nullable = false)
+  private int attempts = 0;
 
   @Column(nullable = false, updatable = false)
   private LocalDateTime createdAt;

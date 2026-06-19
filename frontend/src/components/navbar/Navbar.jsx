@@ -28,8 +28,8 @@ const Navbar = () => {
     <header 
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
         isScrolled 
-          ? "border-b border-gray-200/50 bg-white/85 shadow-sm backdrop-blur-md py-3" 
-          : "bg-white py-4"
+          ? "border-b border-gray-200/50 bg-white/90 shadow-sm backdrop-blur-md py-2" 
+          : "bg-white py-2.5"
       }`}
     >
       <div className="mx-auto flex w-full max-w-[2520px] flex-row items-center justify-between px-4 md:px-8 lg:px-16 xl:px-24 2xl:px-40">

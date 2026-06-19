@@ -3,11 +3,14 @@ import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { getRoomById } from "../../services/propertyService";
-import { DEFAULT_AMENITIES } from "../../utils/constants";
+import { AMENITIES_LIST } from "../../utils/constants";
 import { formatPrice } from "../../utils/formatPrice";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { eachDayOfInterval, parseISO } from "date-fns";
 
 const inferAmenities = (room) => {
-  const base = [...DEFAULT_AMENITIES];
+  const base = AMENITIES_LIST.slice(0, 4);
   const description =
     `${room?.roomType ?? ""} ${room?.roomDescription ?? ""}`.toLowerCase();
 
@@ -50,17 +53,41 @@ const PropertyDetailPage = () => {
     return `${room?.roomType || ""} ${room?.roomLocation || ""}`.trim() || "Vietnam homestay";
   }, [room?.roomLocation, room?.roomType]);
 
-  const amenities = useMemo(() => inferAmenities(room), [room]);
+  const amenities = useMemo(() => {
+    if (room?.amenities && room.amenities.length > 0) return room.amenities;
+    return inferAmenities(room);
+  }, [room]);
+  const [dateRange, setDateRange] = useState([null, null]);
+  const [startDate, endDate] = dateRange;
+
+  const disabledDates = useMemo(() => {
+    if (!room || !room.bookings) return [];
+    const dates = [];
+    room.bookings.forEach((b) => {
+      // Chỉ disable nếu booking chưa bị hủy, nếu status có trả về
+      // (thường status là BOOKED, COMPLETED)
+      if (b.status === "CANCELLED") return;
+      if (b.checkInDate && b.checkOutDate) {
+        const interval = eachDayOfInterval({
+          start: parseISO(b.checkInDate),
+          end: parseISO(b.checkOutDate),
+        });
+        dates.push(...interval);
+      }
+    });
+    return dates;
+  }, [room]);
+
   const bookingLink = useMemo(() => {
     const params = new URLSearchParams();
-    const checkInDate = searchParams.get("checkInDate");
-    const checkOutDate = searchParams.get("checkOutDate");
+    const checkInDateParam = startDate ? startDate.toISOString().split("T")[0] : searchParams.get("checkInDate");
+    const checkOutDateParam = endDate ? endDate.toISOString().split("T")[0] : searchParams.get("checkOutDate");
     const location = searchParams.get("location");
-    if (checkInDate) params.set("checkInDate", checkInDate);
-    if (checkOutDate) params.set("checkOutDate", checkOutDate);
+    if (checkInDateParam) params.set("checkInDate", checkInDateParam);
+    if (checkOutDateParam) params.set("checkOutDate", checkOutDateParam);
     if (location) params.set("location", location);
     return `/rooms/${roomId}/booking${params.toString() ? `?${params}` : ""}`;
-  }, [roomId, searchParams]);
+  }, [roomId, searchParams, startDate, endDate]);
 
   if (loading) {
     return (
@@ -208,10 +235,29 @@ const PropertyDetailPage = () => {
                 </li>
               </ul>
             </div>
+            {/* Lịch trực quan */}
+            <div className="p-7 pt-0">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Chọn ngày lưu trú</label>
+              <div className="border border-gray-200 rounded-xl overflow-hidden p-2 bg-gray-50 flex justify-center">
+                <DatePicker
+                  selectsRange={true}
+                  startDate={startDate}
+                  endDate={endDate}
+                  onChange={(update) => {
+                    setDateRange(update);
+                  }}
+                  excludeDates={disabledDates}
+                  minDate={new Date()}
+                  inline
+                  monthsShown={1}
+                />
+              </div>
+            </div>
+
           </div>
 
           {/* 2. Khối nút bấm (Đẩy xuống đáy thẻ bằng mt-auto) */}
-          <div className="mt-auto p-7 pt-0 space-y-3">
+          <div className="mt-auto p-7 pt-2 space-y-3">
             <Link
               to={bookingLink}
               className="flex w-full items-center justify-center rounded-full bg-rose-500 px-8 py-4 text-lg font-bold text-white shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-rose-600 hover:shadow-xl hover:shadow-rose-500/30"
@@ -275,6 +321,50 @@ const PropertyDetailPage = () => {
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
           />
+        </div>
+      </motion.div>
+
+      {/* ═══════════════════════════════════════════
+          ROW 3: Fake Reviews cho việc Demo
+      ═══════════════════════════════════════════ */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+        className="rounded-[32px] border border-gray-100 bg-white p-8 shadow-sm"
+      >
+        <div className="flex items-center gap-4 mb-8">
+          <div className="flex items-center gap-1">
+            <Star className="fill-amber-400 text-amber-400 w-8 h-8" />
+            <span className="text-3xl font-bold text-gray-900">5.0</span>
+          </div>
+          <div className="text-gray-500 font-medium">
+            · Dựa trên 12 đánh giá (Hiển thị mẫu)
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {[
+            { name: "Minh Tuấn", date: "Tháng 6, 2026", text: "Phòng cực kỳ sạch sẽ, view nhìn ra ngoài rất thoáng và đẹp. Vị trí thuận lợi để đi chơi. Host thân thiện!" },
+            { name: "Lan Phương", date: "Tháng 5, 2026", text: "Trải nghiệm tuyệt vời. Mình rất thích không gian ở đây, đầy đủ tiện nghi y hệt như mô tả. Chắc chắn sẽ quay lại." },
+            { name: "Hoàng Bách", date: "Tháng 5, 2026", text: "Giá cả hợp lý, khu vực yên tĩnh phù hợp để nghỉ dưỡng. Giường ngủ cực kỳ êm ái." },
+            { name: "Thảo Vy", date: "Tháng 4, 2026", text: "Gia đình mình đã có kỳ nghỉ đáng nhớ ở đây. Đầy đủ bếp núc nên rất tiện nấu ăn cho bé nhỏ." },
+          ].map((review, idx) => (
+            <div key={idx} className="p-5 rounded-2xl bg-gray-50 border border-gray-100">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-full bg-rose-100 text-rose-600 font-bold flex items-center justify-center">
+                  {review.name.charAt(0)}
+                </div>
+                <div>
+                  <div className="font-bold text-gray-900">{review.name}</div>
+                  <div className="text-sm text-gray-500">{review.date}</div>
+                </div>
+              </div>
+              <p className="text-gray-700 text-sm leading-relaxed">
+                "{review.text}"
+              </p>
+            </div>
+          ))}
         </div>
       </motion.div>
     </div>

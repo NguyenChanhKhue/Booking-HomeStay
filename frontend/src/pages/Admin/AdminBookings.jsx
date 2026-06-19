@@ -16,17 +16,7 @@ const AdminBookings = () => {
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      navigate("/auth?redirect=%2Fadmin%2Fbookings");
-      return;
-    }
 
-    if (!loading && user?.role !== "ADMIN") {
-      navigate("/");
-      return;
-    }
-  }, [isAuthenticated, loading, user, navigate]);
 
   useEffect(() => {
     const loadBookings = async () => {

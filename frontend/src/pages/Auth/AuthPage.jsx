@@ -23,6 +23,7 @@ const AuthPage = () => {
     phoneNumber: "",
     email: "",
     password: "",
+    confirmPassword: "",
   });
   const [showForgotPassword, setShowForgotPassword] = useState(false);
 
@@ -45,11 +46,16 @@ const AuthPage = () => {
           password: form.password,
         });
         if (response?.role === "ADMIN") {
-          navigate("/admin");
+          navigate(redirectTo.startsWith("/admin") ? redirectTo : "/admin");
         } else {
-          navigate("/");
+          navigate(redirectTo.startsWith("/admin") ? "/" : redirectTo);
         }
       } else {
+        if (form.password !== form.confirmPassword) {
+          setError("Mật khẩu xác nhận không khớp.");
+          setSubmitting(false);
+          return;
+        }
         await register(form);
         navigate(redirectTo);
       }
@@ -134,6 +140,19 @@ const AuthPage = () => {
                 <input
                   name="phoneNumber"
                   value={form.phoneNumber}
+                  onChange={handleChange}
+                  className="w-full rounded-2xl border border-gray-200 px-5 py-4 text-base outline-none transition focus:border-rose-400 focus:ring-4 focus:ring-rose-50"
+                  required
+                />
+              </label>
+              <label className="block">
+                <span className="mb-2 block text-base font-semibold text-gray-700">
+                  Xác nhận mật khẩu
+                </span>
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  value={form.confirmPassword}
                   onChange={handleChange}
                   className="w-full rounded-2xl border border-gray-200 px-5 py-4 text-base outline-none transition focus:border-rose-400 focus:ring-4 focus:ring-rose-50"
                   required

@@ -25,6 +25,7 @@ export const searchRooms = async (filters) => {
   if (filters.maxPrice) params.maxPrice = filters.maxPrice;
   if (filters.checkInDate) params.checkInDate = filters.checkInDate;
   if (filters.checkOutDate) params.checkOutDate = filters.checkOutDate;
+  if (filters.amenities) params.amenities = filters.amenities;
 
   const { data } = await api.get("/rooms/search", { params });
   return Array.isArray(data) ? data : data.roomList ?? [];

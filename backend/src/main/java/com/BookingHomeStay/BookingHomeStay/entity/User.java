@@ -55,7 +55,7 @@ public class User implements UserDetails {
   @Column(name = "avatar_url")
   private String avatarUrl;
 
-  @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
   private List<Booking> bookings = new ArrayList<>();
 
   @Override

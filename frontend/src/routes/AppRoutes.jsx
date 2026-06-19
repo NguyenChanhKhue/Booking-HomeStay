@@ -16,6 +16,7 @@ import AdminUsers from "../pages/Admin/AdminUsers";
 import PaymentResultPage from "../pages/Payment/PaymentResultPage";
 import AboutPage from "../pages/Home/AboutPage";
 import ContactPage from "../pages/Home/ContactPage";
+import ProtectedRoute from "../components/ProtectedRoute";
 
 const NotFoundPage = () => (
   <div className="mx-auto flex min-h-[60vh] max-w-3xl flex-col items-center justify-center gap-4 text-center">
@@ -88,7 +89,9 @@ const AppRoutes = () => {
             path="/rooms/:roomId/booking"
             element={
               <MainLayout>
-                <BookingPage />
+                <ProtectedRoute>
+                  <BookingPage />
+                </ProtectedRoute>
               </MainLayout>
             }
           />
@@ -96,7 +99,9 @@ const AppRoutes = () => {
             path="/profile"
             element={
               <MainLayout>
-                <ProfilePage />
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
               </MainLayout>
             }
           />

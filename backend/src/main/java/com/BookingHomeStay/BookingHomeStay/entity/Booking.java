@@ -17,9 +17,18 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import org.hibernate.annotations.Check;
+
 @Data
 @Entity
-@Table(name = "bookings")
+@Table(
+  name = "bookings", 
+  indexes = {
+    @Index(name = "idx_booking_code", columnList = "bookingConfirmationCode"),
+    @Index(name = "idx_booking_status", columnList = "status")
+  }
+)
+@Check(constraints = "status IN ('PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED') AND paymentStatus IN ('UNPAID', 'PAID', 'REFUNDED')")
 public class Booking {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,6 +37,7 @@ public class Booking {
   @NotNull(message = "check in date is required")
   private LocalDate checkInDate;
 
+  @NotNull(message = "check out date is required")
   @Future(message = "check out date must be in the future")
   private LocalDate checkOutDate;
 
@@ -39,6 +49,7 @@ public class Booking {
 
   private int totalNumOfGuest;
 
+  @Column(unique = true)
   private String bookingConfirmationCode;
 
   private String status = "PENDING";

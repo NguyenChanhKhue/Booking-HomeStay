@@ -32,7 +32,7 @@ public class RoomServiceImpl implements RoomService {
   @Override
   @Transactional
   public Response addNewRoom(MultipartFile photo, List<MultipartFile> additionalPhotos, String roomType, String roomLocation, BigDecimal roomPrice,
-      String description) {
+      String description, List<String> amenities) {
     validateRoomData(roomType, roomLocation, roomPrice, description);
 
     Room room = new Room();
@@ -41,6 +41,10 @@ public class RoomServiceImpl implements RoomService {
     room.setRoomPrice(roomPrice);
     room.setRoomDescription(description.trim());
     room.setRoomPhotoUrl(cloudinaryService.uploadImage(photo, "booking-home-stay/rooms"));
+    
+    if (amenities != null) {
+      room.setAmenities(new ArrayList<>(amenities));
+    }
     
     if (additionalPhotos != null && !additionalPhotos.isEmpty()) {
       List<String> additionalImages = new ArrayList<>();
@@ -57,7 +61,7 @@ public class RoomServiceImpl implements RoomService {
     Response response = new Response();
     response.setStatusCode(201);
     response.setMessage("Add new room successfully");
-    response.setRoom(mapRoomToRoomDto(savedRoom));
+    response.setRoom(com.BookingHomeStay.BookingHomeStay.utils.EntityMapper.mapRoomToDto(savedRoom));
     return response;
   }
 
@@ -70,7 +74,7 @@ public class RoomServiceImpl implements RoomService {
   public Response getAllRooms() {
     List<RoomDTO> rooms = roomRepository.findAll()
         .stream()
-        .map(this::mapRoomToRoomDto)
+        .map(com.BookingHomeStay.BookingHomeStay.utils.EntityMapper::mapRoomToDto)
         .toList();
 
     Response response = new Response();
@@ -95,7 +99,7 @@ public class RoomServiceImpl implements RoomService {
   @Override
   @Transactional
   public Response updateRoom(Long roomId, String description, String roomType, String roomLocation,
-      BigDecimal roomPrice, MultipartFile photo, List<MultipartFile> additionalPhotos) {
+      BigDecimal roomPrice, MultipartFile photo, List<MultipartFile> additionalPhotos, List<String> amenities) {
     Room room = findRoomById(roomId);
 
     if (roomType != null && !roomType.isBlank()) {
@@ -115,6 +119,10 @@ public class RoomServiceImpl implements RoomService {
 
     if (description != null && !description.isBlank()) {
       room.setRoomDescription(description.trim());
+    }
+    
+    if (amenities != null) {
+      room.setAmenities(new ArrayList<>(amenities));
     }
 
     if (photo != null && !photo.isEmpty()) {
@@ -138,7 +146,7 @@ public class RoomServiceImpl implements RoomService {
     Response response = new Response();
     response.setStatusCode(200);
     response.setMessage("Update room successfully");
-    response.setRoom(mapRoomToRoomDto(updatedRoom));
+    response.setRoom(com.BookingHomeStay.BookingHomeStay.utils.EntityMapper.mapRoomToDto(updatedRoom));
     return response;
   }
 
@@ -149,7 +157,7 @@ public class RoomServiceImpl implements RoomService {
     Response response = new Response();
     response.setStatusCode(200);
     response.setMessage("Get room successfully");
-    response.setRoom(mapRoomToRoomDtoWithBookings(room));
+    response.setRoom(com.BookingHomeStay.BookingHomeStay.utils.EntityMapper.mapRoomToDtoWithBookings(room));
     return response;
   }
 
@@ -160,7 +168,7 @@ public class RoomServiceImpl implements RoomService {
     String normalizedRoomType = roomType == null ? "" : roomType.trim();
     List<RoomDTO> rooms = roomRepository.findAvailableRoomsByDatesAndTypes(checkInDate, checkOutDate, normalizedRoomType)
         .stream()
-        .map(this::mapRoomToRoomDto)
+        .map(com.BookingHomeStay.BookingHomeStay.utils.EntityMapper::mapRoomToDto)
         .toList();
 
     Response response = new Response();
@@ -174,7 +182,7 @@ public class RoomServiceImpl implements RoomService {
   public Response getAllAvailableRooms() {
     List<RoomDTO> rooms = roomRepository.getAllAvailableRooms()
         .stream()
-        .map(this::mapRoomToRoomDto)
+        .map(com.BookingHomeStay.BookingHomeStay.utils.EntityMapper::mapRoomToDto)
         .toList();
 
     Response response = new Response();
@@ -186,7 +194,7 @@ public class RoomServiceImpl implements RoomService {
 
   @Override
   public Response searchRooms(String keyword, String location, String roomType, BigDecimal minPrice, BigDecimal maxPrice,
-      LocalDate checkInDate, LocalDate checkOutDate) {
+      LocalDate checkInDate, LocalDate checkOutDate, List<String> amenities) {
     validateSearchFilters(minPrice, maxPrice, checkInDate, checkOutDate);
 
     List<RoomDTO> rooms = roomRepository.searchRooms(
@@ -198,7 +206,12 @@ public class RoomServiceImpl implements RoomService {
         checkInDate,
         checkOutDate)
         .stream()
-        .map(this::mapRoomToRoomDto)
+        .filter(r -> {
+            if (amenities == null || amenities.isEmpty()) return true;
+            // Check if room has ALL requested amenities
+            return r.getAmenities() != null && r.getAmenities().containsAll(amenities);
+        })
+        .map(com.BookingHomeStay.BookingHomeStay.utils.EntityMapper::mapRoomToDto)
         .toList();
 
     Response response = new Response();
@@ -270,36 +283,4 @@ public class RoomServiceImpl implements RoomService {
     return value.trim();
   }
 
-  private RoomDTO mapRoomToRoomDto(Room room) {
-    RoomDTO roomDTO = new RoomDTO();
-    roomDTO.setId(room.getId());
-    roomDTO.setRoomType(room.getRoomType());
-    roomDTO.setRoomLocation(room.getRoomLocation());
-    roomDTO.setRoomPrice(room.getRoomPrice());
-    roomDTO.setRoomPhotoUrl(room.getRoomPhotoUrl());
-    roomDTO.setAdditionalImages(room.getAdditionalImages() != null ? room.getAdditionalImages() : new ArrayList<>());
-    roomDTO.setRoomDescription(room.getRoomDescription());
-    roomDTO.setBookingCount(room.getBookings() != null ? room.getBookings().size() : 0);
-    return roomDTO;
-  }
-
-  private RoomDTO mapRoomToRoomDtoWithBookings(Room room) {
-    RoomDTO roomDTO = mapRoomToRoomDto(room);
-    roomDTO.setBookings(room.getBookings().stream().map(this::mapBookingToBookingDto).toList());
-    return roomDTO;
-  }
-
-  private BookingDTO mapBookingToBookingDto(Booking booking) {
-    BookingDTO bookingDTO = new BookingDTO();
-    bookingDTO.setId(booking.getId());
-    bookingDTO.setCheckInDate(booking.getCheckInDate());
-    bookingDTO.setCheckOutDate(booking.getCheckOutDate());
-    bookingDTO.setNumOfAdults(booking.getNumOfAdults());
-    bookingDTO.setNumOfChildren(booking.getNumOfChildren());
-    bookingDTO.setTotalNumOfGuest(booking.getTotalNumOfGuest());
-    bookingDTO.setBookingConfirmationCode(booking.getBookingConfirmationCode());
-    bookingDTO.setPaymentStatus(booking.getPaymentStatus());
-    bookingDTO.setPaymentMethod(booking.getPaymentMethod());
-    return bookingDTO;
-  }
 }

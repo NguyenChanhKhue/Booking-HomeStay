@@ -28,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@lombok.extern.slf4j.Slf4j
 public class PaymentServiceImpl implements PaymentService {
 
   private final BookingRepository bookingRepository;
@@ -58,7 +59,7 @@ public class PaymentServiceImpl implements PaymentService {
     vnp_Params.put("vnp_ReturnUrl", vnPayConfig.vnp_ReturnUrl);
     vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
-    Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+    Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
     SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
     String vnp_CreateDate = formatter.format(cld.getTime());
     vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
@@ -99,9 +100,7 @@ public class PaymentServiceImpl implements PaymentService {
     queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
     String paymentUrl = vnPayConfig.vnp_Url + "?" + queryUrl;
 
-    // Attach booking ID to transaction reference to look up later
-    booking.setBookingConfirmationCode(booking.getBookingConfirmationCode() + "_" + vnp_TxnRef);
-    bookingRepository.save(booking);
+    // Note: Do not mutate bookingConfirmationCode here. It will be sent in vnp_OrderInfo and retrieved on callback.
 
     Response response = new Response();
     response.setStatusCode(200);
@@ -119,32 +118,23 @@ public class PaymentServiceImpl implements PaymentService {
 
     String signValue = VNPayConfig.hashAllFields(params, vnPayConfig.vnp_HashSecret);
     
-    System.out.println("Received vnp_SecureHash: " + vnp_SecureHash);
-    System.out.println("Calculated signValue: " + signValue);
-    
     Response response = new Response();
     
     if (signValue.equals(vnp_SecureHash)) {
       if ("00".equals(params.get("vnp_ResponseCode"))) {
         // Success
         String orderInfo = params.get("vnp_OrderInfo");
-        System.out.println("OrderInfo: " + orderInfo);
         // Extract booking code from orderInfo "Thanh toan don dat phong: CODE"
         String[] parts = orderInfo.split(": ");
         if (parts.length > 1) {
           String confirmationCodeWithTxn = parts[1];
           String originalCode = confirmationCodeWithTxn.split("_")[0];
-          System.out.println("Original code: " + originalCode);
           
-          // Try to find the booking. It might still have _TXNREF or it might have been reverted to originalCode.
-          Booking booking = bookingRepository.findByBookingConfirmationCodeStartingWith(originalCode).stream()
-            .filter(b -> b.getBookingConfirmationCode().equals(originalCode) || b.getBookingConfirmationCode().contains(params.get("vnp_TxnRef")))
-            .findFirst()
-            .orElse(null);
+          // Try to find the booking.
+          Booking booking = bookingRepository.findByBookingConfirmationCode(originalCode).orElse(null);
 
           if (booking != null) {
             if ("PAID".equals(booking.getPaymentStatus())) {
-              System.out.println("Booking already paid!");
               response.setStatusCode(200);
               response.setMessage("Payment success (already processed)");
               return response;
@@ -152,25 +142,21 @@ public class PaymentServiceImpl implements PaymentService {
             
             booking.setPaymentStatus("PAID");
             booking.setPaymentMethod("VNPAY");
-            booking.setBookingConfirmationCode(originalCode); // Revert to original code
             bookingRepository.save(booking);
             
-            System.out.println("Booking updated successfully!");
+            log.info("Booking updated successfully!");
             response.setStatusCode(200);
             response.setMessage("Payment success");
             return response;
           } else {
-             System.out.println("Booking not found!");
+             log.error("Booking not found!");
           }
         } else {
-           System.out.println("OrderInfo parsing failed: " + orderInfo);
+           log.error("OrderInfo parsing failed: {}", orderInfo);
         }
       } else {
-         System.out.println("ResponseCode is not 00: " + params.get("vnp_ResponseCode"));
+         log.warn("ResponseCode is not 00: {}", params.get("vnp_ResponseCode"));
       }
-    } else {
-       System.out.println("Hash mismatch!");
-       System.out.println("Params: " + params.toString());
     }
     
     response.setStatusCode(400);

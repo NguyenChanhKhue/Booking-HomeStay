@@ -18,6 +18,7 @@ public class RoomDTO {
   private String roomPhotoUrl;
   private String roomDescription;
   private List<String> additionalImages = new ArrayList<>();
+  private List<String> amenities = new ArrayList<>();
   private List<BookingDTO> bookings = new ArrayList<>();
   private Integer bookingCount;
 }

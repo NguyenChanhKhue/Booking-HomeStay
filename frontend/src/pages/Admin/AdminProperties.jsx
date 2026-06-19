@@ -9,6 +9,7 @@ import {
   updateRoomAdmin,
 } from "../../services/adminService";
 import { formatPrice } from "../../utils/formatPrice";
+import { AMENITIES_LIST } from "../../utils/constants";
 
 const AdminProperties = () => {
   const navigate = useNavigate();
@@ -26,19 +27,10 @@ const AdminProperties = () => {
     description: "",
     photo: null,
     additionalPhotos: [],
+    amenities: [],
   });
 
-  useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      navigate("/auth?redirect=%2Fadmin%2Fproperties");
-      return;
-    }
 
-    if (!loading && user?.role !== "ADMIN") {
-      navigate("/");
-      return;
-    }
-  }, [isAuthenticated, loading, user, navigate]);
 
   useEffect(() => {
     const loadRooms = async () => {
@@ -67,6 +59,7 @@ const AdminProperties = () => {
         description: room.roomDescription,
         photo: null,
         additionalPhotos: [],
+        amenities: room.amenities || [],
       });
     } else {
       setEditingRoom(null);
@@ -77,6 +70,7 @@ const AdminProperties = () => {
         description: "",
         photo: null,
         additionalPhotos: [],
+        amenities: [],
       });
     }
     setMessage("");
@@ -113,6 +107,17 @@ const AdminProperties = () => {
       ...prev,
       additionalPhotos: files.slice(0, 4), // max 4 additional images + 1 main = 5
     }));
+  };
+
+  const handleAmenityChange = (amenity) => {
+    setFormData((prev) => {
+      const isChecked = prev.amenities.includes(amenity);
+      if (isChecked) {
+        return { ...prev, amenities: prev.amenities.filter((a) => a !== amenity) };
+      } else {
+        return { ...prev, amenities: [...prev.amenities, amenity] };
+      }
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -160,6 +165,9 @@ const AdminProperties = () => {
         formData.additionalPhotos.forEach((file) => {
           data.append("additionalPhotos", file);
         });
+      }
+      if (formData.amenities && formData.amenities.length > 0) {
+        data.append("amenities", formData.amenities.join(','));
       }
 
       if (editingRoom) {
@@ -412,6 +420,25 @@ const AdminProperties = () => {
                     ✓ Đã chọn {formData.additionalPhotos.length} ảnh phụ.
                   </p>
                 )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Tiện nghi phòng
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {AMENITIES_LIST.map((amenity) => (
+                    <label key={amenity} className="flex items-center space-x-2 text-sm text-gray-700 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.amenities?.includes(amenity) || false}
+                        onChange={() => handleAmenityChange(amenity)}
+                        className="rounded border-gray-300 text-rose-500 focus:ring-rose-500"
+                      />
+                      <span>{amenity}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
 
               <div className="flex gap-4 pt-4">

@@ -21,7 +21,7 @@ public class UserController {
   private final UserService userService;
 
   @GetMapping
-  @PreAuthorize("hasAuthority('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Response> getAllUsers() {
     return ResponseEntity.ok(userService.getAllUsers());
   }
@@ -51,19 +51,19 @@ public class UserController {
   }
 
   @DeleteMapping("/{userId}")
-  @PreAuthorize("hasAuthority('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Response> deleteUser(@PathVariable String userId) {
     return ResponseEntity.ok(userService.deleteUser(userId));
   }
 
   @org.springframework.web.bind.annotation.PutMapping("/{userId}/toggle-status")
-  @PreAuthorize("hasAuthority('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Response> toggleUserStatus(@PathVariable String userId) {
     return ResponseEntity.ok(userService.toggleUserStatus(userId));
   }
 
   @org.springframework.web.bind.annotation.PutMapping("/{userId}/role")
-  @PreAuthorize("hasAuthority('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Response> changeUserRole(@PathVariable String userId) {
     return ResponseEntity.ok(userService.changeUserRole(userId));
   }

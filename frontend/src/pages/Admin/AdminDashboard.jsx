@@ -20,18 +20,6 @@ const AdminDashboard = () => {
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [revenueFilter, setRevenueFilter] = useState('all');
 
-  const calculatePrice = (booking) => {
-    const pricePerNight = booking.room?.roomPrice || 0;
-    if (booking.checkInDate && booking.checkOutDate) {
-      const checkIn = new Date(booking.checkInDate);
-      const checkOut = new Date(booking.checkOutDate);
-      const diffTime = Math.abs(checkOut - checkIn);
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      const days = diffDays > 0 ? diffDays : 1;
-      return pricePerNight * days;
-    }
-    return pricePerNight;
-  };
 
   const loadStats = async () => {
     if (!token || user?.role !== "ADMIN") return;
@@ -45,17 +33,7 @@ const AdminDashboard = () => {
     }
   };
 
-  useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      navigate("/auth?redirect=%2Fadmin");
-      return;
-    }
 
-    if (!loading && user?.role !== "ADMIN") {
-      navigate("/");
-      return;
-    }
-  }, [isAuthenticated, loading, user, navigate]);
 
   useEffect(() => {
     loadStats();
@@ -311,7 +289,7 @@ const AdminDashboard = () => {
                     {new Date(booking.checkOutDate).toLocaleDateString("vi-VN")}
                   </td>
                   <td className="px-6 py-4 text-sm text-rose-500 font-semibold">
-                    {new Intl.NumberFormat('vi-VN').format(calculatePrice(booking))} đ
+                    {new Intl.NumberFormat('vi-VN').format(booking.totalPrice || 0)} đ
                   </td>
                   <td className="px-6 py-4 text-sm">
                     {getStatusBadge(booking)}
@@ -375,7 +353,9 @@ const AdminDashboard = () => {
               </div>
               <div className="grid grid-cols-3 gap-2">
                 <span className="text-gray-500 font-medium">Tổng tiền:</span>
-                <span className="col-span-2 text-rose-500 font-bold text-lg">{new Intl.NumberFormat('vi-VN').format(calculatePrice(selectedBooking))} đ</span>
+                <span className="text-rose-600 font-bold text-base">
+                  {new Intl.NumberFormat('vi-VN').format(selectedBooking.totalPrice || 0)} đ
+                </span>
               </div>
               <div className="grid grid-cols-3 gap-2">
                 <span className="text-gray-500 font-medium">Thời gian:</span>

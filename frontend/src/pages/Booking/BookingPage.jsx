@@ -20,6 +20,7 @@ const BookingPage = () => {
     isAuthenticated,
     loading: authLoading,
     user,
+    token,
     refreshProfile,
   } = useAuth();
   const [room, setRoom] = useState(null);
@@ -92,9 +93,16 @@ const BookingPage = () => {
     setError("");
     setMessage("");
 
+    const checkIn = new Date(form.checkInDate);
+    const checkOut = new Date(form.checkOutDate);
+
+    if (checkOut <= checkIn) {
+      setError("Ngày trả phòng phải sau Ngày nhận phòng");
+      setSubmitting(false);
+      return;
+    }
+
     if (room && room.bookings) {
-      const checkIn = new Date(form.checkInDate);
-      const checkOut = new Date(form.checkOutDate);
       const isOverlap = room.bookings.some(b => {
         if (b.status === "CANCELLED") return false;
         const bIn = new Date(b.checkInDate);
@@ -117,7 +125,7 @@ const BookingPage = () => {
       }
 
       const profile = user ?? (await refreshProfile());
-      const response = await createBooking(roomId, profile.id, bookingPayload);
+      const response = await createBooking(roomId, profile.id, bookingPayload, token);
       
       if (paymentMethod === "VNPAY") {
         // Redirect to payment gateway

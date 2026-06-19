@@ -6,6 +6,7 @@ import PropertyCard from "../../components/cards/PropertyCard";
 import Search from "../../components/navbar/Search";
 import SkeletonCard from "../../components/ui/SkeletonCard";
 import EmptyState from "../../components/ui/EmptyState";
+import Pagination from "../../components/Pagination";
 import CountUp from "../../components/ui/CountUp";
 import { getAllRooms, getRoomTypes } from "../../services/propertyService";
 
@@ -123,7 +124,7 @@ const HomePage = () => {
   return (
     <div className="pb-6">
       {/* Hero Section */}
-      <section className="relative h-[65vh] min-h-[450px] w-[100vw] ml-[calc(-50vw+50%)] mb-8 -mt-[88px]">
+      <section className="relative z-20 h-[50vh] min-h-[380px] w-[100vw] ml-[calc(-50vw+50%)] mb-8 -mt-[88px]">
         {/* Background Image */}
         <div className="absolute inset-0 w-full h-full">
           <img
@@ -132,16 +133,16 @@ const HomePage = () => {
             className="w-full h-full object-cover"
           />
           {/* Gradient Overlay giúp chữ nổi bật mà không làm tối toàn bộ ảnh */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/5 to-transparent"></div>
         </div>
 
         {/* Hero Content */}
-        <div className="relative h-full w-full flex flex-col justify-center items-center text-center pb-20 px-4">
+        <div className="relative h-full w-full flex flex-col justify-center items-center text-center pt-[130px] pb-6 px-4">
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 tracking-tight drop-shadow-[0_4px_8px_rgba(0,0,0,0.5)] [text-shadow:_0_2px_15px_rgb(0_0_0_/_60%)]"
+            className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-4 tracking-tight drop-shadow-[0_4px_8px_rgba(0,0,0,0.5)] [text-shadow:_0_2px_15px_rgb(0_0_0_/_60%)]"
           >
             Khám phá không gian <br className="hidden md:block" /> lưu trú tuyệt vời
           </motion.h1>
@@ -150,7 +151,7 @@ const HomePage = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-            className="text-lg md:text-2xl text-white/95 mb-10 max-w-2xl font-medium drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+            className="text-base md:text-lg text-white/95 mb-8 max-w-2xl font-medium drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
           >
             Trải nghiệm những khoảnh khắc đáng nhớ với hàng ngàn lựa chọn chỗ ở độc đáo trên khắp Việt Nam.
           </motion.p>
@@ -167,36 +168,7 @@ const HomePage = () => {
       </section>
 
       <div className="space-y-10 relative z-10 mt-4">
-        {/* Categories Section */}
-        <motion.section 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="space-y-6"
-        >
-          <div className="flex flex-col gap-4 border-b border-gray-100 pb-4 md:flex-row md:items-center md:justify-between">
-          {roomTypes.length > 0 ? (
-            <div className="flex gap-3 overflow-x-auto pb-1">
-              {roomTypes.map((type) => (
-                <Link
-                  key={type}
-                  to={`/search?roomType=${encodeURIComponent(type)}`}
-                  className="shrink-0 rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition hover:border-gray-950 hover:text-gray-950"
-                >
-                  {type}
-                </Link>
-              ))}
-            </div>
-          ) : null}
-          <Link
-            to="/search"
-            className="shrink-0 flex items-center text-sm font-medium text-rose-500 hover:text-rose-600 transition"
-          >
-            Xem tất cả <ChevronRight size={16} className="ml-0.5" />
-          </Link>
-        </div>
-        </motion.section>
+
 
         <motion.section 
           initial={{ opacity: 0, y: 20 }}
@@ -305,38 +277,7 @@ const HomePage = () => {
               ))}
             </div>
             
-            {/* Pagination UI */}
-            {totalPages > 1 && (
-              <div className="flex justify-center mt-8 gap-2">
-                <button
-                  onClick={() => paginate(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className="px-4 py-2 border border-gray-200 rounded-lg disabled:opacity-50 hover:bg-gray-50 transition"
-                >
-                  Trang trước
-                </button>
-                {[...Array(totalPages)].map((_, i) => (
-                  <button
-                    key={i + 1}
-                    onClick={() => paginate(i + 1)}
-                    className={`w-10 h-10 rounded-lg flex items-center justify-center transition ${
-                      currentPage === i + 1 
-                        ? "bg-rose-500 text-white font-bold" 
-                        : "border border-gray-200 hover:bg-gray-50 text-gray-700"
-                    }`}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
-                <button
-                  onClick={() => paginate(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className="px-4 py-2 border border-gray-200 rounded-lg disabled:opacity-50 hover:bg-gray-50 transition"
-                >
-                  Trang sau
-                </button>
-              </div>
-            )}
+            <Pagination currentPage={currentPage} totalPages={totalPages} paginate={paginate} />
           </>
         ) : (
           <EmptyState onReset={() => window.location.reload()} />

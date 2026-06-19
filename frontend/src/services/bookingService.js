@@ -1,7 +1,9 @@
-import { api } from "./api";
+import { api, authHeaders } from "./api";
 
-export const createBooking = async (roomId, userId, payload) => {
-  const { data } = await api.post(`/bookings/room/${roomId}/user/${userId}`, payload);
+export const createBooking = async (roomId, userId, payload, token) => {
+  const { data } = await api.post(`/bookings/room/${roomId}/user/${userId}`, payload, {
+    headers: authHeaders(token),
+  });
   return data;
 };
 

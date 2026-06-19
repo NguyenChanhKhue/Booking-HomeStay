@@ -406,7 +406,7 @@ const ProfilePage = () => {
                       <p>
                         <strong className="text-gray-800">Tổng tiền:</strong>{" "}
                         <span className="text-rose-600 font-bold text-base">
-                          {formatPrice((booking.room?.roomPrice || 0) * Math.max(1, Math.ceil((new Date(booking.checkOutDate) - new Date(booking.checkInDate)) / (1000 * 60 * 60 * 24))))}
+                          {formatPrice(booking.totalPrice || 0)}
                         </span>
                       </p>
                       <p className="md:col-span-2">
