@@ -10,7 +10,7 @@ import com.BookingHomeStay.BookingHomeStay.dto.Response;
 
 public interface RoomService {
   Response addNewRoom(MultipartFile photo, List<MultipartFile> additionalPhotos, String roomType, String roomLocation, BigDecimal roomPrice,
-      String description, List<String> amenities);
+      String description, List<String> amenities, Integer maxCapacity);
 
   List<String> getAllRoomTypes();
 
@@ -19,7 +19,7 @@ public interface RoomService {
   Response deleteRoom(Long roomId);
 
   Response updateRoom(Long roomId, String description, String roomType, String roomLocation, BigDecimal roomPrice,
-      MultipartFile photo, List<MultipartFile> additionalPhotos, List<String> amenities);
+      MultipartFile photo, List<MultipartFile> additionalPhotos, List<String> amenities, Integer maxCapacity);
 
   Response getRoomById(Long roomId);
 

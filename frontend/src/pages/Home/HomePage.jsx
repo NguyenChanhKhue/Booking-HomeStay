@@ -13,19 +13,19 @@ import { getAllRooms, getRoomTypes } from "../../services/propertyService";
 const FEATURED_LOCATIONS = [
   {
     id: "da-lat",
-    name: "Da Lat",
+    name: "Đà Lạt",
     image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80",
     propertyCount: "1,200",
   },
   {
     id: "vung-tau",
-    name: "Vung Tau",
+    name: "Vũng Tàu",
     image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80",
     propertyCount: "850",
   },
   {
     id: "hoi-an",
-    name: "Hoi An",
+    name: "Hội An",
     image: "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=400&q=80",
     propertyCount: "920",
   },
@@ -40,13 +40,7 @@ const FEATURED_LOCATIONS = [
     name: "Nha Trang",
     image: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=400&q=80",
     propertyCount: "1,500",
-  },
-  {
-    id: "phu-quoc",
-    name: "Phu Quoc",
-    image: "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=400&q=80",
-    propertyCount: "680",
-  },
+  }
 ];
 
 const HomePage = () => {
@@ -55,7 +49,7 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const roomsPerPage = 10;
+  const roomsPerPage = 12;
 
   const trendingRooms = [...rooms]
     .sort((a, b) => (b.bookingCount || 0) - (a.bookingCount || 0))
@@ -250,8 +244,8 @@ const HomePage = () => {
 
         <section className="space-y-6">
           <div className="flex items-center justify-between border-b border-gray-100 pb-4">
-          <h2 className="text-2xl font-bold tracking-tight text-gray-950">Khám phá tất cả</h2>
-        </div>
+            <h2 className="text-2xl font-bold tracking-tight text-gray-950">Khám phá tất cả</h2>
+          </div>
 
         {error ? (
           <div className="rounded-[28px] border border-red-100 bg-red-50 p-5 text-sm text-red-600">

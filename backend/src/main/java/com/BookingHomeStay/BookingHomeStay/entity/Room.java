@@ -26,7 +26,11 @@ public class Room {
   @Column(precision = 18, scale = 2)
   private BigDecimal roomPrice;
   
+  @Column(name = "max_capacity", nullable = false, columnDefinition = "integer default 2")
+  private Integer maxCapacity = 2;
+  
   private String roomPhotoUrl;
+  @Column(columnDefinition = "TEXT")
   private String roomDescription;
   
   @ElementCollection(fetch = FetchType.EAGER)

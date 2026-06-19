@@ -27,8 +27,11 @@ const UserMenu = () => {
   }, []);
 
   const handleLogout = () => {
-    logout();
     setOpen(false);
+    navigate("/");
+    setTimeout(() => {
+      logout();
+    }, 10);
   };
 
   return (

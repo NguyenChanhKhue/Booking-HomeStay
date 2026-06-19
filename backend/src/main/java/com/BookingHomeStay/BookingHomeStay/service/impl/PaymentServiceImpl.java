@@ -22,6 +22,7 @@ import com.BookingHomeStay.BookingHomeStay.entity.Booking;
 import com.BookingHomeStay.BookingHomeStay.exception.ResourceNotFoundException;
 import com.BookingHomeStay.BookingHomeStay.repository.BookingRepository;
 import com.BookingHomeStay.BookingHomeStay.service.PaymentService;
+import com.BookingHomeStay.BookingHomeStay.service.EmailService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,7 @@ public class PaymentServiceImpl implements PaymentService {
 
   private final BookingRepository bookingRepository;
   private final VNPayConfig vnPayConfig;
+  private final EmailService emailService;
 
   @Override
   public Response createPayment(Long bookingId, HttpServletRequest request) {
@@ -144,6 +146,9 @@ public class PaymentServiceImpl implements PaymentService {
             booking.setPaymentMethod("VNPAY");
             bookingRepository.save(booking);
             
+            // Send success email asynchronously (or synchronously)
+            emailService.sendPaymentSuccessEmail(booking);
+
             log.info("Booking updated successfully!");
             response.setStatusCode(200);
             response.setMessage("Payment success");

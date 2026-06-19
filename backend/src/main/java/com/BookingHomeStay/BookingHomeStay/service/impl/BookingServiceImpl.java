@@ -46,9 +46,12 @@ public class BookingServiceImpl implements BookingService {
       throw new BadRequestException("Room is not available for the selected date range");
     }
 
+    if (bookingRequest.getNumberOfGuests() > room.getMaxCapacity()) {
+      throw new BadRequestException("Số lượng khách vượt quá giới hạn tối đa của phòng (" + room.getMaxCapacity() + " người)");
+    }
+
     bookingRequest.setRoom(room);
     bookingRequest.setUser(user);
-    bookingRequest.calculateTotalNumberOfGuest();
     bookingRequest.setBookingConfirmationCode(generateBookingConfirmationCode());
 
     long days = Math.max(1, java.time.temporal.ChronoUnit.DAYS.between(bookingRequest.getCheckInDate(), bookingRequest.getCheckOutDate()));
@@ -142,11 +145,8 @@ public class BookingServiceImpl implements BookingService {
     if (!bookingRequest.getCheckInDate().isAfter(LocalDate.now().minusDays(1))) {
       throw new BadRequestException("Check in date must be today or in the future");
     }
-    if (bookingRequest.getNumOfAdults() < 1) {
-      throw new BadRequestException("Number of adults must be at least 1");
-    }
-    if (bookingRequest.getNumOfChildren() < 0) {
-      throw new BadRequestException("Number of children must not be negative");
+    if (bookingRequest.getNumberOfGuests() < 1) {
+      throw new BadRequestException("Number of guests must be at least 1");
     }
   }
 

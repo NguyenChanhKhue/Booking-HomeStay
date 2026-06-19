@@ -41,13 +41,9 @@ public class Booking {
   @Future(message = "check out date must be in the future")
   private LocalDate checkOutDate;
 
-  @Min(value = 1, message = "Number of adults must not be less that 1")
-  private int numOfAdults;
-
-  @Min(value = 0, message = "Number of children must not be less that 0")
-  private int numOfChildren;
-
-  private int totalNumOfGuest;
+  @Min(value = 1, message = "Number of guests must not be less than 1")
+  @Column(name = "number_of_guests", nullable = false)
+  private int numberOfGuests;
 
   @Column(unique = true)
   private String bookingConfirmationCode;
@@ -70,19 +66,7 @@ public class Booking {
   @JoinColumn(name = "room_id")
   private Room room;
 
-  public void calculateTotalNumberOfGuest() {
-    this.totalNumOfGuest = this.numOfAdults + this.numOfChildren;
-  }
 
-  public void setNumOfAdults(int numOfAdults) {
-    this.numOfAdults = numOfAdults;
-    calculateTotalNumberOfGuest();
-  }
-
-  public void setNumOfChildren(int numOfChildren) {
-    this.numOfChildren = numOfChildren;
-    calculateTotalNumberOfGuest();
-  }
 
   @Override
   public String toString() {
@@ -90,9 +74,7 @@ public class Booking {
         "id=" + id +
         ", checkInDate=" + checkInDate +
         ", checkOutDate=" + checkOutDate +
-        ", numOfAdults=" + numOfAdults +
-        ", numOfChildren=" + numOfChildren +
-        ", totalNumOfGuest=" + totalNumOfGuest +
+        ", numberOfGuests=" + numberOfGuests +
         ", bookingConfirmationCode='" + bookingConfirmationCode + '\'' +
         '}';
   }

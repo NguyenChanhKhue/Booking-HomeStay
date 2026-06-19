@@ -25,6 +25,7 @@ const Search = ({ compact = false, fullWidth = false, initialValues = {} }) => {
     location: initialValues.location ?? initialValues.keyword ?? "",
     checkInDate: initialValues.checkInDate ?? defaultCheckIn,
     checkOutDate: initialValues.checkOutDate ?? defaultCheckOut,
+    roomType: initialValues.roomType ?? "",
     minPrice: initialValues.minPrice ? Number(initialValues.minPrice) : 0,
     maxPrice: initialValues.maxPrice ? Number(initialValues.maxPrice) : 5000000,
     amenities: initialValues.amenities ? initialValues.amenities.split(',') : [],
@@ -35,6 +36,7 @@ const Search = ({ compact = false, fullWidth = false, initialValues = {} }) => {
       location: initialValues.location ?? initialValues.keyword ?? "",
       checkInDate: initialValues.checkInDate ?? defaultCheckIn,
       checkOutDate: initialValues.checkOutDate ?? defaultCheckOut,
+      roomType: initialValues.roomType ?? "",
       minPrice: initialValues.minPrice ? Number(initialValues.minPrice) : 0,
       maxPrice: initialValues.maxPrice ? Number(initialValues.maxPrice) : 5000000,
       amenities: initialValues.amenities ? initialValues.amenities.split(',') : [],
@@ -44,6 +46,7 @@ const Search = ({ compact = false, fullWidth = false, initialValues = {} }) => {
     initialValues.checkOutDate,
     initialValues.keyword,
     initialValues.location,
+    initialValues.roomType,
     initialValues.minPrice,
     initialValues.maxPrice,
     initialValues.amenities,
@@ -67,6 +70,7 @@ const Search = ({ compact = false, fullWidth = false, initialValues = {} }) => {
     if (form.location.trim()) params.set("location", form.location.trim());
     if (form.checkInDate) params.set("checkInDate", form.checkInDate);
     if (form.checkOutDate) params.set("checkOutDate", form.checkOutDate);
+    if (form.roomType) params.set("roomType", form.roomType);
     if (form.minPrice > 0) params.set("minPrice", form.minPrice.toString());
     if (form.maxPrice < 5000000) params.set("maxPrice", form.maxPrice.toString());
     if (form.amenities.length > 0) params.set("amenities", form.amenities.join(','));
@@ -102,6 +106,7 @@ const Search = ({ compact = false, fullWidth = false, initialValues = {} }) => {
             type="date"
             name="checkInDate"
             value={form.checkInDate}
+            min={defaultCheckIn}
             onChange={handleChange}
             className="w-full border-none bg-transparent text-xs font-medium text-gray-900 outline-none"
           />
@@ -115,6 +120,7 @@ const Search = ({ compact = false, fullWidth = false, initialValues = {} }) => {
             type="date"
             name="checkOutDate"
             value={form.checkOutDate}
+            min={form.checkInDate || defaultCheckIn}
             onChange={handleChange}
             className="w-full border-none bg-transparent text-xs font-medium text-gray-900 outline-none"
           />
@@ -168,6 +174,7 @@ const Search = ({ compact = false, fullWidth = false, initialValues = {} }) => {
               type="date"
               name="checkInDate"
               value={form.checkInDate}
+              min={defaultCheckIn}
               onChange={handleChange}
               className="w-full border-none bg-transparent text-sm font-medium text-gray-900 outline-none cursor-pointer"
             />
@@ -182,6 +189,7 @@ const Search = ({ compact = false, fullWidth = false, initialValues = {} }) => {
               type="date"
               name="checkOutDate"
               value={form.checkOutDate}
+              min={form.checkInDate || defaultCheckIn}
               onChange={handleChange}
               className="w-full border-none bg-transparent text-sm font-medium text-gray-900 outline-none cursor-pointer"
             />
@@ -235,9 +243,30 @@ const Search = ({ compact = false, fullWidth = false, initialValues = {} }) => {
           </div>
         </div>
 
-        {/* Tiện nghi - Advanced Filters */}
+        {/* Tiện nghi & Loại phòng - Advanced Filters */}
         {showAdvanced && (
           <div className="px-6 pb-6 pt-5 border-t border-gray-100 mt-2">
+            <div className="mb-6">
+              <span className="block text-[10px] font-extrabold uppercase tracking-widest text-gray-900 mb-4">
+                Loại phòng
+              </span>
+              <select
+                name="roomType"
+                value={form.roomType}
+                onChange={handleChange}
+                className="w-full md:w-1/3 border border-gray-200 text-sm font-medium text-gray-700 rounded-lg px-3 py-2 outline-none focus:border-rose-300"
+              >
+                <option value="">Tất cả loại phòng</option>
+                <option value="Single Room">Single Room</option>
+                <option value="Double Room">Double Room</option>
+                <option value="Family Room">Family Room</option>
+                <option value="Deluxe Room">Deluxe Room</option>
+                <option value="Suite Room">Suite Room</option>
+                <option value="Studio Room">Studio Room</option>
+                <option value="VIP Room">VIP Room</option>
+              </select>
+            </div>
+            
             <span className="block text-[10px] font-extrabold uppercase tracking-widest text-gray-900 mb-4">
               Lọc theo tiện nghi
             </span>

@@ -15,6 +15,7 @@ public class RoomDTO {
   private String roomType;
   private String roomLocation;
   private BigDecimal roomPrice;
+  private Integer maxCapacity;
   private String roomPhotoUrl;
   private String roomDescription;
   private List<String> additionalImages = new ArrayList<>();

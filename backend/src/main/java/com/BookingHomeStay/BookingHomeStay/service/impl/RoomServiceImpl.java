@@ -32,7 +32,7 @@ public class RoomServiceImpl implements RoomService {
   @Override
   @Transactional
   public Response addNewRoom(MultipartFile photo, List<MultipartFile> additionalPhotos, String roomType, String roomLocation, BigDecimal roomPrice,
-      String description, List<String> amenities) {
+      String description, List<String> amenities, Integer maxCapacity) {
     validateRoomData(roomType, roomLocation, roomPrice, description);
 
     Room room = new Room();
@@ -40,9 +40,12 @@ public class RoomServiceImpl implements RoomService {
     room.setRoomLocation(roomLocation.trim());
     room.setRoomPrice(roomPrice);
     room.setRoomDescription(description.trim());
+    if (maxCapacity != null && maxCapacity > 0) {
+      room.setMaxCapacity(maxCapacity);
+    }
     room.setRoomPhotoUrl(cloudinaryService.uploadImage(photo, "booking-home-stay/rooms"));
     
-    if (amenities != null) {
+    if (amenities != null && !(amenities.size() == 1 && amenities.get(0).trim().isEmpty())) {
       room.setAmenities(new ArrayList<>(amenities));
     }
     
@@ -98,8 +101,8 @@ public class RoomServiceImpl implements RoomService {
 
   @Override
   @Transactional
-  public Response updateRoom(Long roomId, String description, String roomType, String roomLocation,
-      BigDecimal roomPrice, MultipartFile photo, List<MultipartFile> additionalPhotos, List<String> amenities) {
+  public Response updateRoom(Long roomId, String description, String roomType, String roomLocation, BigDecimal roomPrice, MultipartFile photo,
+      List<MultipartFile> additionalPhotos, List<String> amenities, Integer maxCapacity) {
     Room room = findRoomById(roomId);
 
     if (roomType != null && !roomType.isBlank()) {
@@ -110,11 +113,12 @@ public class RoomServiceImpl implements RoomService {
       room.setRoomLocation(roomLocation.trim());
     }
 
-    if (roomPrice != null) {
-      if (roomPrice.compareTo(BigDecimal.ZERO) <= 0) {
-        throw new BadRequestException("Room price must be greater than 0");
-      }
+    if (roomPrice != null && roomPrice.compareTo(BigDecimal.ZERO) >= 0) {
       room.setRoomPrice(roomPrice);
+    }
+
+    if (maxCapacity != null && maxCapacity > 0) {
+      room.setMaxCapacity(maxCapacity);
     }
 
     if (description != null && !description.isBlank()) {
@@ -122,7 +126,10 @@ public class RoomServiceImpl implements RoomService {
     }
     
     if (amenities != null) {
-      room.setAmenities(new ArrayList<>(amenities));
+      room.getAmenities().clear();
+      if (!(amenities.size() == 1 && amenities.get(0).trim().isEmpty())) {
+        room.getAmenities().addAll(amenities);
+      }
     }
 
     if (photo != null && !photo.isEmpty()) {

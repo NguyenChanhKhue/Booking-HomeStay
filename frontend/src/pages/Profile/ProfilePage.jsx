@@ -21,6 +21,12 @@ const ProfilePage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef(null);
 
+  // Change Password States
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [passwordFormData, setPasswordFormData] = useState({ oldPassword: "", newPassword: "", confirmPassword: "" });
+  const [passwordError, setPasswordError] = useState("");
+  const [isSubmittingPassword, setIsSubmittingPassword] = useState(false);
+
   useEffect(() => {
     if (!loading && !isAuthenticated) {
       navigate("/auth?redirect=%2Fprofile");
@@ -115,9 +121,33 @@ const ProfilePage = () => {
       alert("Cập nhật thông tin thành công!");
       setIsEditing(false);
     } catch (err) {
-      alert("Cập nhật thông tin thất bại. Vui lòng thử lại.");
+      setError("Không thể cập nhật hồ sơ.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    if (passwordFormData.newPassword !== passwordFormData.confirmPassword) {
+      setPasswordError("Mật khẩu mới không khớp.");
+      return;
+    }
+    setIsSubmittingPassword(true);
+    setPasswordError("");
+    try {
+      const { changePasswordRequest } = await import("../../services/authService");
+      await changePasswordRequest({
+        oldPassword: passwordFormData.oldPassword,
+        newPassword: passwordFormData.newPassword
+      }, token);
+      alert("Đổi mật khẩu thành công!");
+      setIsChangingPassword(false);
+      setPasswordFormData({ oldPassword: "", newPassword: "", confirmPassword: "" });
+    } catch (err) {
+      setPasswordError(err.response?.data?.message || "Đổi mật khẩu thất bại.");
+    } finally {
+      setIsSubmittingPassword(false);
     }
   };
 
@@ -266,6 +296,79 @@ const ProfilePage = () => {
                 </p>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Form Đổi mật khẩu */}
+        {isChangingPassword ? (
+          <form onSubmit={handleChangePassword} className="mt-4 bg-gray-50 p-6 rounded-[28px] border border-gray-100 max-w-xl">
+            <h3 className="text-xl font-semibold mb-4 text-gray-900">Đổi mật khẩu</h3>
+            {passwordError && (
+              <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+                {passwordError}
+              </div>
+            )}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Mật khẩu cũ</label>
+                <input 
+                  type="password" 
+                  value={passwordFormData.oldPassword} 
+                  onChange={e => setPasswordFormData({...passwordFormData, oldPassword: e.target.value})}
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-rose-500 focus:border-rose-500 outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Mật khẩu mới</label>
+                <input 
+                  type="password" 
+                  value={passwordFormData.newPassword} 
+                  onChange={e => setPasswordFormData({...passwordFormData, newPassword: e.target.value})}
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-rose-500 focus:border-rose-500 outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Xác nhận mật khẩu mới</label>
+                <input 
+                  type="password" 
+                  value={passwordFormData.confirmPassword} 
+                  onChange={e => setPasswordFormData({...passwordFormData, confirmPassword: e.target.value})}
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-rose-500 focus:border-rose-500 outline-none"
+                />
+              </div>
+              <div className="flex gap-3 pt-4">
+                <button 
+                  type="submit" 
+                  disabled={isSubmittingPassword}
+                  className="px-6 py-2 bg-rose-500 text-white font-medium rounded-full hover:bg-rose-600 transition disabled:opacity-70"
+                >
+                  {isSubmittingPassword ? "Đang lưu..." : "Xác nhận đổi"}
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => { setIsChangingPassword(false); setPasswordError(""); setPasswordFormData({oldPassword:"", newPassword:"", confirmPassword:""}); }}
+                  disabled={isSubmittingPassword}
+                  className="px-6 py-2 bg-white border border-gray-300 text-gray-700 font-medium rounded-full hover:bg-gray-50 transition"
+                >
+                  Hủy
+                </button>
+              </div>
+            </div>
+          </form>
+        ) : (
+          <div className="mt-4 flex gap-3">
+            {!isEditing && (
+              <button 
+                onClick={() => setIsChangingPassword(true)}
+                className="px-6 py-2 bg-white border border-rose-200 text-rose-500 font-medium rounded-full hover:bg-rose-50 transition text-sm flex items-center gap-2"
+              >
+                <KeyRound size={16} />
+                Đổi mật khẩu
+              </button>
+            )}
           </div>
         )}
       </section>

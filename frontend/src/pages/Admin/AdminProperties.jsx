@@ -24,6 +24,7 @@ const AdminProperties = () => {
     roomType: "",
     roomLocation: "",
     roomPrice: "",
+    maxCapacity: 2,
     description: "",
     photo: null,
     additionalPhotos: [],
@@ -56,10 +57,11 @@ const AdminProperties = () => {
         roomType: room.roomType,
         roomLocation: room.roomLocation,
         roomPrice: room.roomPrice,
+        maxCapacity: room.maxCapacity || 2,
         description: room.roomDescription,
         photo: null,
         additionalPhotos: [],
-        amenities: room.amenities || [],
+        amenities: (room.amenities || []).filter(a => AMENITIES_LIST.includes(a)),
       });
     } else {
       setEditingRoom(null);
@@ -67,6 +69,7 @@ const AdminProperties = () => {
         roomType: "",
         roomLocation: "",
         roomPrice: "",
+        maxCapacity: 2,
         description: "",
         photo: null,
         additionalPhotos: [],
@@ -141,6 +144,11 @@ const AdminProperties = () => {
       setSubmitting(false);
       return;
     }
+    if (!formData.maxCapacity || formData.maxCapacity <= 0) {
+      setMessage("Vui lòng nhập sức chứa phòng lớn hơn 0");
+      setSubmitting(false);
+      return;
+    }
     if (!formData.description.trim()) {
       setMessage("Vui lòng nhập mô tả");
       setSubmitting(false);
@@ -157,6 +165,7 @@ const AdminProperties = () => {
       data.append("roomType", formData.roomType.trim());
       data.append("roomLocation", formData.roomLocation.trim());
       data.append("roomPrice", formData.roomPrice);
+      data.append("maxCapacity", formData.maxCapacity);
       data.append("description", formData.description.trim());
       if (formData.photo) {
         data.append("photo", formData.photo);
@@ -166,8 +175,14 @@ const AdminProperties = () => {
           data.append("additionalPhotos", file);
         });
       }
-      if (formData.amenities && formData.amenities.length > 0) {
-        data.append("amenities", formData.amenities.join(','));
+      if (formData.amenities) {
+        if (formData.amenities.length > 0) {
+          formData.amenities.forEach((amenity) => {
+            data.append("amenities", amenity);
+          });
+        } else {
+          data.append("amenities", "");
+        }
       }
 
       if (editingRoom) {
@@ -261,6 +276,9 @@ const AdminProperties = () => {
                   Giá
                 </th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                  Sức chứa
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
                   Mô tả
                 </th>
                 <th className="px-6 py-3 text-center text-sm font-semibold text-gray-900">
@@ -279,6 +297,9 @@ const AdminProperties = () => {
                   </td>
                   <td className="px-6 py-4 text-sm font-medium text-rose-500">
                     {formatPrice(room.roomPrice)}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    {room.maxCapacity || 2} người
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600 truncate max-w-xs">
                     {room.roomDescription}
@@ -327,14 +348,22 @@ const AdminProperties = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Loại phòng *
                 </label>
-                <input
-                  type="text"
+                <select
                   name="roomType"
                   value={formData.roomType}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none bg-white"
                   required
-                />
+                >
+                  <option value="" disabled>-- Chọn loại phòng --</option>
+                  <option value="Single Room">Single Room (Phòng đơn)</option>
+                  <option value="Double Room">Double Room (Phòng đôi)</option>
+                  <option value="Family Room">Family Room (Phòng gia đình)</option>
+                  <option value="Deluxe Room">Deluxe Room (Phòng cao cấp)</option>
+                  <option value="Suite Room">Suite Room (Phòng Suite)</option>
+                  <option value="Studio Room">Studio Room (Phòng Studio)</option>
+                  <option value="VIP Room">VIP Room (Phòng VIP)</option>
+                </select>
               </div>
 
               <div>
@@ -360,6 +389,21 @@ const AdminProperties = () => {
                   name="roomPrice"
                   value={formData.roomPrice}
                   onChange={handleInputChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Sức chứa (Người) *
+                </label>
+                <input
+                  type="number"
+                  name="maxCapacity"
+                  value={formData.maxCapacity}
+                  onChange={handleInputChange}
+                  min="1"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none"
                   required
                 />

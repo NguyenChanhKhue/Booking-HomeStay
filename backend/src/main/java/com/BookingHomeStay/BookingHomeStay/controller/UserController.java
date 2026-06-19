@@ -40,6 +40,13 @@ public class UserController {
     return ResponseEntity.ok(userService.updateProfile(authentication.getName(), name, phoneNumber, avatar));
   }
 
+  @org.springframework.web.bind.annotation.PutMapping("/change-password")
+  public ResponseEntity<Response> changePassword(
+      Authentication authentication,
+      @org.springframework.validation.annotation.Validated @org.springframework.web.bind.annotation.RequestBody com.BookingHomeStay.BookingHomeStay.dto.AuthDTO.ChangePasswordRequest request) {
+    return ResponseEntity.ok(userService.changePassword(authentication.getName(), request));
+  }
+
   @GetMapping("/{userId}")
   public ResponseEntity<Response> getUserById(@PathVariable String userId) {
     return ResponseEntity.ok(userService.getUserById(userId));

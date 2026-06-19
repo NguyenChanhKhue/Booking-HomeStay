@@ -51,3 +51,10 @@ export const resetPassword = async (email, otp, newPassword) => {
   });
   return data;
 };
+
+export const changePasswordRequest = async (payload, token) => {
+  const { data } = await api.put("/users/change-password", payload, {
+    headers: authHeaders(token),
+  });
+  return data;
+};

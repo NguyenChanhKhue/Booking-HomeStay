@@ -39,9 +39,10 @@ public class RoomController {
       @RequestParam("roomLocation") String roomLocation,
       @RequestParam("roomPrice") BigDecimal roomPrice,
       @RequestParam("description") String description,
-      @RequestParam(value = "amenities", required = false) List<String> amenities) {
+      @RequestParam(value = "amenities", required = false) List<String> amenities,
+      @RequestParam(value = "maxCapacity", required = false) Integer maxCapacity) {
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(roomService.addNewRoom(photo, additionalPhotos, roomType, roomLocation, roomPrice, description, amenities));
+        .body(roomService.addNewRoom(photo, additionalPhotos, roomType, roomLocation, roomPrice, description, amenities, maxCapacity));
   }
 
   @GetMapping("/types")
@@ -96,8 +97,9 @@ public class RoomController {
       @RequestParam(required = false) BigDecimal roomPrice,
       @RequestParam(required = false) MultipartFile photo,
       @RequestParam(required = false) List<MultipartFile> additionalPhotos,
-      @RequestParam(value = "amenities", required = false) List<String> amenities) {
-    return ResponseEntity.ok(roomService.updateRoom(roomId, description, roomType, roomLocation, roomPrice, photo, additionalPhotos, amenities));
+      @RequestParam(value = "amenities", required = false) List<String> amenities,
+      @RequestParam(value = "maxCapacity", required = false) Integer maxCapacity) {
+    return ResponseEntity.ok(roomService.updateRoom(roomId, description, roomType, roomLocation, roomPrice, photo, additionalPhotos, amenities, maxCapacity));
   }
 
   @DeleteMapping("/{roomId}")

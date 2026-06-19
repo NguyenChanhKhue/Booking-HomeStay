@@ -26,6 +26,7 @@ public class UserServiceImpl implements UserService {
 
   private final UserRepository userRepository;
   private final CloudinaryService cloudinaryService;
+  private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
   @Override
   public Response getAllUsers() {
@@ -58,11 +59,16 @@ public class UserServiceImpl implements UserService {
   @Transactional
   public Response deleteUser(String userId) {
     User user = findUserById(userId);
+
+    if (user.getBookings() != null && !user.getBookings().isEmpty()) {
+      throw new BadRequestException("Không thể xóa người dùng đã có đơn đặt phòng.");
+    }
+
     userRepository.delete(user);
 
     Response response = new Response();
     response.setStatusCode(200);
-    response.setMessage("Delete user successfully");
+    response.setMessage("Xóa người dùng thành công");
     return response;
   }
 
@@ -144,6 +150,25 @@ public class UserServiceImpl implements UserService {
     response.setStatusCode(200);
     response.setMessage("Profile updated successfully");
     response.setUser(com.BookingHomeStay.BookingHomeStay.utils.EntityMapper.mapUserToDto(user));
+    return response;
+  }
+
+  @Override
+  @Transactional
+  public Response changePassword(String email, com.BookingHomeStay.BookingHomeStay.dto.AuthDTO.ChangePasswordRequest request) {
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+    if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+      throw new BadRequestException("Mật khẩu cũ không chính xác.");
+    }
+
+    user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+    userRepository.save(user);
+
+    Response response = new Response();
+    response.setStatusCode(200);
+    response.setMessage("Đổi mật khẩu thành công.");
     return response;
   }
 

@@ -31,6 +31,7 @@ public class EntityMapper {
         roomDTO.setRoomLocation(room.getRoomLocation());
         roomDTO.setRoomPrice(room.getRoomPrice());
         roomDTO.setRoomPhotoUrl(room.getRoomPhotoUrl());
+        roomDTO.setMaxCapacity(room.getMaxCapacity());
         roomDTO.setAdditionalImages(room.getAdditionalImages() != null ? room.getAdditionalImages() : new ArrayList<>());
         roomDTO.setAmenities(room.getAmenities() != null ? room.getAmenities() : new ArrayList<>());
         roomDTO.setRoomDescription(room.getRoomDescription());
@@ -44,9 +45,7 @@ public class EntityMapper {
         bookingDTO.setId(booking.getId());
         bookingDTO.setCheckInDate(booking.getCheckInDate());
         bookingDTO.setCheckOutDate(booking.getCheckOutDate());
-        bookingDTO.setNumOfAdults(booking.getNumOfAdults());
-        bookingDTO.setNumOfChildren(booking.getNumOfChildren());
-        bookingDTO.setTotalNumOfGuest(booking.getTotalNumOfGuest());
+        bookingDTO.setNumberOfGuests(booking.getNumberOfGuests());
         bookingDTO.setBookingConfirmationCode(booking.getBookingConfirmationCode());
         bookingDTO.setStatus(booking.getStatus());
         bookingDTO.setPaymentStatus(booking.getPaymentStatus());
