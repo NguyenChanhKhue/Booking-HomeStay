@@ -3,11 +3,14 @@ import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { getRoomById } from "../../services/propertyService";
-import { DEFAULT_AMENITIES } from "../../utils/constants";
+import { AMENITIES_LIST } from "../../utils/constants";
 import { formatPrice } from "../../utils/formatPrice";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { eachDayOfInterval, parseISO } from "date-fns";
 
 const inferAmenities = (room) => {
-  const base = [...DEFAULT_AMENITIES];
+  const base = AMENITIES_LIST.slice(0, 4);
   const description =
     `${room?.roomType ?? ""} ${room?.roomDescription ?? ""}`.toLowerCase();
 
@@ -50,17 +53,49 @@ const PropertyDetailPage = () => {
     return `${room?.roomType || ""} ${room?.roomLocation || ""}`.trim() || "Vietnam homestay";
   }, [room?.roomLocation, room?.roomType]);
 
-  const amenities = useMemo(() => inferAmenities(room), [room]);
+  const amenities = useMemo(() => {
+    return room?.amenities || [];
+  }, [room]);
+  const [dateRange, setDateRange] = useState([null, null]);
+  const [startDate, endDate] = dateRange;
+
+  const disabledDates = useMemo(() => {
+    if (!room || !room.bookings) return [];
+    const dates = [];
+    room.bookings.forEach((b) => {
+      // Chỉ disable nếu booking chưa bị hủy, nếu status có trả về
+      // (thường status là BOOKED, COMPLETED)
+      if (b.status === "CANCELLED") return;
+      if (b.checkInDate && b.checkOutDate) {
+        const interval = eachDayOfInterval({
+          start: parseISO(b.checkInDate),
+          end: parseISO(b.checkOutDate),
+        });
+        dates.push(...interval);
+      }
+    });
+    return dates;
+  }, [room]);
+
   const bookingLink = useMemo(() => {
+    const formatLocalDate = (date) => {
+      if (!date) return null;
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    };
+
     const params = new URLSearchParams();
-    const checkInDate = searchParams.get("checkInDate");
-    const checkOutDate = searchParams.get("checkOutDate");
+    const checkInDateParam = startDate ? formatLocalDate(startDate) : searchParams.get("checkInDate");
+    const checkOutDateParam = endDate ? formatLocalDate(endDate) : searchParams.get("checkOutDate");
     const location = searchParams.get("location");
-    if (checkInDate) params.set("checkInDate", checkInDate);
-    if (checkOutDate) params.set("checkOutDate", checkOutDate);
+    
+    if (checkInDateParam) params.set("checkInDate", checkInDateParam);
+    if (checkOutDateParam) params.set("checkOutDate", checkOutDateParam);
     if (location) params.set("location", location);
     return `/rooms/${roomId}/booking${params.toString() ? `?${params}` : ""}`;
-  }, [roomId, searchParams]);
+  }, [roomId, searchParams, startDate, endDate]);
 
   if (loading) {
     return (
@@ -121,20 +156,19 @@ const PropertyDetailPage = () => {
       </motion.div>
 
       {/* ═══════════════════════════════════════════
-          ROW 1: Image Gallery (left) | Price Card (right, stretch height)
-          Dùng items-stretch để card phải kéo cao bằng ảnh trái
+          ROW 1: Image Gallery (left) | Price Card (right)
       ═══════════════════════════════════════════ */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
-        className="grid gap-6 lg:grid-cols-[1fr_380px] items-stretch"
+        className="grid gap-6 lg:grid-cols-[1fr_380px] items-start"
       >
         {/* ─── LEFT col: Image Gallery ─── */}
         <div className="flex flex-col gap-4">
 
-          {/* Khung ảnh chính cố định tỷ lệ 16/9 (hoặc 4/3) — khóa layer với overflow:hidden và bo góc */}
-          <div className="relative w-full aspect-[4/3] lg:aspect-[16/9] overflow-hidden rounded-[32px] shadow-sm bg-gray-100">
+          {/* Khung ảnh chính với tỉ lệ 16:9 */}
+          <div className="relative w-full overflow-hidden rounded-[32px] shadow-sm bg-gray-100 aspect-[16/9]">
             <img
               src={images[activeImg] || 'https://via.placeholder.com/1200x800?text=Room'}
               alt={room.roomType}
@@ -173,52 +207,66 @@ const PropertyDetailPage = () => {
           {/* 1. Nhóm nội dung phía trên (Banner giá + Danh sách tiện ích) */}
           <div className="flex flex-col">
             {/* Banner giá */}
-            <div className="shrink-0 bg-gradient-to-br from-rose-500 to-rose-600 p-7 text-white">
-              <p className="mb-2 text-sm font-bold uppercase tracking-widest opacity-80">Giá mỗi đêm</p>
-              <p className="text-5xl font-black leading-none">{formatPrice(room.roomPrice)}</p>
-              <p className="mt-2 text-sm opacity-70">Chưa bao gồm dịch vụ phát sinh</p>
+            <div className="shrink-0 bg-gradient-to-br from-rose-500 to-rose-600 p-5 text-white">
+              <p className="mb-1 text-sm font-bold uppercase tracking-widest opacity-80">Giá mỗi đêm</p>
+              <p className="text-4xl font-black leading-none">{formatPrice(room.roomPrice)}</p>
+              <p className="mt-2 text-xs opacity-70">Chưa bao gồm dịch vụ phát sinh</p>
             </div>
 
             {/* Các bullet thông tin */}
-            <div className="p-7">
-              <ul className="space-y-5">
-                <li className="flex items-start gap-4">
-                  <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-rose-50">
-                    <Users size={20} className="text-rose-500" />
+            <div className="p-5 pb-3">
+              <ul className="space-y-3">
+                <li className="flex items-start gap-3">
+                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-rose-50">
+                    <Users size={18} className="text-rose-500" />
                   </div>
-                  <span className="text-base font-medium leading-snug text-gray-700">
+                  <span className="text-[14px] font-medium leading-snug text-gray-700">
                     Phù hợp cho khách cá nhân hoặc nhóm nhỏ
                   </span>
                 </li>
-                <li className="flex items-start gap-4">
-                  <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-rose-50">
-                    <CalendarDays size={20} className="text-rose-500" />
+                <li className="flex items-start gap-3">
+                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-rose-50">
+                    <ShieldCheck size={18} className="text-rose-500" />
                   </div>
-                  <span className="text-base font-medium leading-snug text-gray-700">
-                    Kiểm tra phòng trống theo ngày trước khi đặt
-                  </span>
-                </li>
-                <li className="flex items-start gap-4">
-                  <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-rose-50">
-                    <ShieldCheck size={20} className="text-rose-500" />
-                  </div>
-                  <span className="text-base font-medium leading-snug text-gray-700">
+                  <span className="text-[14px] font-medium leading-snug text-gray-700">
                     Đặt phòng trực tiếp từ hệ thống – an toàn &amp; bảo mật
                   </span>
                 </li>
               </ul>
             </div>
+            {/* Lịch trực quan */}
+            <div className="px-5 pt-2 pb-2">
+              <label className="block text-xs font-bold text-gray-800 mb-2 uppercase tracking-wide">Chọn ngày lưu trú</label>
+              <div className="border-2 border-gray-100 hover:border-rose-300 focus-within:border-rose-500 rounded-xl overflow-hidden px-3 py-2 bg-gray-50 flex items-center transition-colors cursor-pointer">
+                <CalendarDays size={18} className="text-gray-400 mr-2 shrink-0" />
+                <DatePicker
+                  selectsRange={true}
+                  startDate={startDate}
+                  endDate={endDate}
+                  onChange={(update) => {
+                    setDateRange(update);
+                  }}
+                  excludeDates={disabledDates}
+                  minDate={new Date()}
+                  monthsShown={1}
+                  placeholderText="Nhận phòng - Trả phòng"
+                  dateFormat="dd/MM/yyyy"
+                  className="w-full bg-transparent outline-none text-[14px] font-semibold text-gray-800 placeholder:text-gray-400 placeholder:font-medium cursor-pointer"
+                />
+              </div>
+            </div>
+
           </div>
 
           {/* 2. Khối nút bấm (Đẩy xuống đáy thẻ bằng mt-auto) */}
-          <div className="mt-auto p-7 pt-0 space-y-3">
+          <div className="mt-auto p-5 pt-2 space-y-2">
             <Link
               to={bookingLink}
-              className="flex w-full items-center justify-center rounded-full bg-rose-500 px-8 py-4 text-lg font-bold text-white shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-rose-600 hover:shadow-xl hover:shadow-rose-500/30"
+              className="flex w-full items-center justify-center rounded-full bg-rose-500 px-6 py-3 text-base font-bold text-white shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-rose-600 hover:shadow-xl hover:shadow-rose-500/30"
             >
               Đặt phòng ngay
             </Link>
-            <p className="text-center text-sm text-gray-400">Không mất phí khi hủy trong 24 giờ đầu</p>
+            <p className="text-center text-xs text-gray-400">Không mất phí khi hủy trong 24 giờ đầu</p>
           </div>
         </div>
       </motion.div>
@@ -238,15 +286,16 @@ const PropertyDetailPage = () => {
         <div className="flex flex-col gap-6">
           <div className="rounded-[32px] border border-gray-100 bg-white p-8 shadow-sm">
             <h2 className="mb-3 text-xl font-bold text-gray-900">Về phòng này</h2>
-            <p className="text-base leading-relaxed text-gray-600">
+            <p className="text-base leading-relaxed text-gray-600 whitespace-pre-wrap">
               {room.roomDescription || 'Phòng chưa có mô tả chi tiết.'}
             </p>
           </div>
 
-          <div className="rounded-[32px] border border-gray-100 bg-white p-8 shadow-sm">
-            <h2 className="mb-6 text-xl font-bold text-gray-900">Tiện nghi</h2>
-            <div className="grid grid-cols-2 gap-4">
-              {amenities.map((item) => (
+          {amenities.length > 0 && (
+            <div className="rounded-[32px] border border-gray-100 bg-white p-8 shadow-sm">
+              <h2 className="mb-6 text-xl font-bold text-gray-900">Tiện nghi</h2>
+              <div className="grid grid-cols-2 gap-4">
+                {amenities.map((item) => (
                 <div key={item} className="flex items-center gap-3">
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-rose-50">
                     <Check size={16} className="text-rose-500" />
@@ -254,8 +303,9 @@ const PropertyDetailPage = () => {
                   <span className="text-sm font-medium text-gray-700">{item}</span>
                 </div>
               ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* RIGHT col: Map – h-full + flex flex-col → iframe lấp đầy, không thò xuống */}
@@ -275,6 +325,50 @@ const PropertyDetailPage = () => {
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
           />
+        </div>
+      </motion.div>
+
+      {/* ═══════════════════════════════════════════
+          ROW 3: Fake Reviews cho việc Demo
+      ═══════════════════════════════════════════ */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+        className="rounded-[32px] border border-gray-100 bg-white p-8 shadow-sm"
+      >
+        <div className="flex items-center gap-4 mb-8">
+          <div className="flex items-center gap-1">
+            <Star className="fill-amber-400 text-amber-400 w-8 h-8" />
+            <span className="text-3xl font-bold text-gray-900">5.0</span>
+          </div>
+          <div className="text-gray-500 font-medium">
+            · Dựa trên 12 đánh giá (Hiển thị mẫu)
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {[
+            { name: "Minh Tuấn", date: "Tháng 6, 2026", text: "Phòng cực kỳ sạch sẽ, view nhìn ra ngoài rất thoáng và đẹp. Vị trí thuận lợi để đi chơi. Host thân thiện!" },
+            { name: "Lan Phương", date: "Tháng 5, 2026", text: "Trải nghiệm tuyệt vời. Mình rất thích không gian ở đây, đầy đủ tiện nghi y hệt như mô tả. Chắc chắn sẽ quay lại." },
+            { name: "Hoàng Bách", date: "Tháng 5, 2026", text: "Giá cả hợp lý, khu vực yên tĩnh phù hợp để nghỉ dưỡng. Giường ngủ cực kỳ êm ái." },
+            { name: "Thảo Vy", date: "Tháng 4, 2026", text: "Gia đình mình đã có kỳ nghỉ đáng nhớ ở đây. Đầy đủ bếp núc nên rất tiện nấu ăn cho bé nhỏ." },
+          ].map((review, idx) => (
+            <div key={idx} className="p-5 rounded-2xl bg-gray-50 border border-gray-100">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 rounded-full bg-rose-100 text-rose-600 font-bold flex items-center justify-center">
+                  {review.name.charAt(0)}
+                </div>
+                <div>
+                  <div className="font-bold text-gray-900">{review.name}</div>
+                  <div className="text-sm text-gray-500">{review.date}</div>
+                </div>
+              </div>
+              <p className="text-gray-700 text-sm leading-relaxed">
+                "{review.text}"
+              </p>
+            </div>
+          ))}
         </div>
       </motion.div>
     </div>

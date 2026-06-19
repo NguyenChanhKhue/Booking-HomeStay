@@ -20,18 +20,6 @@ const AdminDashboard = () => {
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [revenueFilter, setRevenueFilter] = useState('all');
 
-  const calculatePrice = (booking) => {
-    const pricePerNight = booking.room?.roomPrice || 0;
-    if (booking.checkInDate && booking.checkOutDate) {
-      const checkIn = new Date(booking.checkInDate);
-      const checkOut = new Date(booking.checkOutDate);
-      const diffTime = Math.abs(checkOut - checkIn);
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      const days = diffDays > 0 ? diffDays : 1;
-      return pricePerNight * days;
-    }
-    return pricePerNight;
-  };
 
   const loadStats = async () => {
     if (!token || user?.role !== "ADMIN") return;
@@ -45,17 +33,7 @@ const AdminDashboard = () => {
     }
   };
 
-  useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      navigate("/auth?redirect=%2Fadmin");
-      return;
-    }
 
-    if (!loading && user?.role !== "ADMIN") {
-      navigate("/");
-      return;
-    }
-  }, [isAuthenticated, loading, user, navigate]);
 
   useEffect(() => {
     loadStats();
@@ -151,31 +129,29 @@ const AdminDashboard = () => {
 
   const getStatusBadge = (booking) => {
     if (booking.status === "CANCELLED") {
-      return <span className="px-2.5 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold uppercase tracking-wider">Đã hủy</span>;
+      return <span className="inline-flex items-center justify-center whitespace-nowrap px-3 py-1 bg-red-100 text-red-700 rounded-full text-[11px] font-bold uppercase tracking-wider">Đã hủy</span>;
     }
     if (booking.paymentStatus === "PAID") {
-      return <span className="px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-semibold uppercase tracking-wider">Đã thanh toán</span>;
+      return <span className="inline-flex items-center justify-center whitespace-nowrap px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-[11px] font-bold uppercase tracking-wider">Đã thanh toán</span>;
     }
-    return <span className="px-2.5 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-semibold uppercase tracking-wider">Chưa thanh toán</span>;
+    return <span className="inline-flex items-center justify-center whitespace-nowrap px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-[11px] font-bold uppercase tracking-wider">Chưa thanh toán</span>;
   };
 
   const StatCard = ({ icon: Icon, label, value, color, onClick }) => (
-    <div
+    <div 
+      className={`bg-white rounded-2xl border border-gray-100 p-6 flex items-center justify-between cursor-pointer hover:-translate-y-1 transition-all duration-300`}
+      style={{ boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}
       onClick={onClick}
-      className={`bg-white rounded-lg shadow-md p-6 border-l-4 ${onClick ? 'cursor-pointer hover:scale-105 transition-transform duration-300' : ''}`}
-      style={{ borderColor: color }}
     >
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-gray-600 text-sm font-medium">{label}</p>
-          <p className="text-3xl font-bold text-gray-900 mt-2">{value}</p>
-        </div>
-        <div
-          className="p-3 rounded-full"
-          style={{ backgroundColor: `${color}20` }}
-        >
-          <Icon size={28} color={color} />
-        </div>
+      <div className="flex-1 pr-4">
+        <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 whitespace-nowrap">{label}</p>
+        <div className="text-3xl font-black text-gray-900">{value}</div>
+      </div>
+      <div
+        className="p-3 rounded-2xl flex-shrink-0"
+        style={{ backgroundColor: `${color}15`, color: color }}
+      >
+        <Icon size={24} />
       </div>
     </div>
   );
@@ -189,17 +165,17 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-4xl font-bold text-gray-900">Tổng quan</h1>
-        <p className="text-gray-600 mt-2">
+        <h1 className="text-3xl font-bold text-gray-900">Tổng quan</h1>
+        <p className="text-sm text-gray-500 mt-1">
           Xin chào, {user?.name ?? "Admin"}! Đây là thống kê hôm nay.
         </p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         <StatCard
           icon={BookOpen}
           label="Tổng đơn đặt"
@@ -226,18 +202,24 @@ const AdminDashboard = () => {
           label="Đơn hôm nay"
           value={getTodayBookingsCount()}
           color="#F59E0B"
-          onClick={() => setFilterToday(true)}
+          onClick={() => {
+            setFilterToday(true);
+            document.getElementById('recent-bookings')?.scrollIntoView({ behavior: 'smooth' });
+          }}
         />
       </div>
 
       {/* Revenue Section */}
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div 
+        className="bg-white rounded-2xl border border-gray-100 p-6"
+        style={{ boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}
+      >
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold text-gray-900">Tổng doanh thu</h2>
           <select 
             value={revenueFilter}
             onChange={(e) => setRevenueFilter(e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm outline-none focus:border-rose-500 font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 transition"
+            className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm outline-none focus:border-rose-500 font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 transition"
           >
             <option value="all">Toàn thời gian</option>
             <option value="day">Hôm nay</option>
@@ -245,24 +227,28 @@ const AdminDashboard = () => {
             <option value="year">Năm nay</option>
           </select>
         </div>
-        <p className="text-4xl font-bold text-rose-500">
+        <p className="text-4xl font-black text-[#333333] tracking-tight">
           {calculateTotalRevenue()}
         </p>
-        <p className="text-gray-600 text-sm mt-2">
+        <p className="text-sm text-gray-500 mt-2">
           Doanh thu từ tất cả các đơn đặt đã được thanh toán thành công.
         </p>
       </div>
 
       {/* Recent Bookings */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="border-b border-gray-200 px-6 py-4 flex justify-between items-center">
-          <h2 className="text-xl font-bold text-gray-900">
+      <div 
+        id="recent-bookings" 
+        className="bg-white rounded-2xl border border-gray-100 overflow-hidden"
+        style={{ boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}
+      >
+        <div className="border-b border-gray-100 px-6 py-5 flex justify-between items-center bg-white">
+          <h2 className="text-2xl font-bold text-gray-900">
             {filterToday ? "Đơn đặt hôm nay" : "Đơn đặt gần đây"}
           </h2>
           {filterToday && (
             <button
               onClick={() => setFilterToday(false)}
-              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg text-sm transition"
+              className="px-5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold rounded-xl text-sm transition-colors"
             >
               Xem tất cả
             </button>
@@ -310,27 +296,29 @@ const AdminDashboard = () => {
                   <td className="px-6 py-4 text-sm text-gray-600">
                     {new Date(booking.checkOutDate).toLocaleDateString("vi-VN")}
                   </td>
-                  <td className="px-6 py-4 text-sm text-rose-500 font-semibold">
-                    {new Intl.NumberFormat('vi-VN').format(calculatePrice(booking))} đ
+                  <td className="px-6 py-4 text-sm text-gray-900 font-bold whitespace-nowrap">
+                    {new Intl.NumberFormat('vi-VN').format(booking.totalPrice || 0)} đ
                   </td>
-                  <td className="px-6 py-4 text-sm">
+                  <td className="px-6 py-4 text-sm whitespace-nowrap">
                     {getStatusBadge(booking)}
                   </td>
-                  <td className="px-6 py-4 text-sm space-x-2">
-                    <button
-                      onClick={() => setSelectedBooking(booking)}
-                      className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-xs font-semibold shadow-sm transition"
-                    >
-                      Xem chi tiết
-                    </button>
-                    {booking.status !== "CANCELLED" && (
+                  <td className="px-6 py-4 text-sm">
+                    <div className="flex gap-2">
                       <button
-                        onClick={() => handleCancel(booking.id)}
-                        className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-lg text-xs font-semibold shadow-sm transition"
+                        onClick={() => setSelectedBooking(booking)}
+                        className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-xs font-bold transition-colors whitespace-nowrap"
                       >
-                        Hủy
+                        Chi tiết
                       </button>
-                    )}
+                      {booking.status !== "CANCELLED" && (
+                        <button
+                          onClick={() => handleCancel(booking.id)}
+                          className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs font-bold transition-colors whitespace-nowrap"
+                        >
+                          Hủy
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -375,7 +363,9 @@ const AdminDashboard = () => {
               </div>
               <div className="grid grid-cols-3 gap-2">
                 <span className="text-gray-500 font-medium">Tổng tiền:</span>
-                <span className="col-span-2 text-rose-500 font-bold text-lg">{new Intl.NumberFormat('vi-VN').format(calculatePrice(selectedBooking))} đ</span>
+                <span className="text-rose-600 font-bold text-base">
+                  {new Intl.NumberFormat('vi-VN').format(selectedBooking.totalPrice || 0)} đ
+                </span>
               </div>
               <div className="grid grid-cols-3 gap-2">
                 <span className="text-gray-500 font-medium">Thời gian:</span>
@@ -385,7 +375,7 @@ const AdminDashboard = () => {
               </div>
               <div className="grid grid-cols-3 gap-2">
                 <span className="text-gray-500 font-medium">Số người:</span>
-                <span className="col-span-2 text-gray-900 font-semibold">{selectedBooking.totalNumberOfGuest || selectedBooking.totalNumOfGuest || 1}</span>
+                <span className="col-span-2 text-gray-900 font-semibold">{selectedBooking.numberOfGuests || 1}</span>
               </div>
             </div>
             <div className="p-6 bg-gray-50 flex justify-end gap-3 rounded-b-2xl">

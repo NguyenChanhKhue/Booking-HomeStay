@@ -9,6 +9,7 @@ import {
   updateRoomAdmin,
 } from "../../services/adminService";
 import { formatPrice } from "../../utils/formatPrice";
+import { AMENITIES_LIST } from "../../utils/constants";
 
 const AdminProperties = () => {
   const navigate = useNavigate();
@@ -23,22 +24,14 @@ const AdminProperties = () => {
     roomType: "",
     roomLocation: "",
     roomPrice: "",
+    maxCapacity: 2,
     description: "",
     photo: null,
     additionalPhotos: [],
+    amenities: [],
   });
 
-  useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      navigate("/auth?redirect=%2Fadmin%2Fproperties");
-      return;
-    }
 
-    if (!loading && user?.role !== "ADMIN") {
-      navigate("/");
-      return;
-    }
-  }, [isAuthenticated, loading, user, navigate]);
 
   useEffect(() => {
     const loadRooms = async () => {
@@ -64,9 +57,11 @@ const AdminProperties = () => {
         roomType: room.roomType,
         roomLocation: room.roomLocation,
         roomPrice: room.roomPrice,
+        maxCapacity: room.maxCapacity || 2,
         description: room.roomDescription,
         photo: null,
         additionalPhotos: [],
+        amenities: (room.amenities || []).filter(a => AMENITIES_LIST.includes(a)),
       });
     } else {
       setEditingRoom(null);
@@ -74,9 +69,11 @@ const AdminProperties = () => {
         roomType: "",
         roomLocation: "",
         roomPrice: "",
+        maxCapacity: 2,
         description: "",
         photo: null,
         additionalPhotos: [],
+        amenities: [],
       });
     }
     setMessage("");
@@ -115,6 +112,17 @@ const AdminProperties = () => {
     }));
   };
 
+  const handleAmenityChange = (amenity) => {
+    setFormData((prev) => {
+      const isChecked = prev.amenities.includes(amenity);
+      if (isChecked) {
+        return { ...prev, amenities: prev.amenities.filter((a) => a !== amenity) };
+      } else {
+        return { ...prev, amenities: [...prev.amenities, amenity] };
+      }
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
@@ -136,6 +144,11 @@ const AdminProperties = () => {
       setSubmitting(false);
       return;
     }
+    if (!formData.maxCapacity || formData.maxCapacity <= 0) {
+      setMessage("Vui lòng nhập sức chứa phòng lớn hơn 0");
+      setSubmitting(false);
+      return;
+    }
     if (!formData.description.trim()) {
       setMessage("Vui lòng nhập mô tả");
       setSubmitting(false);
@@ -152,6 +165,7 @@ const AdminProperties = () => {
       data.append("roomType", formData.roomType.trim());
       data.append("roomLocation", formData.roomLocation.trim());
       data.append("roomPrice", formData.roomPrice);
+      data.append("maxCapacity", formData.maxCapacity);
       data.append("description", formData.description.trim());
       if (formData.photo) {
         data.append("photo", formData.photo);
@@ -160,6 +174,15 @@ const AdminProperties = () => {
         formData.additionalPhotos.forEach((file) => {
           data.append("additionalPhotos", file);
         });
+      }
+      if (formData.amenities) {
+        if (formData.amenities.length > 0) {
+          formData.amenities.forEach((amenity) => {
+            data.append("amenities", amenity);
+          });
+        } else {
+          data.append("amenities", "");
+        }
       }
 
       if (editingRoom) {
@@ -253,6 +276,9 @@ const AdminProperties = () => {
                   Giá
                 </th>
                 <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                  Sức chứa
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
                   Mô tả
                 </th>
                 <th className="px-6 py-3 text-center text-sm font-semibold text-gray-900">
@@ -271,6 +297,9 @@ const AdminProperties = () => {
                   </td>
                   <td className="px-6 py-4 text-sm font-medium text-rose-500">
                     {formatPrice(room.roomPrice)}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    {room.maxCapacity || 2} người
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600 truncate max-w-xs">
                     {room.roomDescription}
@@ -319,14 +348,22 @@ const AdminProperties = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Loại phòng *
                 </label>
-                <input
-                  type="text"
+                <select
                   name="roomType"
                   value={formData.roomType}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none bg-white"
                   required
-                />
+                >
+                  <option value="" disabled>-- Chọn loại phòng --</option>
+                  <option value="Single Room">Single Room (Phòng đơn)</option>
+                  <option value="Double Room">Double Room (Phòng đôi)</option>
+                  <option value="Family Room">Family Room (Phòng gia đình)</option>
+                  <option value="Deluxe Room">Deluxe Room (Phòng cao cấp)</option>
+                  <option value="Suite Room">Suite Room (Phòng Suite)</option>
+                  <option value="Studio Room">Studio Room (Phòng Studio)</option>
+                  <option value="VIP Room">VIP Room (Phòng VIP)</option>
+                </select>
               </div>
 
               <div>
@@ -352,6 +389,21 @@ const AdminProperties = () => {
                   name="roomPrice"
                   value={formData.roomPrice}
                   onChange={handleInputChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Sức chứa (Người) *
+                </label>
+                <input
+                  type="number"
+                  name="maxCapacity"
+                  value={formData.maxCapacity}
+                  onChange={handleInputChange}
+                  min="1"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none"
                   required
                 />
@@ -412,6 +464,25 @@ const AdminProperties = () => {
                     ✓ Đã chọn {formData.additionalPhotos.length} ảnh phụ.
                   </p>
                 )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Tiện nghi phòng
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {AMENITIES_LIST.map((amenity) => (
+                    <label key={amenity} className="flex items-center space-x-2 text-sm text-gray-700 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.amenities?.includes(amenity) || false}
+                        onChange={() => handleAmenityChange(amenity)}
+                        className="rounded border-gray-300 text-rose-500 focus:ring-rose-500"
+                      />
+                      <span>{amenity}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
 
               <div className="flex gap-4 pt-4">

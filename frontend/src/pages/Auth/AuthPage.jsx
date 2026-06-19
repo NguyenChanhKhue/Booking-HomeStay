@@ -6,7 +6,7 @@ import ForgotPasswordModal from "../../components/ForgotPasswordModal";
 const AuthPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get("redirect") || "/profile";
+  const redirectTo = searchParams.get("redirect") || "/";
   const { login, register } = useAuth();
   const [mode, setMode] = useState(searchParams.get("mode") === "register" ? "register" : "login");
 
@@ -40,18 +40,14 @@ const AuthPage = () => {
 
     try {
       if (isLogin) {
-        const response = await login({
+        await login({
           email: form.email,
           password: form.password,
         });
-        if (response?.role === "ADMIN") {
-          navigate("/admin");
-        } else {
-          navigate("/");
-        }
+        navigate("/");
       } else {
         await register(form);
-        navigate(redirectTo);
+        navigate("/");
       }
     } catch (err) {
       setError(
@@ -67,8 +63,8 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-      <section className="relative flex min-h-[400px] flex-col justify-center overflow-hidden rounded-[36px] bg-gray-900 p-8 md:p-12">
+    <div className="mx-auto grid max-w-4xl gap-4 lg:gap-5 lg:grid-cols-[0.85fr_1.15fr]">
+      <section className="relative flex min-h-[300px] flex-col justify-center overflow-hidden rounded-3xl bg-gray-900 p-6 md:p-8">
         {/* Dark Image Background */}
         <img 
           src="https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=1600&q=80" 
@@ -76,21 +72,21 @@ const AuthPage = () => {
           className="absolute inset-0 h-full w-full object-cover opacity-50 mix-blend-overlay"
         />
         <div className="relative z-10">
-          <p className="text-sm font-bold uppercase tracking-[0.3em] text-rose-300">
+          <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-rose-300">
             Tài khoản khách hàng
           </p>
-          <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-white md:text-5xl lg:text-[54px] leading-[1.1]">
+          <h1 className="mt-2 text-xl font-extrabold tracking-tight text-white lg:text-2xl leading-[1.2]">
             {isLogin
               ? "Đăng nhập để tiếp tục đặt phòng"
               : "Tạo tài khoản để quản lý booking"}
           </h1>
-          <p className="mt-6 text-lg font-medium text-gray-200 lg:text-xl">
+          <p className="mt-2 text-[13px] font-medium text-gray-200 lg:text-sm">
              Trải nghiệm không gian lưu trú tuyệt vời và các dịch vụ tốt nhất.
           </p>
         </div>
       </section>
 
-      <section className="rounded-[36px] border border-gray-100 bg-white p-6 shadow-sm md:p-8">
+      <section className="rounded-3xl border border-gray-100 bg-white p-4 shadow-sm md:p-5 flex flex-col justify-center">
         <div className="inline-flex rounded-full bg-gray-100 p-1">
           <button
             type="button"
@@ -112,30 +108,30 @@ const AuthPage = () => {
           </button>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="mt-4 space-y-3" onSubmit={handleSubmit}>
           {!isLogin ? (
             <>
               <label className="block">
-                <span className="mb-2 block text-base font-semibold text-gray-700">
+                <span className="mb-1 block text-[13px] font-semibold text-gray-700">
                   Họ và tên
                 </span>
                 <input
                   name="name"
                   value={form.name}
                   onChange={handleChange}
-                  className="w-full rounded-2xl border border-gray-200 px-5 py-4 text-base outline-none transition focus:border-rose-400 focus:ring-4 focus:ring-rose-50"
+                  className="w-full rounded-xl border border-gray-200 px-3 py-2 text-[13px] outline-none transition focus:border-rose-400 focus:ring-2 focus:ring-rose-50"
                   required
                 />
               </label>
               <label className="block">
-                <span className="mb-2 block text-base font-semibold text-gray-700">
+                <span className="mb-1 block text-[13px] font-semibold text-gray-700">
                   Số điện thoại
                 </span>
                 <input
                   name="phoneNumber"
                   value={form.phoneNumber}
                   onChange={handleChange}
-                  className="w-full rounded-2xl border border-gray-200 px-5 py-4 text-base outline-none transition focus:border-rose-400 focus:ring-4 focus:ring-rose-50"
+                  className="w-full rounded-xl border border-gray-200 px-3 py-2 text-[13px] outline-none transition focus:border-rose-400 focus:ring-2 focus:ring-rose-50"
                   required
                 />
               </label>
@@ -143,7 +139,7 @@ const AuthPage = () => {
           ) : null}
 
           <label className="block">
-            <span className="mb-2 block text-base font-semibold text-gray-700">
+            <span className="mb-1 block text-[13px] font-semibold text-gray-700">
               Email
             </span>
             <input
@@ -151,12 +147,12 @@ const AuthPage = () => {
               name="email"
               value={form.email}
               onChange={handleChange}
-              className="w-full rounded-2xl border border-gray-200 px-5 py-4 text-base outline-none transition focus:border-rose-400 focus:ring-4 focus:ring-rose-50"
+              className="w-full rounded-xl border border-gray-200 px-3 py-2 text-[13px] outline-none transition focus:border-rose-400 focus:ring-2 focus:ring-rose-50"
               required
             />
           </label>
           <label className="block">
-            <span className="mb-2 block text-base font-semibold text-gray-700">
+            <span className="mb-1 block text-[13px] font-semibold text-gray-700">
               Mật khẩu
             </span>
             <input
@@ -164,13 +160,13 @@ const AuthPage = () => {
               name="password"
               value={form.password}
               onChange={handleChange}
-              className="w-full rounded-2xl border border-gray-200 px-5 py-4 text-base outline-none transition focus:border-rose-400 focus:ring-4 focus:ring-rose-50"
+              className="w-full rounded-xl border border-gray-200 px-3 py-2 text-[13px] outline-none transition focus:border-rose-400 focus:ring-2 focus:ring-rose-50"
               required
             />
           </label>
 
           {error ? (
-            <div className="rounded-[20px] border border-red-200 bg-red-50 p-4 text-sm text-red-600">
+            <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-[13px] text-red-600">
               {error}
             </div>
           ) : null}
@@ -178,7 +174,7 @@ const AuthPage = () => {
           <button
             type="submit"
             disabled={submitting}
-            className="inline-flex w-full items-center justify-center rounded-full bg-rose-500 px-6 py-4 text-lg font-bold text-white transition hover:-translate-y-1 hover:bg-rose-600 hover:shadow-xl hover:shadow-rose-500/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+            className="inline-flex w-full items-center justify-center rounded-full bg-rose-500 px-4 py-2.5 text-[14px] font-bold text-white transition hover:-translate-y-1 hover:bg-rose-600 hover:shadow-md hover:shadow-rose-500/30 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 mt-2"
           >
             {submitting
               ? "Đang xử lý..."
@@ -188,11 +184,11 @@ const AuthPage = () => {
           </button>
         </form>
 
-        <div className="mt-6 text-center">
+        <div className="mt-3 text-center">
           {isLogin && (
             <button
               type="button"
-              className="text-base font-medium text-blue-600 hover:text-blue-800 hover:underline"
+              className="text-[13px] font-medium text-blue-600 hover:text-blue-800 hover:underline"
               onClick={handleForgotPassword}
             >
               Quên mật khẩu?

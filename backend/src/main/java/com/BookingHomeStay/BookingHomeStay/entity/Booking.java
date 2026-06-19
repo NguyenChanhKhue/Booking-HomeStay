@@ -17,9 +17,18 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import org.hibernate.annotations.Check;
+
 @Data
 @Entity
-@Table(name = "bookings")
+@Table(
+  name = "bookings", 
+  indexes = {
+    @Index(name = "idx_booking_code", columnList = "bookingConfirmationCode"),
+    @Index(name = "idx_booking_status", columnList = "status")
+  }
+)
+@Check(constraints = "status IN ('PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED') AND paymentStatus IN ('UNPAID', 'PAID', 'REFUNDED')")
 public class Booking {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,17 +37,15 @@ public class Booking {
   @NotNull(message = "check in date is required")
   private LocalDate checkInDate;
 
+  @NotNull(message = "check out date is required")
   @Future(message = "check out date must be in the future")
   private LocalDate checkOutDate;
 
-  @Min(value = 1, message = "Number of adults must not be less that 1")
-  private int numOfAdults;
+  @Min(value = 1, message = "Number of guests must not be less than 1")
+  @Column(name = "number_of_guests", nullable = false)
+  private int numberOfGuests;
 
-  @Min(value = 0, message = "Number of children must not be less that 0")
-  private int numOfChildren;
-
-  private int totalNumOfGuest;
-
+  @Column(unique = true)
   private String bookingConfirmationCode;
 
   private String status = "PENDING";
@@ -59,19 +66,7 @@ public class Booking {
   @JoinColumn(name = "room_id")
   private Room room;
 
-  public void calculateTotalNumberOfGuest() {
-    this.totalNumOfGuest = this.numOfAdults + this.numOfChildren;
-  }
 
-  public void setNumOfAdults(int numOfAdults) {
-    this.numOfAdults = numOfAdults;
-    calculateTotalNumberOfGuest();
-  }
-
-  public void setNumOfChildren(int numOfChildren) {
-    this.numOfChildren = numOfChildren;
-    calculateTotalNumberOfGuest();
-  }
 
   @Override
   public String toString() {
@@ -79,9 +74,7 @@ public class Booking {
         "id=" + id +
         ", checkInDate=" + checkInDate +
         ", checkOutDate=" + checkOutDate +
-        ", numOfAdults=" + numOfAdults +
-        ", numOfChildren=" + numOfChildren +
-        ", totalNumOfGuest=" + totalNumOfGuest +
+        ", numberOfGuests=" + numberOfGuests +
         ", bookingConfirmationCode='" + bookingConfirmationCode + '\'' +
         '}';
   }

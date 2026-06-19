@@ -18,4 +18,6 @@ public interface UserService {
   Response changeUserRole(String userId);
 
   Response updateProfile(String email, String name, String phoneNumber, org.springframework.web.multipart.MultipartFile avatar);
+
+  Response changePassword(String email, com.BookingHomeStay.BookingHomeStay.dto.AuthDTO.ChangePasswordRequest request);
 }

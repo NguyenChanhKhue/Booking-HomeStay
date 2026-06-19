@@ -119,10 +119,7 @@ public class AuthServiceImpl implements AuthService {
         .orElseThrow(() -> new BadRequestException("Invalid email or OTP"));
 
     OtpVerification otpVerification = otpVerificationRepository
-        .findTopByEmailAndOtpCodeAndPurposeOrderByCreatedAtDesc(
-            request.getEmail(),
-            request.getOtp(),
-            OtpPurpose.RESET_PASSWORD)
+        .findTopByEmailAndPurposeOrderByCreatedAtDesc(request.getEmail(), OtpPurpose.RESET_PASSWORD)
         .orElseThrow(() -> new BadRequestException("Invalid email or OTP"));
 
     if (otpVerification.isUsed()) {
@@ -131,6 +128,16 @@ public class AuthServiceImpl implements AuthService {
 
     if (otpVerification.isExpired()) {
       throw new BadRequestException("OTP has expired");
+    }
+
+    if (otpVerification.getAttempts() >= 5) {
+      throw new BadRequestException("OTP has been locked due to too many failed attempts. Please request a new one.");
+    }
+
+    if (!otpVerification.getOtpCode().equals(request.getOtp())) {
+      otpVerification.setAttempts(otpVerification.getAttempts() + 1);
+      otpVerificationRepository.save(otpVerification);
+      throw new BadRequestException("Invalid OTP code. Attempts remaining: " + (5 - otpVerification.getAttempts()));
     }
 
     otpVerification.setVerified(true);

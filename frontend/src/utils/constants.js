@@ -31,9 +31,17 @@ export const REGION_SUGGESTIONS = [
   },
 ];
 
-export const DEFAULT_AMENITIES = [
+export const AMENITIES_LIST = [
   "Wi-Fi tốc độ cao",
-  "Không gian riêng tư",
-  "Hỗ trợ nhận phòng linh hoạt",
-  "Khu vực nghỉ ngơi thoải mái",
+  "TV màn hình phẳng",
+  "Máy lạnh",
+  "Máy nước nóng",
+  "Bếp nấu ăn",
+  "Hồ bơi",
+  "Phòng gym",
+  "Chỗ đỗ xe miễn phí",
+  "Ban công/View đẹp",
+  "Phục vụ bữa sáng",
+  "Cho phép thú cưng",
+  "Dọn phòng hằng ngày",
 ];

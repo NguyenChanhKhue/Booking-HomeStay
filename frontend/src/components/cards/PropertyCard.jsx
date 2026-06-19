@@ -50,15 +50,15 @@ const PropertyCard = ({ data }) => {
           </div>
         </div>
 
-        <div className="mt-auto flex items-center justify-between gap-4 border-t border-gray-100 pt-5">
-          <div>
-            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Giá mỗi đêm</p>
-            <p className="text-xl font-black text-rose-500">
+        <div className="mt-auto flex items-center justify-between gap-2 border-t border-gray-100 pt-4">
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-0.5">Giá mỗi đêm</p>
+            <p className="text-[15px] sm:text-base font-black text-rose-500 whitespace-nowrap tracking-tight">
               {formatPrice(data.roomPrice)}
             </p>
           </div>
-          <span className="shrink-0 rounded-full bg-rose-50 px-5 py-2.5 text-sm font-bold text-rose-600 transition-colors group-hover:bg-rose-500 group-hover:text-white">
-            Xem chi tiết
+          <span className="shrink-0 rounded-full bg-rose-50 px-3 py-1.5 text-xs font-bold text-rose-600 transition-colors group-hover:bg-rose-500 group-hover:text-white">
+            Đặt ngay
           </span>
         </div>
       </div>

@@ -16,17 +16,7 @@ const AdminBookings = () => {
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      navigate("/auth?redirect=%2Fadmin%2Fbookings");
-      return;
-    }
 
-    if (!loading && user?.role !== "ADMIN") {
-      navigate("/");
-      return;
-    }
-  }, [isAuthenticated, loading, user, navigate]);
 
   useEffect(() => {
     const loadBookings = async () => {
@@ -61,7 +51,7 @@ const AdminBookings = () => {
   const getStatusBadge = (booking) => {
     if (booking.status === "CANCELLED") {
       return (
-        <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">
+        <span className="inline-flex items-center justify-center whitespace-nowrap px-3 py-1 bg-red-100 text-red-700 rounded-full text-[11px] font-bold uppercase tracking-wider">
           Đã hủy
         </span>
       );
@@ -71,14 +61,14 @@ const AdminBookings = () => {
 
     if (checkOutDate < today) {
       return (
-        <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
+        <span className="inline-flex items-center justify-center whitespace-nowrap px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-[11px] font-bold uppercase tracking-wider">
           Đã hoàn thành
         </span>
       );
     }
 
     return (
-      <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+      <span className="inline-flex items-center justify-center whitespace-nowrap px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-[11px] font-bold uppercase tracking-wider">
         Đang diễn ra
       </span>
     );

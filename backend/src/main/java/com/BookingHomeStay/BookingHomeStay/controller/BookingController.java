@@ -24,6 +24,7 @@ public class BookingController {
   private final BookingService bookingService;
 
   @PostMapping("/room/{roomId}/user/{userId}")
+  @org.springframework.security.access.prepost.PreAuthorize("isAuthenticated()")
   public ResponseEntity<Response> saveBooking(
       @PathVariable Long roomId,
       @PathVariable Long userId,
@@ -33,6 +34,7 @@ public class BookingController {
   }
 
   @GetMapping
+  @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Response> getAllBookings() {
     return ResponseEntity.ok(bookingService.getAllBookings());
   }
@@ -43,11 +45,13 @@ public class BookingController {
   }
 
   @DeleteMapping("/{bookingId}")
+  @org.springframework.security.access.prepost.PreAuthorize("isAuthenticated()")
   public ResponseEntity<Response> cancelBooking(@PathVariable Long bookingId) {
     return ResponseEntity.ok(bookingService.cancelBooking(bookingId));
   }
 
   @org.springframework.web.bind.annotation.PatchMapping("/{bookingId}/status")
+  @org.springframework.security.access.prepost.PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Response> updateBookingStatus(
       @PathVariable Long bookingId,
       @RequestBody java.util.Map<String, String> requestBody) {

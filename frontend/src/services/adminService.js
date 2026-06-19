@@ -105,15 +105,14 @@ export const getDashboardStats = async (token) => {
     today.setHours(0, 0, 0, 0);
 
     const todayBookings = bookings.filter((b) => {
-      const bookingDate = new Date(
-        b.bookingConfirmationCode || b.createdDate || "",
-      );
+      if (!b.createdAt) return false;
+      const bookingDate = new Date(b.createdAt);
       bookingDate.setHours(0, 0, 0, 0);
       return bookingDate.getTime() === today.getTime();
     });
 
     const totalRevenue = bookings.reduce(
-      (sum, b) => sum + (b.totalNumberOfGuest || 1) * 500000,
+      (sum, b) => sum + (b.paymentStatus === "PAID" ? (b.totalPrice || 0) : 0),
       0,
     );
 
@@ -129,15 +128,6 @@ export const getDashboardStats = async (token) => {
     };
   } catch (error) {
     console.error("Failed to load dashboard stats:", error);
-    return {
-      totalBookings: 0,
-      totalRooms: 0,
-      totalUsers: 0,
-      todayBookings: 0,
-      totalRevenue: 0,
-      bookings: [],
-      rooms: [],
-      users: [],
-    };
+    throw error;
   }
 };

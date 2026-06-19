@@ -31,16 +31,18 @@ public class RoomController {
   private final RoomService roomService;
 
   @PostMapping
-  @PreAuthorize("hasAuthority('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Response> addNewRoom(
       @RequestParam("photo") MultipartFile photo,
       @RequestParam(value = "additionalPhotos", required = false) List<MultipartFile> additionalPhotos,
       @RequestParam("roomType") String roomType,
       @RequestParam("roomLocation") String roomLocation,
       @RequestParam("roomPrice") BigDecimal roomPrice,
-      @RequestParam("description") String description) {
+      @RequestParam("description") String description,
+      @RequestParam(value = "amenities", required = false) List<String> amenities,
+      @RequestParam(value = "maxCapacity", required = false) Integer maxCapacity) {
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(roomService.addNewRoom(photo, additionalPhotos, roomType, roomLocation, roomPrice, description));
+        .body(roomService.addNewRoom(photo, additionalPhotos, roomType, roomLocation, roomPrice, description, amenities, maxCapacity));
   }
 
   @GetMapping("/types")
@@ -61,9 +63,10 @@ public class RoomController {
       @RequestParam(required = false) BigDecimal minPrice,
       @RequestParam(required = false) BigDecimal maxPrice,
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkInDate,
-      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOutDate) {
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOutDate,
+      @RequestParam(required = false) List<String> amenities) {
     return ResponseEntity.ok(
-        roomService.searchRooms(keyword, location, roomType, minPrice, maxPrice, checkInDate, checkOutDate));
+        roomService.searchRooms(keyword, location, roomType, minPrice, maxPrice, checkInDate, checkOutDate, amenities));
   }
 
   @GetMapping("/available")
@@ -85,7 +88,7 @@ public class RoomController {
   }
 
   @PutMapping("/{roomId}")
-  @PreAuthorize("hasAuthority('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Response> updateRoom(
       @PathVariable Long roomId,
       @RequestParam(required = false) String description,
@@ -93,12 +96,14 @@ public class RoomController {
       @RequestParam(required = false) String roomLocation,
       @RequestParam(required = false) BigDecimal roomPrice,
       @RequestParam(required = false) MultipartFile photo,
-      @RequestParam(required = false) List<MultipartFile> additionalPhotos) {
-    return ResponseEntity.ok(roomService.updateRoom(roomId, description, roomType, roomLocation, roomPrice, photo, additionalPhotos));
+      @RequestParam(required = false) List<MultipartFile> additionalPhotos,
+      @RequestParam(value = "amenities", required = false) List<String> amenities,
+      @RequestParam(value = "maxCapacity", required = false) Integer maxCapacity) {
+    return ResponseEntity.ok(roomService.updateRoom(roomId, description, roomType, roomLocation, roomPrice, photo, additionalPhotos, amenities, maxCapacity));
   }
 
   @DeleteMapping("/{roomId}")
-  @PreAuthorize("hasAuthority('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Response> deleteRoom(@PathVariable Long roomId) {
     return ResponseEntity.ok(roomService.deleteRoom(roomId));
   }

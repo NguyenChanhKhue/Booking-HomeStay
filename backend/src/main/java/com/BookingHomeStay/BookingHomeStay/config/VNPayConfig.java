@@ -63,7 +63,7 @@ public class VNPayConfig {
   }
 
   public static String getRandomNumber(int len) {
-    Random rnd = new Random();
+    java.security.SecureRandom rnd = new java.security.SecureRandom();
     String chars = "0123456789";
     StringBuilder sb = new StringBuilder(len);
     for (int i = 0; i < len; i++) {

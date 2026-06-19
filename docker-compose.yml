@@ -60,5 +60,16 @@ services:
     ports:
       - "${BACKEND_PORT:-4040}:4040"
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: bookinghomestay-frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-5173}:80"
+    depends_on:
+      - backend
+
 volumes:
   mysql_data:

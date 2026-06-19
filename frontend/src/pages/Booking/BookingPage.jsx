@@ -20,6 +20,7 @@ const BookingPage = () => {
     isAuthenticated,
     loading: authLoading,
     user,
+    token,
     refreshProfile,
   } = useAuth();
   const [room, setRoom] = useState(null);
@@ -30,8 +31,7 @@ const BookingPage = () => {
   const [form, setForm] = useState({
     checkInDate: searchParams.get("checkInDate") ?? "",
     checkOutDate: searchParams.get("checkOutDate") ?? "",
-    numOfAdults: 1,
-    numOfChildren: 0,
+    numberOfGuests: 1,
   });
 
   useEffect(() => {
@@ -74,8 +74,7 @@ const BookingPage = () => {
     () => ({
       checkInDate: form.checkInDate,
       checkOutDate: form.checkOutDate,
-      numOfAdults: Number(form.numOfAdults),
-      numOfChildren: Number(form.numOfChildren),
+      numberOfGuests: Number(form.numberOfGuests),
       totalPrice: (room?.roomPrice || 0) * getDiffDays(),
     }),
     [form, room],
@@ -92,9 +91,16 @@ const BookingPage = () => {
     setError("");
     setMessage("");
 
+    const checkIn = new Date(form.checkInDate);
+    const checkOut = new Date(form.checkOutDate);
+
+    if (checkOut <= checkIn) {
+      setError("Ngày trả phòng phải sau Ngày nhận phòng");
+      setSubmitting(false);
+      return;
+    }
+
     if (room && room.bookings) {
-      const checkIn = new Date(form.checkInDate);
-      const checkOut = new Date(form.checkOutDate);
       const isOverlap = room.bookings.some(b => {
         if (b.status === "CANCELLED") return false;
         const bIn = new Date(b.checkInDate);
@@ -117,7 +123,7 @@ const BookingPage = () => {
       }
 
       const profile = user ?? (await refreshProfile());
-      const response = await createBooking(roomId, profile.id, bookingPayload);
+      const response = await createBooking(roomId, profile.id, bookingPayload, token);
       
       if (paymentMethod === "VNPAY") {
         // Redirect to payment gateway
@@ -240,34 +246,27 @@ const BookingPage = () => {
             </label>
           </div>
 
-          <div className="grid gap-5 sm:grid-cols-2">
+          <div className="grid gap-5 sm:grid-cols-1 mt-5">
             <label className="block">
               <span className="mb-2 block text-sm font-medium text-gray-700">
-                Người lớn
+                Số lượng khách
               </span>
-              <input
-                type="number"
-                min="1"
-                name="numOfAdults"
-                value={form.numOfAdults}
+              <select
+                name="numberOfGuests"
+                value={form.numberOfGuests}
                 onChange={handleChange}
-                className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none transition focus:border-rose-300"
+                className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none transition focus:border-rose-300 bg-white"
                 required
-              />
-            </label>
-            <label className="block">
-              <span className="mb-2 block text-sm font-medium text-gray-700">
-                Trẻ em
-              </span>
-              <input
-                type="number"
-                min="0"
-                name="numOfChildren"
-                value={form.numOfChildren}
-                onChange={handleChange}
-                className="w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none transition focus:border-rose-300"
-                required
-              />
+              >
+                {Array.from({ length: room?.maxCapacity || 2 }, (_, i) => i + 1).map(num => (
+                  <option key={num} value={num}>
+                    {num} người
+                  </option>
+                ))}
+              </select>
+              <p className="mt-2 text-sm text-gray-500">
+                Phòng này có sức chứa tối đa là {room?.maxCapacity || 2} người
+              </p>
             </label>
           </div>
 

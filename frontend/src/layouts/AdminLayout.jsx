@@ -21,8 +21,10 @@ const AdminLayout = ({ children }) => {
   }, [isAuthenticated, loading, user, navigate]);
 
   const handleLogout = () => {
-    logout();
     navigate("/");
+    setTimeout(() => {
+      logout();
+    }, 10);
   };
 
   const navItems = [
@@ -41,35 +43,35 @@ const AdminLayout = ({ children }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#f4f6f8]">
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 bg-gray-900 text-white transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-100 shadow-sm transition-transform duration-300 lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-700">
-            <Link to="/admin" className="text-2xl font-bold text-rose-500">
-              Admin
+          <div className="flex items-center justify-between p-6 border-b border-gray-100">
+            <Link to="/admin" className="text-xl font-black text-rose-500 tracking-tight">
+              AdminPanel.
             </Link>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="lg:hidden text-gray-400 hover:text-white"
+              className="lg:hidden text-gray-400 hover:text-gray-600"
             >
               <X size={24} />
             </button>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto py-6 px-4">
+          <nav className="flex-1 overflow-y-auto admin-scrollbar py-6 px-4">
             <div className="space-y-2">
               {navItems.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
-                  className="block px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition"
+                  className="block px-4 py-3 rounded-2xl text-gray-600 font-medium hover:bg-rose-50 hover:text-rose-600 transition-all duration-200"
                   onClick={() => setSidebarOpen(false)}
                 >
                   {item.label}
@@ -79,23 +81,23 @@ const AdminLayout = ({ children }) => {
           </nav>
 
           {/* Footer */}
-          <div className="border-t border-gray-700 p-4 space-y-4">
-            <div className="px-4 py-3 bg-gray-800 rounded-lg">
-              <p className="text-sm text-gray-400">Đã đăng nhập như</p>
-              <p className="font-medium text-white truncate">
+          <div className="border-t border-gray-100 p-6 space-y-4">
+            <div className="px-4 py-3 bg-gray-50 rounded-2xl border border-gray-100">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-0.5">Đã đăng nhập như</p>
+              <p className="font-bold text-gray-900 truncate">
                 {user?.name ?? "Admin"}
               </p>
             </div>
             <Link
               to="/"
-              className="w-full flex items-center gap-2 px-4 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-white font-medium transition"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-rose-50 hover:bg-rose-100 rounded-2xl text-rose-600 font-bold transition-colors"
             >
               <Home size={18} />
-              Trở về trang chủ
+              Về trang chủ
             </Link>
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-2 px-4 py-3 bg-red-600 hover:bg-red-700 rounded-lg text-white font-medium transition"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 hover:bg-red-50 hover:text-red-600 rounded-2xl text-gray-600 font-bold transition-colors"
             >
               <LogOut size={18} />
               Đăng xuất

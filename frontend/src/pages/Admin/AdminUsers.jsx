@@ -12,17 +12,7 @@ const AdminUsers = () => {
   const [message, setMessage] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
 
-  useEffect(() => {
-    if (!loading && !isAuthenticated) {
-      navigate("/auth?redirect=%2Fadmin%2Fusers");
-      return;
-    }
 
-    if (!loading && user?.role !== "ADMIN") {
-      navigate("/");
-      return;
-    }
-  }, [isAuthenticated, loading, user, navigate]);
 
   useEffect(() => {
     const loadUsers = async () => {

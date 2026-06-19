@@ -13,12 +13,12 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     @Query("SELECT DISTINCT r.roomType FROM Room r")
     List<String> findDistinctRoomTypes();
 
-    @Query("SELECT r FROM Room r WHERE r.roomType LIKE %:roomType% AND r.id NOT IN (SELECT bk.room.id FROM Booking bk WHERE"
+    @Query("SELECT r FROM Room r WHERE r.roomType LIKE %:roomType% AND r.id NOT IN (SELECT bk.room.id FROM Booking bk WHERE "
             +
-            "(bk.checkInDate <= :checkOutDate) AND (bk.checkOutDate >= :checkInDate))")
+            "bk.status != 'CANCELLED' AND (bk.checkInDate <= :checkOutDate) AND (bk.checkOutDate >= :checkInDate))")
     List<Room> findAvailableRoomsByDatesAndTypes(LocalDate checkInDate, LocalDate checkOutDate, String roomType);
 
-    @Query("SELECT r FROM Room r WHERE r.id NOT IN (SELECT b.room.id FROM Booking b)")
+    @Query("SELECT r FROM Room r WHERE r.id NOT IN (SELECT b.room.id FROM Booking b WHERE b.status != 'CANCELLED' AND b.checkInDate <= CURRENT_DATE AND b.checkOutDate >= CURRENT_DATE)")
     List<Room> getAllAvailableRooms();
 
     @Query("""
@@ -37,6 +37,7 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
                     SELECT 1
                     FROM Booking bk
                     WHERE bk.room = r
+                    AND bk.status != 'CANCELLED'
                     AND bk.checkInDate <= :checkOutDate
                     AND bk.checkOutDate >= :checkInDate
                 ))

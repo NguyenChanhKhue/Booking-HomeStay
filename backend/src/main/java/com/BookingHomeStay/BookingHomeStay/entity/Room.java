@@ -23,10 +23,14 @@ public class Room {
   private String roomType;
   private String roomLocation;
   
-  @Column(precision = 18, scale = 0)
+  @Column(precision = 18, scale = 2)
   private BigDecimal roomPrice;
   
+  @Column(name = "max_capacity", nullable = false, columnDefinition = "integer default 2")
+  private Integer maxCapacity = 2;
+  
   private String roomPhotoUrl;
+  @Column(columnDefinition = "TEXT")
   private String roomDescription;
   
   @ElementCollection(fetch = FetchType.EAGER)
@@ -34,7 +38,12 @@ public class Room {
   @Column(name = "image_url")
   private List<String> additionalImages = new ArrayList<>();
 
-  @OneToMany(mappedBy = "room", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @ElementCollection(fetch = FetchType.EAGER)
+  @CollectionTable(name = "room_amenities", joinColumns = @JoinColumn(name = "room_id"))
+  @Column(name = "amenity")
+  private List<String> amenities = new ArrayList<>();
+
+  @OneToMany(mappedBy = "room", fetch = FetchType.LAZY)
   private List<Booking> bookings = new ArrayList<>();
 
   @Override
