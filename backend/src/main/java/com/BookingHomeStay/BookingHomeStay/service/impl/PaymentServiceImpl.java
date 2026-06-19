@@ -147,6 +147,10 @@ public class PaymentServiceImpl implements PaymentService {
             booking.setPaymentMethod("VNPAY");
             bookingRepository.save(booking);
             
+            // Trigger lazy loading for async email service
+            if (booking.getUser() != null) booking.getUser().getName();
+            if (booking.getRoom() != null) booking.getRoom().getRoomType();
+            
             // Send success email asynchronously (or synchronously)
             emailService.sendPaymentSuccessEmail(booking);
 
