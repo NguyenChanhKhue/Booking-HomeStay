@@ -52,7 +52,10 @@ public class EmailServiceImpl implements EmailService {
                   .header("Content-Type", "application/json")
                   .POST(java.net.http.HttpRequest.BodyPublishers.ofString(json))
                   .build();
-          java.net.http.HttpClient.newHttpClient().send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+          java.net.http.HttpClient client = java.net.http.HttpClient.newBuilder()
+                  .followRedirects(java.net.http.HttpClient.Redirect.NORMAL)
+                  .build();
+          client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
           return true;
       } catch (Exception e) {
           log.error("Failed to send via Google Script", e);
