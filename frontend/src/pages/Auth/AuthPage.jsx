@@ -1,7 +1,6 @@
 import { useMemo, useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import ForgotPasswordModal from "../../components/ForgotPasswordModal";
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -24,7 +23,6 @@ const AuthPage = () => {
     email: "",
     password: "",
   });
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   const isLogin = useMemo(() => mode === "login", [mode]);
 
@@ -59,7 +57,7 @@ const AuthPage = () => {
   };
 
   const handleForgotPassword = () => {
-    setShowForgotPassword(true);
+    navigate("/forgot-password");
   };
 
   return (
@@ -196,10 +194,6 @@ const AuthPage = () => {
           )}
         </div>
       </section>
-      <ForgotPasswordModal
-        isOpen={showForgotPassword}
-        onClose={() => setShowForgotPassword(false)}
-      />
     </div>
   );
 };
