@@ -42,14 +42,14 @@ const AdminDashboard = () => {
   const getFilteredBookings = () => {
     if (!filterToday) return stats.bookings;
     const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    const currentDateStr = `${yyyy}-${mm}-${dd}`;
     
     return stats.bookings.filter(booking => {
       if (!booking.createdAt) return false;
-      return booking.createdAt.split("T")[0] === currentDateStr;
+      // Backend returns UTC without Z, append Z to convert to local time
+      const bookingDate = new Date(booking.createdAt + (booking.createdAt.endsWith('Z') ? '' : 'Z'));
+      return bookingDate.getFullYear() === today.getFullYear() && 
+             bookingDate.getMonth() === today.getMonth() && 
+             bookingDate.getDate() === today.getDate();
     });
   };
 
@@ -57,15 +57,14 @@ const AdminDashboard = () => {
 
   const getTodayBookingsCount = () => {
     const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    const currentDateStr = `${yyyy}-${mm}-${dd}`;
 
     return stats.bookings.reduce((count, booking) => {
       if (!booking.createdAt) return count;
-      const bookingDateStr = booking.createdAt.split("T")[0];
-      return bookingDateStr === currentDateStr ? count + 1 : count;
+      const bookingDate = new Date(booking.createdAt + (booking.createdAt.endsWith('Z') ? '' : 'Z'));
+      const isToday = bookingDate.getFullYear() === today.getFullYear() && 
+                      bookingDate.getMonth() === today.getMonth() && 
+                      bookingDate.getDate() === today.getDate();
+      return isToday ? count + 1 : count;
     }, 0);
   };
 
@@ -77,7 +76,7 @@ const AdminDashboard = () => {
 
     const revenue = stats.bookings.reduce((sum, booking) => {
       if (booking.status !== "CANCELLED" && booking.paymentStatus === "PAID" && booking.createdAt) {
-        const bookingDate = new Date(booking.createdAt);
+        const bookingDate = new Date(booking.createdAt + (booking.createdAt.endsWith('Z') ? '' : 'Z'));
         
         if (revenueFilter === 'day') {
           if (bookingDate.getFullYear() !== yyyy || bookingDate.getMonth() !== mm || bookingDate.getDate() !== dd) {
