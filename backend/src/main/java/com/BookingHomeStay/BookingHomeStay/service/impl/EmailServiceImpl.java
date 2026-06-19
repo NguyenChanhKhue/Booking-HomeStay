@@ -12,6 +12,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
+import org.springframework.scheduling.annotation.Async;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,6 +43,7 @@ public class EmailServiceImpl implements EmailService {
     mailSender.send(message);
   }
 
+  @Async
   @Override
   public void sendContactEmail(String name, String email, String subject, String messageContent) {
     SimpleMailMessage message = new SimpleMailMessage();
@@ -62,6 +64,7 @@ public class EmailServiceImpl implements EmailService {
     mailSender.send(message);
   }
 
+  @Async
   @Override
   public void sendPaymentSuccessEmail(Booking booking) {
     try {
