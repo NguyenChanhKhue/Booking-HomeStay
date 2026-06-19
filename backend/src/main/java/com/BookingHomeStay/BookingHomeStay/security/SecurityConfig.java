@@ -39,7 +39,9 @@ public class SecurityConfig {
         .csrf(csrf -> csrf.disable())
         .cors(Customizer.withDefaults())
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/auth/**", "/api/rooms/**", "/api/payment/**", "/api/contact/**", "/api/bookings/{confirmationCode}").permitAll()
+            .requestMatchers("/api/auth/**", "/api/rooms/**", "/api/payment/**", "/api/contact/**",
+                "/api/bookings/{confirmationCode}")
+            .permitAll()
             .anyRequest().authenticated())
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authenticationProvider(authenticationProvider())
@@ -74,7 +76,8 @@ public class SecurityConfig {
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "http://localhost:4173",
-        "http://127.0.0.1:4173"));
+        "http://127.0.0.1:4173",
+        "https://booking-home-stay-six.vercel.app"));
     configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
     configuration.setAllowedHeaders(List.of("*"));
     configuration.setAllowCredentials(true);
